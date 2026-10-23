@@ -1,0 +1,23 @@
+{
+  "name": "z-tienhiep",
+  "version": "3.0.0",
+  "description": "Bộ công cụ MOD, Hỗ trợ và Tự động hóa Web Game Vạn Kiếp Tu Tiên (Tối ưu cho Edge Mobile & Violentmonkey)",
+  "main": "dist/van-kiep-tu-tien-mod.user.js",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch"
+  },
+  "keywords": [
+    "van-kiep-tu-tien",
+    "userscript",
+    "violentmonkey",
+    "tampermonkey",
+    "mod",
+    "tu-tien"
+  ],
+  "author": "VKTT Team & Z-TienHiep",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.25.12"
+  }
+}
