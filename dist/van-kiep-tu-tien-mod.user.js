@@ -37,6 +37,19 @@
     }
     return out;
   }
+  function uniqueStrings(arr1, arr2) {
+    const seen = {};
+    const out = [];
+    const list = (arr1 || []).concat(arr2 || []);
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      if (item !== void 0 && item !== null && item !== "" && !seen[item]) {
+        seen[item] = true;
+        out.push(item);
+      }
+    }
+    return out;
+  }
   function getGameState() {
     try {
       if (gWin.game && gWin.game.store) {
@@ -56,12 +69,45 @@
       console.error("[VKTT Bridge] Error setting state:", e);
     }
   }
+  function persistGameSave(run) {
+    try {
+      if (gWin.game) {
+        const targetRun = run || gWin.game.store?.getState()?.run;
+        if (targetRun && typeof gWin.game.saveNow === "function") {
+          gWin.game.saveNow(targetRun);
+        } else if (targetRun && typeof gWin.game.scheduleSave === "function") {
+          gWin.game.scheduleSave(targetRun);
+        }
+      }
+    } catch (e) {
+      console.error("[VKTT Bridge] Error persisting run:", e);
+    }
+  }
+  function persistGameMeta(updater) {
+    try {
+      if (gWin.game && typeof gWin.game.ben === "function") {
+        gWin.game.ben((m) => {
+          updater(m);
+        });
+        return;
+      }
+      const store = gWin.game?.store;
+      if (store) {
+        const state = store.getState();
+        const meta = copyObj(state.meta || {});
+        updater(meta);
+        store.setState({ meta });
+      }
+    } catch (e) {
+      console.error("[VKTT Bridge] Error persisting meta:", e);
+    }
+  }
   function waitForGame(onReady) {
     const timer = setInterval(() => {
       try {
         if (gWin.game && gWin.game.store) {
           clearInterval(timer);
-          console.log("[VKTT MOD v3.0] K\u1EBFt n\u1ED1i th\xE0nh c\xF4ng t\u1EDBi Game Store!");
+          console.log("[VKTT MOD v3.0] K\u1EBFt n\u1ED1i th\xE0nh c\xF4ng t\u1EDBi Game Store & Engine!");
           onReady();
         }
       } catch (e) {
@@ -72,6 +118,10 @@
   // src/ui/styles.ts
   var MOD_STYLES = `
 /* ================= VKTT MOD v3.0 MOBILE-FIRST STYLES ================= */
+#vktt-drawer, #vktt-drawer *, #vktt-drawer *::before, #vktt-drawer *::after {
+  box-sizing: border-box;
+}
+
 @keyframes vktt-gold-pulse {
   0% { box-shadow: 0 0 0 0 rgba(229, 184, 105, 0.6); }
   70% { box-shadow: 0 0 0 10px rgba(229, 184, 105, 0); }
@@ -97,16 +147,16 @@
 #vktt-fab {
   position: fixed;
   bottom: 80px;
-  right: 18px;
-  width: 50px;
-  height: 50px;
+  right: 14px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, #e5b869 0%, #996515 100%);
   color: #0b0d14;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 900;
   cursor: pointer;
   z-index: 9999999;
@@ -148,11 +198,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 82vh;
-  max-height: 85vh;
-  background: linear-gradient(180deg, rgba(22, 27, 42, 0.98) 0%, rgba(11, 14, 22, 0.99) 100%);
+  width: 100%;
+  max-width: 100vw;
+  height: 84vh;
+  max-height: 86vh;
+  background: linear-gradient(180deg, rgba(20, 24, 38, 0.99) 0%, rgba(10, 13, 20, 0.99) 100%);
   border-top: 2px solid #e5b869;
-  border-radius: 20px 20px 0 0;
+  border-radius: 18px 18px 0 0;
   z-index: 9999999;
   display: flex;
   flex-direction: column;
@@ -163,6 +215,7 @@
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   -webkit-user-select: none;
+  overflow-x: hidden;
 }
 
 /* DESKTOP RESPONSIVE ADJUSTMENT */
@@ -171,8 +224,8 @@
     left: auto;
     right: 20px;
     bottom: 20px;
-    width: 440px;
-    height: 84vh;
+    width: 420px;
+    height: 85vh;
     border-radius: 16px;
     border: 1px solid #e5b869;
   }
@@ -185,28 +238,28 @@
 /* DRAG HANDLE */
 .vktt-drag-handle {
   width: 100%;
-  height: 20px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
-  padding-top: 6px;
+  padding-top: 4px;
 }
 
 .vktt-drag-bar {
-  width: 44px;
-  height: 5px;
-  border-radius: 4px;
+  width: 40px;
+  height: 4px;
+  border-radius: 3px;
   background: rgba(229, 184, 105, 0.4);
 }
 
 /* HEADER */
 .vktt-header {
-  padding: 8px 16px 12px 16px;
+  padding: 6px 14px 10px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(229, 184, 105, 0.25);
+  border-bottom: 1px solid rgba(229, 184, 105, 0.2);
 }
 
 .vktt-title-wrap {
@@ -216,15 +269,15 @@
 }
 
 .vktt-title {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 800;
   color: #e5b869;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .vktt-badge {
-  font-size: 10px;
-  padding: 2px 6px;
+  font-size: 9.5px;
+  padding: 2px 5px;
   background: rgba(229, 184, 105, 0.15);
   border: 1px solid rgba(229, 184, 105, 0.4);
   color: #e5b869;
@@ -236,10 +289,10 @@
   background: rgba(255, 255, 255, 0.08);
   border: none;
   color: #94a3b8;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -258,9 +311,9 @@
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  background: rgba(14, 17, 27, 0.95);
+  background: rgba(13, 16, 26, 0.98);
   border-bottom: 1px solid #1e2438;
-  padding: 4px 8px;
+  padding: 4px 6px;
   gap: 4px;
 }
 
@@ -270,19 +323,19 @@
 
 .vktt-tab-btn {
   flex: 0 0 auto;
-  padding: 8px 12px;
+  padding: 7px 11px;
   background: transparent;
   border: none;
   color: #94a3b8;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 7px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .vktt-tab-btn.active {
@@ -294,42 +347,124 @@
 /* CONTENT CONTAINER */
 .vktt-content {
   flex: 1;
+  width: 100%;
+  max-width: 100%;
   overflow-y: auto;
-  padding: 14px 16px;
+  overflow-x: hidden;
+  padding: 10px 12px;
   -webkit-overflow-scrolling: touch;
+}
+
+/* OVERVIEW STAT BOX */
+.vktt-stat-overview {
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, rgba(229, 184, 105, 0.1) 0%, rgba(168, 85, 247, 0.08) 100%);
+  border: 1px solid rgba(229, 184, 105, 0.25);
+  padding: 7px 10px;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 8px;
+  font-size: 11px;
+}
+
+.vktt-stat-overview div {
+  color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vktt-stat-overview b {
+  color: #f1f5f9;
 }
 
 /* CARD / SECTION */
 .vktt-card {
-  background: rgba(19, 23, 36, 0.85);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  background: rgba(18, 22, 34, 0.9);
   border: 1px solid #232a42;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
+  border-radius: 9px;
+  padding: 9px 10px;
+  margin-bottom: 8px;
 }
 
 .vktt-card-hdr {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
   color: #ffd88a;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* FORMS & INPUTS */
-.vktt-field {
-  margin-bottom: 10px;
+/* COMPACT RESPONSIVE ROW */
+.vktt-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+  width: 100%;
+  min-width: 0;
 }
 
-.vktt-field:last-child {
+.vktt-row:last-child {
   margin-bottom: 0;
+}
+
+.vktt-lbl {
+  width: 88px;
+  min-width: 80px;
+  color: #94a3b8;
+  font-size: 11.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vktt-inp {
+  flex: 1;
+  min-width: 0;
+  height: 33px;
+  background: #0f1320;
+  border: 1px solid #2d3652;
+  border-radius: 6px;
+  padding: 0 7px;
+  color: #f8fafc;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.vktt-inp:focus {
+  border-color: #e5b869;
+  box-shadow: 0 0 6px rgba(229, 184, 105, 0.2);
+}
+
+.vktt-select {
+  height: 33px;
+  background: #0f1320;
+  border: 1px solid #2d3652;
+  border-radius: 6px;
+  padding: 0 6px;
+  color: #f8fafc;
+  font-size: 12px;
+  outline: none;
+  min-width: 0;
+}
+
+.vktt-select:focus {
+  border-color: #e5b869;
 }
 
 .vktt-label {
   display: block;
-  font-size: 11.5px;
+  font-size: 11px;
   color: #94a3b8;
   margin-bottom: 4px;
   font-weight: 600;
@@ -337,65 +472,41 @@
 
 .vktt-input-group {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
-}
-
-.vktt-input {
-  flex: 1;
-  height: 38px;
-  background: #0f1320;
-  border: 1px solid #2d3652;
-  border-radius: 8px;
-  padding: 0 10px;
-  color: #f8fafc;
-  font-size: 13px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.vktt-input:focus {
-  border-color: #e5b869;
-  box-shadow: 0 0 8px rgba(229, 184, 105, 0.2);
-}
-
-.vktt-select {
-  height: 38px;
-  background: #0f1320;
-  border: 1px solid #2d3652;
-  border-radius: 8px;
-  padding: 0 10px;
-  color: #f8fafc;
-  font-size: 13px;
-  outline: none;
-}
-
-.vktt-select:focus {
-  border-color: #e5b869;
+  width: 100%;
+  min-width: 0;
 }
 
 /* BUTTONS */
 .vktt-btn {
-  height: 38px;
-  padding: 0 14px;
+  height: 33px;
+  padding: 0 11px;
   background: linear-gradient(135deg, #e5b869 0%, #b78438 100%);
   color: #0b0d14;
   border: none;
-  border-radius: 8px;
-  font-size: 12.5px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
+  flex-shrink: 0;
   transition: filter 0.15s, transform 0.1s;
 }
 
 .vktt-btn:active {
   transform: scale(0.96);
   filter: brightness(1.15);
+}
+
+.vktt-btn-sm {
+  height: 31px;
+  padding: 0 9px;
+  font-size: 11.5px;
 }
 
 .vktt-btn-block {
@@ -428,11 +539,75 @@
   border: 1px solid #334155;
 }
 
-/* GRID 2 COLUMNS */
+/* LINH CAN GRID */
+.vktt-linhcan-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 6px 0;
+  width: 100%;
+}
+
+.vktt-chk-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #131724;
+  padding: 5px 2px;
+  border-radius: 5px;
+  border: 1px solid #232a3f;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.vktt-chk-label input {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* STAT ROW WITH CHECKBOX */
+.vktt-stat-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 5px;
+  width: 100%;
+  min-width: 0;
+}
+
+.vktt-stat-row:last-child {
+  margin-bottom: 0;
+}
+
+.vktt-stat-chk-wrap {
+  width: 102px;
+  min-width: 92px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #cbd5e1;
+  font-weight: 600;
+  flex-shrink: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.vktt-stat-chk-wrap input {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* GRID 2 COLUMNS (FLEXIBLE) */
 .vktt-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
+  width: 100%;
 }
 
 /* SEARCH SUGGESTIONS */
@@ -443,11 +618,12 @@
   border-radius: 8px;
   background: #0f1320;
   margin-top: 6px;
+  width: 100%;
 }
 
 .vktt-dropdown-item {
-  padding: 8px 10px;
-  font-size: 12px;
+  padding: 7px 9px;
+  font-size: 11.5px;
   border-bottom: 1px solid #1a2033;
   cursor: pointer;
   display: flex;
@@ -461,8 +637,8 @@
 }
 
 .vktt-quality-tag {
-  font-size: 10px;
-  padding: 1px 5px;
+  font-size: 9.5px;
+  padding: 1px 4px;
   border-radius: 3px;
   font-weight: 700;
 }
@@ -663,8 +839,57 @@
       return false;
     }
     const nextNv = mergeObj(state.run.nhanVat, patchObj);
-    setGameState({ run: mergeObj(state.run, { nhanVat: nextNv }) });
+    const nextRun = mergeObj(state.run, { nhanVat: nextNv });
+    setGameState({ run: nextRun });
+    persistGameSave(nextRun);
     return true;
+  }
+  function updateChiSo(k, v) {
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) {
+      notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return;
+    }
+    const cs = copyObj(state.run.nhanVat.chiSo || {});
+    cs[k] = v;
+    updateNhanVat({ chiSo: cs });
+  }
+  function updateBatchChiSo(statsObj) {
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) {
+      notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return;
+    }
+    const cs = copyObj(state.run.nhanVat.chiSo || {});
+    for (const k in statsObj) {
+      cs[k] = statsObj[k];
+    }
+    updateNhanVat({ chiSo: cs });
+  }
+  function updateTongMon(congTich, capBac) {
+    const state = getGameState();
+    if (!state || !state.run) {
+      notify("\u26A0\uFE0F H\xE3y v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return;
+    }
+    const run = copyObj(state.run);
+    function recursiveAddCongTich(obj) {
+      if (!obj || typeof obj !== "object") return;
+      if (Object.prototype.hasOwnProperty.call(obj, "congTich") && typeof obj.congTich === "number") {
+        obj.congTich = congTich;
+      }
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] === "object" && obj[key] !== null) {
+          recursiveAddCongTich(obj[key]);
+        }
+      }
+    }
+    recursiveAddCongTich(run);
+    const tmPatch = { congTich };
+    if (capBac !== void 0) tmPatch.capBac = capBac;
+    run.tongMon = mergeObj(run.tongMon || { slot: "slot.1115", congTich: 5e3 }, tmPatch);
+    setGameState({ run });
+    persistGameSave(run);
   }
   function buildSyncedXepTui(oldXep, tuiDo) {
     const out = [];
@@ -700,7 +925,7 @@
       nhanVat.tuiDo = tuiDo;
       nhanVat.oTuiThem = Math.max(nhanVat.oTuiThem || 0, 150);
       nhanVat.xepTui = buildSyncedXepTui(nhanVat.xepTui, tuiDo);
-      setGameState({ run: mergeObj(state.run, { nhanVat }) });
+      updateNhanVat(nhanVat);
       const info = getItemInfo(cleanId);
       notify(`\u{1F381} \u0110\xE3 th\xEAm +${count} [${info.name}] v\xE0o t\xFAi \u0111\u1ED3!`);
     } catch (e) {
@@ -734,7 +959,7 @@
       che_phu: "item.phu_but_tien",
       luyen_bao: "item.khi_lo_tien"
     });
-    setGameState({ run: mergeObj(state.run, { nhanVat }) });
+    updateNhanVat(nhanVat);
     notify("\u{1F451} \u0110\xE3 k\xEDch ho\u1EA1t G\xD3I TH\u1EA6N \u0110\u1EA0O v3.0 (Trang b\u1ECB c\u1EF1c ph\u1EA9m Ph\u1EA9m 8-9 + 99 Th\u1EA7n D\u01B0\u1EE3c)!");
   }
   function unlockAllProfessions() {
@@ -742,16 +967,13 @@
     if (!state || !state.run || !state.run.nhanVat) {
       return notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
     }
-    const ngheNghiep = {
-      luyen_dan: { cap: 5, kinhNghiem: 1e4 },
-      luyen_khi: { cap: 5, kinhNghiem: 1e4 },
-      che_phu: { cap: 5, kinhNghiem: 1e4 },
-      tran_phap: { cap: 5, kinhNghiem: 1e4 },
-      ngu_thu: { cap: 5, kinhNghiem: 1e4 },
-      khoi_loi: { cap: 5, kinhNghiem: 1e4 }
+    const nghe = {
+      luyen_dan: { bac: 4, kinhNghiem: 9999 },
+      che_phu: { bac: 4, kinhNghiem: 9999 },
+      luyen_bao: { bac: 4, kinhNghiem: 9999 }
     };
-    updateNhanVat({ ngheNghiep });
-    notify("\u{1F4DC} \u0110\xE3 th\xF4ng tu\u1EC7 TO\xC0N B\u1ED8 NGH\u1EC0 NGHI\u1EC6P C\u1EA4P 5 (T\xF4ng S\u01B0)!");
+    updateNhanVat({ nghe });
+    notify("\u{1F4DC} \u0110\xE3 l\xEAn T\xF4ng S\u01B0 3 Ngh\u1EC1 (Luy\u1EC7n \u0110an, Ch\u1EBF Ph\xF9, Luy\u1EC7n Kh\xED)!");
   }
   function unlockAllRecipes() {
     const state = getGameState();
@@ -759,11 +981,8 @@
       return notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
     }
     const nhanVat = copyObj(state.run.nhanVat);
-    const dp = copyObj(nhanVat.danPhuong || {});
-    for (const r of ALL_RECIPES) {
-      dp[r] = true;
-    }
-    updateNhanVat({ danPhuong: dp });
+    const updatedDonPhuong = uniqueStrings(nhanVat.donPhuong || [], ALL_RECIPES);
+    updateNhanVat({ donPhuong: updatedDonPhuong });
     notify(`\u{1F525} \u0110\xE3 l\u0129nh ng\u1ED9 to\xE0n b\u1ED9 ${ALL_RECIPES.length} \u0110AN PH\u01AF\u01A0NG & \u0110\u1ED2 PH\u1ED4!`);
   }
   function unlockAllSkills() {
@@ -772,98 +991,256 @@
       return notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
     }
     const nhanVat = copyObj(state.run.nhanVat);
-    const kp = copyObj(nhanVat.kyPhap || {});
-    for (const s of ALL_TOP_SKILLS) {
-      kp[s] = { cap: 10, tang: 10 };
+    const oldKm = copyObj(nhanVat.kinhMach || {});
+    oldKm.daLinhNgo = uniqueStrings(oldKm.daLinhNgo || [], ALL_TOP_SKILLS);
+    updateNhanVat({ kinhMach: oldKm });
+    notify(`\u26A1 \u0110\xE3 th\xF4ng th\u1EA1o ${ALL_TOP_SKILLS.length} C\xD4NG PH\xC1P & K\u1EF8 N\u0102NG C\u1EF0C PH\u1EA8M!`);
+  }
+  function parseKhuonFallback(khuonStr) {
+    const rawLines = khuonStr.replace(/^\s+|\s+$/g, "").split("\n");
+    const lines = [];
+    for (let i = 0; i < rawLines.length; i++) {
+      const rowStr = rawLines[i].replace(/^\s+|\s+$/g, "");
+      if (rowStr.length > 0) lines.push(rowStr.split(/\s+/));
     }
-    updateNhanVat({ kyPhap: kp });
-    notify(`\u26A1 \u0110\xE3 th\xF4ng th\u1EA1o ${ALL_TOP_SKILLS.length} C\xD4NG PH\xC1P & K\u1EF8 N\u0102NG \u0110\u1EA0I TH\xC0NH!`);
+    const rong = lines[0] ? lines[0].length : 11;
+    const cao = lines.length;
+    const vung = [];
+    for (let r = 0; r < cao; r++) {
+      for (let c = 0; c < rong; c++) {
+        const ch = lines[r][c];
+        if (ch === "D") vung.push(0);
+        else if (ch === ".") vung.push(-1);
+        else if (/^[0-5]$/.test(ch)) vung.push(Number(ch));
+        else if (/^[a-f]$/.test(ch)) vung.push(ch.charCodeAt(0) - 97);
+        else vung.push(-1);
+      }
+    }
+    return { rong, cao, vung };
   }
   function unlockAllMeridians() {
     const state = getGameState();
     if (!state || !state.run || !state.run.nhanVat) {
       return notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
     }
-    const nv = state.run.nhanVat;
-    const tcKey = nv.theChat || "the_chat.pham_the";
-    const tcData = THE_CHAT_DB[tcKey] || THE_CHAT_DB["the_chat.pham_the"];
-    const rawLines = tcData.khuon.trim().split("\n");
-    const lines = [];
-    for (const r of rawLines) {
-      const s = r.trim();
-      if (s.length > 0) lines.push(s.split(/\s+/));
+    const nv = copyObj(state.run.nhanVat);
+    const oldKm = copyObj(nv.kinhMach || {});
+    const trangThai = [];
+    if (oldKm.trangThai && oldKm.trangThai.length) {
+      for (let i = 0; i < oldKm.trangThai.length; i++) trangThai.push("thong");
     }
-    const vung = [];
-    for (let r = 0; r < lines.length; r++) {
-      for (let c = 0; c < lines[r].length; c++) {
-        const ch = lines[r][c];
-        if (ch === ".") vung.push(-1);
-        else if (ch === "D") vung.push(0);
-        else vung.push(1);
-      }
+    const mau = oldKm.mau ? [...oldKm.mau] : [];
+    const heList = nv.linhCan && nv.linhCan.he && nv.linhCan.he.length ? nv.linhCan.he : ["kim"];
+    for (let j = 0; j < mau.length; j++) {
+      if (mau[j] === "vo_sac") mau[j] = heList[j % heList.length];
     }
-    const allHuyet = [];
-    for (let i = 0; i < vung.length; i++) {
-      if (vung[i] === 1) allHuyet.push(i);
-    }
-    const km = copyObj(nv.kinhMach || {});
-    km.huyetThem = allHuyet;
-    km.daKhaiThong = true;
-    updateNhanVat({ kinhMach: km });
-    notify(`\u{1F300} \u0110\xE3 \u0111\xE3 th\xF4ng TO\xC0N B\u1ED8 ${allHuyet.length} HUY\u1EC6T \u0110\u1EA0O KINH M\u1EA0CH (100% An To\xE0n)!`);
+    oldKm.mau = mau;
+    oldKm.trangThai = trangThai;
+    oldKm.daLinhNgo = uniqueStrings(oldKm.daLinhNgo || [], ALL_TOP_SKILLS);
+    oldKm.cho = { mo: 99, doiMau: 99 };
+    nv.kinhMach = oldKm;
+    updateNhanVat(nv);
+    notify("\u{1F300} \u0110\xE3 m\u1EDF th\xF4ng to\xE0n b\u1ED9 Kinh M\u1EA1ch (99 L\u01B0\u1EE3t) & l\u0129nh ng\u1ED9 87 K\u1EF9 Ph\xE1p!");
   }
-  function setRealm(canhGioiIndex) {
-    const REALM_MAP = {
-      1: { ten: "Luy\u1EC7n Kh\xED", tuViMax: 100 },
-      2: { ten: "Tr\xFAc C\u01A1", tuViMax: 500 },
-      3: { ten: "Kim \u0110an", tuViMax: 2e3 },
-      4: { ten: "Nguy\xEAn Anh", tuViMax: 8e3 },
-      5: { ten: "H\xF3a Th\u1EA7n", tuViMax: 25e3 },
-      6: { ten: "Luy\u1EC7n H\u01B0", tuViMax: 8e4 },
-      7: { ten: "H\u1EE3p Th\u1EC3", tuViMax: 25e4 },
-      8: { ten: "\u0110\u1EA1i Th\u1EEBa", tuViMax: 8e5 },
-      9: { ten: "\u0110\u1ED9 Ki\u1EBFp", tuViMax: 3e6 }
+  function setRealm(canhGioiIndex, tieuCanhGioiIndex = 3) {
+    const cg = Math.max(0, Math.min(5, Math.floor(canhGioiIndex)));
+    const tcg = Math.max(0, Math.min(3, Math.floor(tieuCanhGioiIndex)));
+    const REALM_NAMES = {
+      0: "Ph\xE0m Nh\xE2n",
+      1: "Luy\u1EC7n Kh\xED",
+      2: "Tr\xFAc C\u01A1",
+      3: "K\u1EBFt \u0110an",
+      4: "Nguy\xEAn Anh",
+      5: "H\xF3a Th\u1EA7n"
     };
-    const target = REALM_MAP[canhGioiIndex] || REALM_MAP[9];
+    const SUB_REALM_NAMES = {
+      0: "S\u01A1 k\u1EF3",
+      1: "Trung k\u1EF3",
+      2: "H\u1EADu k\u1EF3",
+      3: "\u0110\u1EA1i vi\xEAn m\xE3n"
+    };
+    updateNhanVat({
+      canhGioi: cg,
+      tieuCanhGioi: tcg,
+      binhCanh: 0
+    });
+    notify(`\u{1F4C8} \u0110\xE3 chuy\u1EC3n C\u1EA3nh Gi\u1EDBi: ${REALM_NAMES[cg]} - ${SUB_REALM_NAMES[tcg]} (X\xF3a b\xECnh c\u1EA3nh)!`);
+  }
+  function setExtraRealm(kimDan, yCanh, diTuong, tucTue) {
     const patch = {
-      canhGioi: { cap: canhGioiIndex, tang: 9, ten: target.ten },
-      tuVi: target.tuViMax,
-      tuViMax: target.tuViMax,
-      kimDan: { pham: 9, ten: "C\u1EEDu Chuy\u1EC3n C\u1EF1c Ph\u1EA9m Kim \u0110an" },
-      yCanh: { cap: 10, ten: "Vi\xEAn M\xE3n Ki\u1EBFm \xDD" },
-      diTuong: "H\u1ED7n \u0110\u1ED9n S\u01A1 Khai"
+      kimDan: Math.max(1, Math.min(5, kimDan || 1)),
+      yCanh: yCanh || "Ki\u1EBFm \xFD",
+      diTuong: diTuong || "kim"
     };
+    if (tucTue !== void 0 && !isNaN(tucTue)) {
+      patch.tucTue = tucTue;
+    }
     updateNhanVat(patch);
-    notify(`\u{1F31F} \u0110\xE3 \u0111\u1ED9t ph\xE1 t\u1EDBi C\u1EA2NH GI\u1EDAI: ${target.ten} \u0110\u1EC9nh Phong (C\u1EEDu Chuy\u1EC3n Kim \u0110an)!`);
+    notify(`\u2728 \u0110\xE3 l\u01B0u Kim \u0110an Ph\u1EA9m ${patch.kimDan}, ${patch.yCanh}, D\u1ECB T\u01B0\u1EE3ng (${patch.diTuong})!`);
   }
   function setPhysique(theChatKey) {
-    const tc = THE_CHAT_DB[theChatKey];
-    if (!tc) return;
-    const patch = {
-      theChat: theChatKey,
-      linhCan: {
-        loai: "thien_linh_can",
-        ngu_hanh: ["kim", "moc", "thuy", "hoa", "tho"],
-        do_tinh_thuan: 100
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) {
+      notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return;
+    }
+    const content = state.content;
+    const updatedNhanVat = copyObj(state.run.nhanVat);
+    const oldKm = copyObj(updatedNhanVat.kinhMach || {});
+    updatedNhanVat.theChat = theChatKey;
+    try {
+      let tcData = null;
+      if (content && content.theChat) {
+        tcData = typeof content.theChat.get === "function" ? content.theChat.get(theChatKey) : content.theChat[theChatKey];
       }
-    };
-    updateNhanVat(patch);
-    unlockAllMeridians();
-    notify(`\u{1F525} \u0110\xE3 t\xE1i t\u1EA1o Th\u1EC3 Ch\u1EA5t: [${tc.ten}] & Thi\xEAn Linh C\u0103n Ng\u0169 H\xE0nh!`);
+      let vungArr = [];
+      let rong = 11, cao = 11;
+      if (tcData) {
+        const tcBase = typeof gWin.Kg === "function" ? gWin.Kg(tcData) : tcData;
+        vungArr = tcBase.vung || tcData.vung || [];
+        rong = tcBase.rong || tcData.rong || 11;
+        cao = tcBase.cao || tcData.cao || 11;
+        if (tcBase.thienPhu || tcData.thienPhu) {
+          updatedNhanVat.thienPhuTheChat = tcBase.thienPhu || tcData.thienPhu;
+        }
+      }
+      if (!vungArr.length && THE_CHAT_DB[theChatKey]) {
+        const fb = parseKhuonFallback(THE_CHAT_DB[theChatKey].khuon);
+        vungArr = fb.vung;
+        rong = fb.rong;
+        cao = fb.cao;
+      }
+      if (vungArr.length) {
+        const heList = updatedNhanVat.linhCan && updatedNhanVat.linhCan.he && updatedNhanVat.linhCan.he.length ? updatedNhanVat.linhCan.he : ["vo_sac"];
+        const newTrangThai = [];
+        const newMau = [];
+        for (let i = 0; i < vungArr.length; i++) {
+          newTrangThai.push("thong");
+          newMau.push(vungArr[i] < 0 ? "vo_sac" : heList[i % heList.length]);
+        }
+        const keptManh = [];
+        if (oldKm.manh && oldKm.manh.length) {
+          for (let mi = 0; mi < oldKm.manh.length; mi++) {
+            const m = oldKm.manh[mi];
+            if (m.x < rong && m.y < cao) keptManh.push(m);
+          }
+        }
+        const keptSkills = uniqueStrings(oldKm.daLinhNgo || [], ALL_TOP_SKILLS);
+        updatedNhanVat.kinhMach = {
+          mau: newMau,
+          trangThai: newTrangThai,
+          huyetThem: oldKm.huyetThem || [],
+          manh: keptManh,
+          daLinhNgo: keptSkills,
+          cho: { mo: 99, doiMau: 99 }
+        };
+      }
+    } catch (err) {
+      console.error("L\u1ED7i khi thi\u1EBFt l\u1EADp th\u1EC3 ch\u1EA5t:", err);
+    }
+    updateNhanVat(updatedNhanVat);
+    const tcName = THE_CHAT_DB[theChatKey]?.ten || theChatKey;
+    notify(`\u{1F9EC} \u0110\xE3 g\xE1n [${tcName}], th\xF4ng to\xE0n b\u1ED9 Kinh M\u1EA1ch & b\u1EA3o to\xE0n K\u1EF9 Ph\xE1p!`);
+  }
+  function setLinhCan(selectedHe) {
+    if (!selectedHe || selectedHe.length === 0) {
+      notify("\u26A0\uFE0F Ch\u1ECDn \xEDt nh\u1EA5t 1 h\u1EC7 Linh C\u0103n!");
+      return;
+    }
+    let isBienDi = false;
+    for (const h of selectedHe) {
+      if (h === "bang" || h === "phong" || h === "loi") isBienDi = true;
+    }
+    let pham = "tap", tuLuyen = 1, dotPha = 0;
+    if (isBienDi) {
+      pham = "bien_di";
+      tuLuyen = 1.2;
+      dotPha = 0.05;
+    } else if (selectedHe.length === 1) {
+      pham = "thien";
+      tuLuyen = 1.3;
+      dotPha = 0.1;
+    } else if (selectedHe.length === 2) {
+      pham = "song";
+      tuLuyen = 1;
+    } else {
+      pham = "tap";
+      tuLuyen = 0.8;
+      dotPha = -0.05;
+    }
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) {
+      notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return;
+    }
+    const nv = copyObj(state.run.nhanVat);
+    if (nv.kinhMach && nv.kinhMach.mau) {
+      const km = copyObj(nv.kinhMach);
+      const newMau = [];
+      for (let mi = 0; mi < km.mau.length; mi++) {
+        newMau.push(km.mau[mi] === "vo_sac" ? "vo_sac" : selectedHe[mi % selectedHe.length]);
+      }
+      km.mau = newMau;
+      nv.kinhMach = km;
+    }
+    nv.linhCan = mergeObj(nv.linhCan || {}, {
+      pham,
+      he: selectedHe,
+      isBienDi,
+      tuLuyen,
+      dotPha
+    });
+    updateNhanVat(nv);
+    notify(`\u{1F331} \u0110\xE3 g\xE1n Linh C\u0103n ${pham.toUpperCase()} (${selectedHe.join(", ")}) & \u0111\u1ED3ng b\u1ED9 m\xE0u m\u1EA1ch!`);
+  }
+  function resetLinhCan() {
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) return;
+    const nv = copyObj(state.run.nhanVat);
+    nv.linhCan = mergeObj(nv.linhCan || {}, {
+      pham: "vo",
+      he: [],
+      isBienDi: false,
+      tuLuyen: 0.5,
+      dotPha: 0
+    });
+    updateNhanVat(nv);
+    notify("\u{1F331} \u0110\xE3 g\u1EE1 v\u1EC1 V\xF4 Linh C\u0103n!");
+  }
+  function updateMetaLuanHoi(diem, kiep) {
+    persistGameMeta((meta) => {
+      meta.diemLuanHoi = diem;
+      meta.diemTong = Math.max(meta.diemTong || 0, diem);
+      if (kiep !== void 0) {
+        meta.kiep = kiep;
+      }
+    });
+    if (kiep !== void 0) {
+      const state = getGameState();
+      if (state?.run) {
+        const run = copyObj(state.run);
+        run.kiep = kiep;
+        setGameState({ run });
+        persistGameSave(run);
+      }
+    }
+    notify(`\u{1F30C} \u0110\xE3 g\xE1n \u0110i\u1EC3m Lu\xE2n H\u1ED3i = ${diem.toLocaleString()}${kiep !== void 0 ? `, S\u1ED1 Ki\u1EBFp = ${kiep}` : ""}!`);
   }
   function unlockAllAchievementsAndFerrymen() {
     const state = getGameState();
     if (!state) return notify("\u26A0\uFE0F Ch\u01B0a k\u1EBFt n\u1ED1i \u0111\u01B0\u1EE3c game store!");
-    const profile = copyObj(state.profile || {});
-    const moKhoa = copyObj(profile.moKhoa || {});
-    for (const m of MO_KHOA_DATA) moKhoa[m] = true;
-    const tt = copyObj(profile.thanhTuu || {});
-    for (const a of ALL_THANH_TUU) tt[a] = true;
-    profile.moKhoa = moKhoa;
-    profile.thanhTuu = tt;
-    profile.luanHoi = Math.max(profile.luanHoi || 0, 999);
-    setGameState({ profile });
-    notify(`\u{1F3C6} \u0110\xE3 m\u1EDF kh\xF3a ${MO_KHOA_DATA.length} L\xC3O \u0110\xD2 v\xE0 ${ALL_THANH_TUU.length} TH\xC0NH T\u1EF0U!`);
+    persistGameMeta((meta) => {
+      meta.diemLuanHoi = 999999;
+      meta.diemTong = Math.max(meta.diemTong || 0, 999999);
+      const moKhoa = copyObj(meta.moKhoa || {});
+      for (const m of MO_KHOA_DATA) {
+        moKhoa[m.id] = m.max;
+      }
+      meta.moKhoa = moKhoa;
+      const ttIds = ALL_THANH_TUU.map((a) => a.id);
+      meta.tienLo = mergeObj(meta.tienLo || {}, { thanhTuu: ttIds });
+    });
+    notify(`\u{1F3C6} \u0110\xE3 Max 999,999 \u0110i\u1EC3m Lu\xE2n H\u1ED3i + M\u1EDF Kh\xF3a 17 L\xE3o \u0110\xF2 & 28 Th\xE0nh T\u1EF1u!`);
   }
 
   // src/modules/automation.ts
@@ -1105,6 +1482,8 @@
     function openDrawer() {
       drawer.classList.add("open");
       backdrop.classList.add("open");
+      const activeTab = drawer.querySelector(".vktt-tab-btn.active")?.getAttribute("data-tab") || "tab-nhan-vat";
+      renderTabContent(activeTab);
     }
     function closeDrawer() {
       drawer.classList.remove("open");
@@ -1146,7 +1525,7 @@
       const deltaY = startY - currentY;
       if (Math.abs(deltaY) > 8) {
         isDragging = true;
-        const newBottom = Math.max(30, Math.min(window.innerHeight - 80, initialBottom + deltaY));
+        const newBottom = Math.max(20, Math.min(window.innerHeight - 70, initialBottom + deltaY));
         fab.style.bottom = `${newBottom}px`;
       }
     }, { passive: true });
@@ -1155,6 +1534,14 @@
         initialBottom = parseInt(fab.style.bottom || "80", 10);
       }
     });
+  }
+  function readInputOrPlaceholder(id, fallbackVal) {
+    const el = document.getElementById(id);
+    if (!el) return fallbackVal;
+    const v = parseInt(el.value, 10);
+    if (!isNaN(v)) return v;
+    const p = parseInt(el.placeholder, 10);
+    return !isNaN(p) ? p : fallbackVal;
   }
   function renderTabContent(tabId) {
     const container = document.getElementById("vktt-tab-content");
@@ -1177,108 +1564,262 @@
     }
   }
   function getTabNhanVatHtml() {
+    const state = getGameState();
+    const nv = state?.run?.nhanVat || {};
+    const meta = state?.meta || {};
+    const cs = nv.chiSo || {};
+    const REALM_NAMES = {
+      0: "Ph\xE0m Nh\xE2n",
+      1: "Luy\u1EC7n Kh\xED",
+      2: "Tr\xFAc C\u01A1",
+      3: "K\u1EBFt \u0110an",
+      4: "Nguy\xEAn Anh",
+      5: "H\xF3a Th\u1EA7n"
+    };
+    const SUB_NAMES = {
+      0: "S\u01A1 k\u1EF3",
+      1: "Trung k\u1EF3",
+      2: "H\u1EADu k\u1EF3",
+      3: "\u0110\u1EA1i vi\xEAn m\xE3n"
+    };
+    const realmStr = `${REALM_NAMES[nv.canhGioi] || "Ch\u01B0a r\xF5"} (${SUB_NAMES[nv.tieuCanhGioi] || "0"})`;
+    const tcName = THE_CHAT_DB[nv.theChat]?.ten || nv.theChat || "Ph\xE0m th\u1EC3";
+    const lcPham = (nv.linhCan?.pham || "Ch\u01B0a c\xF3").toUpperCase();
+    const lcHe = nv.linhCan?.he && nv.linhCan.he.length ? nv.linhCan.he.join("/") : "V\xF4";
+    const congTichVal = state?.run?.tongMon?.congTich ?? 0;
     return `
+    <!-- B\u1EA2NG T\u1ED4NG QUAN CH\u1EC8 S\u1ED0 NH\xC2N V\u1EACT HI\u1EC6N T\u1EA0I -->
+    <div class="vktt-stat-overview">
+      <div>\u{1F48E} Linh Th\u1EA1ch: <b>${(nv.linhThach || 0).toLocaleString()}</b></div>
+      <div>\u2728 Tu Vi: <b>${Math.floor(nv.tuVi || 0).toLocaleString()}</b></div>
+      <div>\u26A1 C\u1EA3nh Gi\u1EDBi: <b style="color:#e5b869;">${realmStr}</b></div>
+      <div>\u23F3 Tu\u1ED5i: <b>${Math.floor(nv.tuoi || 18)}</b></div>
+      <div>\u{1F4DC} C\u1ED1ng Hi\u1EBFn: <b>${(nv.congHien || 0).toLocaleString()}</b></div>
+      <div>\u{1F3DB}\uFE0F C\xF4ng T\xEDch: <b style="color:#38bdf8;">${congTichVal.toLocaleString()}</b></div>
+      <div style="grid-column: span 2;">\u{1F9EC} Th\u1EC3 Ch\u1EA5t: <b style="color:#e5b869;">${tcName}</b></div>
+      <div style="grid-column: span 2;">\u{1F331} Linh C\u0103n: <b style="color:#38bdf8;">${lcPham} (${lcHe})</b></div>
+    </div>
+
+    <!-- N\xDAT BUFF NHANH TO\xC0N DI\u1EC6N -->
+    <div style="display:flex;gap:6px;margin-bottom:8px;">
+      <button id="vktt-btn-all-in-one" class="vktt-btn" style="flex:1;">\u{1F680} Si\xEAu Buff To\xE0n Di\u1EC7n 1-Click</button>
+      <button id="vktt-btn-clear-binh-canh" class="vktt-btn vktt-btn-cyan">\u{1F48A} X\xF3a B\xECnh C\u1EA3nh</button>
+    </div>
+
+    <!-- KH\u1ED0I 1: T\xC0I NGUY\xCAN & M\xD4N PH\xC1I -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">\u{1F48E} T\xE0i Nguy\xEAn C\u01A1 B\u1EA3n</div>
-      <div class="vktt-field">
-        <label class="vktt-label">\u0110\u1EA1o Hi\u1EC7u</label>
-        <div class="vktt-input-group">
-          <input type="text" id="vktt-inp-ten" class="vktt-input" placeholder="Nh\u1EADp \u0111\u1EA1o hi\u1EC7u m\u1EDBi..." />
-          <button id="vktt-btn-ten" class="vktt-btn">\u0110\u1ED5i</button>
-        </div>
+      <div class="vktt-card-hdr">\u{1F4B0} 1. T\xE0i Nguy\xEAn, Tu\u1ED5i Th\u1ECD & M\xF4n Ph\xE1i</div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">\u0110\u1EA1o Hi\u1EC7u:</span>
+        <input type="text" id="vktt-inp-ten" class="vktt-inp" placeholder="${nv.ten || "\u0110\u1EA1o H\u1EEFu"}" />
+        <button id="vktt-btn-ten" class="vktt-btn vktt-btn-sm">\u0110\u1ED5i</button>
       </div>
-      <div class="vktt-grid-2">
-        <div class="vktt-field">
-          <label class="vktt-label">Linh Th\u1EA1ch</label>
-          <div class="vktt-input-group">
-            <input type="number" id="vktt-inp-lt" class="vktt-input" placeholder="999999" />
-            <button id="vktt-btn-lt" class="vktt-btn">G\xE1n</button>
-          </div>
-        </div>
-        <div class="vktt-field">
-          <label class="vktt-label">Tu Vi</label>
-          <div class="vktt-input-group">
-            <input type="number" id="vktt-inp-tv" class="vktt-input" placeholder="999999" />
-            <button id="vktt-btn-tv" class="vktt-btn">G\xE1n</button>
-          </div>
-        </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">Linh Th\u1EA1ch:</span>
+        <input type="number" id="vktt-inp-lt" class="vktt-inp" placeholder="${nv.linhThach || 999999}" />
+        <button id="vktt-btn-lt" class="vktt-btn vktt-btn-sm">G\xE1n</button>
       </div>
-      <div class="vktt-grid-2">
-        <div class="vktt-field">
-          <label class="vktt-label">Th\u1ECD Nguy\xEAn Th\xEAm (N\u0103m)</label>
-          <div class="vktt-input-group">
-            <input type="number" id="vktt-inp-tnt" class="vktt-input" placeholder="5000" />
-            <button id="vktt-btn-tnt" class="vktt-btn">G\xE1n</button>
-          </div>
-        </div>
-        <div class="vktt-field">
-          <label class="vktt-label">Tu\u1ED5i</label>
-          <div class="vktt-input-group">
-            <input type="number" id="vktt-inp-tuoi" class="vktt-input" placeholder="18" />
-            <button id="vktt-btn-tuoi" class="vktt-btn">G\xE1n</button>
-          </div>
-        </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">Tu Vi:</span>
+        <input type="number" id="vktt-inp-tv" class="vktt-inp" placeholder="${Math.floor(nv.tuVi || 999999)}" />
+        <button id="vktt-btn-tv" class="vktt-btn vktt-btn-sm">G\xE1n</button>
       </div>
-      <div class="vktt-grid-2">
-        <div class="vktt-field">
-          <label class="vktt-label">C\u1ED1ng Hi\u1EBFn M\xF4n Ph\xE1i</label>
-          <div class="vktt-input-group">
-            <input type="number" id="vktt-inp-ch" class="vktt-input" placeholder="99999" />
-            <button id="vktt-btn-ch" class="vktt-btn">G\xE1n</button>
-          </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">Th\u1ECD Nguy\xEAn+:</span>
+        <input type="number" id="vktt-inp-tnt" class="vktt-inp" placeholder="${nv.thoNguyenThem || 5e3}" />
+        <button id="vktt-btn-tnt" class="vktt-btn vktt-btn-sm">G\xE1n</button>
+      </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">Tu\u1ED5i:</span>
+        <input type="number" id="vktt-inp-tuoi" class="vktt-inp" placeholder="${Math.floor(nv.tuoi || 18)}" />
+        <button id="vktt-btn-tuoi" class="vktt-btn vktt-btn-sm">G\xE1n</button>
+      </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">C\u1ED1ng Hi\u1EBFn:</span>
+        <input type="number" id="vktt-inp-ch" class="vktt-inp" placeholder="${nv.congHien || 99999}" />
+        <button id="vktt-btn-ch" class="vktt-btn vktt-btn-sm">G\xE1n</button>
+      </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">C\xF4ng T\xEDch:</span>
+        <input type="number" id="vktt-inp-ct" class="vktt-inp" placeholder="${congTichVal || 99999}" />
+        <button id="vktt-btn-ct" class="vktt-btn vktt-btn-sm">G\xE1n</button>
+      </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">Ch\u1EE9c V\u1ECB Ph\xE1i:</span>
+        <select id="vktt-sel-capbac" class="vktt-select" style="flex:1;">
+          <option value="0">0 - Ngo\u1EA1i M\xF4n / T\xE1n Tu</option>
+          <option value="1">1 - \u0110\u1EC7 T\u1EED N\u1ED9i M\xF4n</option>
+          <option value="2">2 - Ch\xE2n Truy\u1EC1n \u0110\u1EC7 T\u1EED</option>
+          <option value="3">3 - Ch\u1EA5p S\u1EF1 / \u0110\u01B0\u1EDDng Ch\u1EE7</option>
+          <option value="4" selected>4 - Tr\u01B0\u1EDFng L\xE3o</option>
+          <option value="5">5 - Th\xE1i Th\u01B0\u1EE3ng Tr\u01B0\u1EDFng L\xE3o</option>
+        </select>
+        <button id="vktt-btn-capbac" class="vktt-btn vktt-btn-sm">G\xE1n</button>
+      </div>
+    </div>
+
+    <!-- KH\u1ED0I 2: C\u1EA2NH GI\u1EDAI, KIM \u0110AN, \xDD C\u1EA2NH & D\u1ECA T\u01AF\u1EE2NG -->
+    <div class="vktt-card">
+      <div class="vktt-card-hdr">\u{1F31F} 2. C\u1EA3nh Gi\u1EDBi & \u0110\u1ED9t Ph\xE1</div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">\u0110\u1EA1i C\u1EA3nh Gi\u1EDBi:</span>
+        <select id="vktt-sel-cg" class="vktt-select" style="flex:1;">
+          <option value="5" ${nv.canhGioi === 5 ? "selected" : ""}>5 - H\xF3a Th\u1EA7n</option>
+          <option value="4" ${nv.canhGioi === 4 ? "selected" : ""}>4 - Nguy\xEAn Anh</option>
+          <option value="3" ${nv.canhGioi === 3 ? "selected" : ""}>3 - K\u1EBFt \u0110an (Kim \u0110an)</option>
+          <option value="2" ${nv.canhGioi === 2 ? "selected" : ""}>2 - Tr\xFAc C\u01A1</option>
+          <option value="1" ${nv.canhGioi === 1 ? "selected" : ""}>1 - Luy\u1EC7n Kh\xED</option>
+          <option value="0" ${nv.canhGioi === 0 ? "selected" : ""}>0 - Ph\xE0m Nh\xE2n</option>
+        </select>
+      </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">Ti\u1EC3u C\u1EA3nh Gi\u1EDBi:</span>
+        <select id="vktt-sel-tcg" class="vktt-select" style="flex:1;">
+          <option value="3" ${nv.tieuCanhGioi === 3 ? "selected" : ""}>3 - \u0110\u1EA1i vi\xEAn m\xE3n</option>
+          <option value="2" ${nv.tieuCanhGioi === 2 ? "selected" : ""}>2 - H\u1EADu k\u1EF3</option>
+          <option value="1" ${nv.tieuCanhGioi === 1 ? "selected" : ""}>1 - Trung k\u1EF3</option>
+          <option value="0" ${nv.tieuCanhGioi === 0 ? "selected" : ""}>0 - S\u01A1 k\u1EF3</option>
+        </select>
+        <button id="vktt-btn-cg" class="vktt-btn vktt-btn-cyan vktt-btn-sm">\u0110\u1ED9t Ph\xE1</button>
+      </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">Kim \u0110an / \xDD:</span>
+        <select id="vktt-sel-kimdan" class="vktt-select" style="flex:1;">
+          <option value="1" ${nv.kimDan === 1 ? "selected" : ""}>Kim \u0110an Nh\u1EA5t Ph\u1EA9m</option>
+          <option value="2" ${nv.kimDan === 2 ? "selected" : ""}>Nh\u1ECB Ph\u1EA9m</option>
+          <option value="3" ${nv.kimDan === 3 ? "selected" : ""}>Tam Ph\u1EA9m</option>
+          <option value="4" ${nv.kimDan === 4 ? "selected" : ""}>T\u1EE9 Ph\u1EA9m</option>
+          <option value="5" ${nv.kimDan === 5 ? "selected" : ""}>Ng\u0169 Ph\u1EA9m</option>
+        </select>
+        <select id="vktt-sel-ycanh" class="vktt-select" style="flex:1;">
+          <option value="Ki\u1EBFm \xFD" ${nv.yCanh === "Ki\u1EBFm \xFD" ? "selected" : ""}>Ki\u1EBFm \xFD</option>
+          <option value="L\xF4i \xFD" ${nv.yCanh === "L\xF4i \xFD" ? "selected" : ""}>L\xF4i \xFD</option>
+          <option value="B\u0103ng \xFD" ${nv.yCanh === "B\u0103ng \xFD" ? "selected" : ""}>B\u0103ng \xFD</option>
+          <option value="Phong \xFD" ${nv.yCanh === "Phong \xFD" ? "selected" : ""}>Phong \xFD</option>
+          <option value="T\u1EEB bi" ${nv.yCanh === "T\u1EEB bi" ? "selected" : ""}>T\u1EEB bi</option>
+          <option value="H\u01B0 v\xF4 \xFD" ${nv.yCanh === "H\u01B0 v\xF4 \xFD" ? "selected" : ""}>H\u01B0 v\xF4 \xFD</option>
+          <option value="H\u1ECFa \xFD" ${nv.yCanh === "H\u1ECFa \xFD" ? "selected" : ""}>H\u1ECFa \xFD</option>
+        </select>
+      </div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">D\u1ECB T\u01B0\u1EE3ng / T\xFAc:</span>
+        <select id="vktt-sel-dituong" class="vktt-select" style="flex:1;">
+          <option value="kim" ${nv.diTuong === "kim" ? "selected" : ""}>Ki\u1EBFm Anh (Kim)</option>
+          <option value="loi" ${nv.diTuong === "loi" ? "selected" : ""}>L\xF4i Anh (L\xF4i)</option>
+          <option value="bang" ${nv.diTuong === "bang" ? "selected" : ""}>B\u0103ng Anh (B\u0103ng)</option>
+          <option value="phong" ${nv.diTuong === "phong" ? "selected" : ""}>Phong Anh</option>
+          <option value="hoa" ${nv.diTuong === "hoa" ? "selected" : ""}>X\xEDch Di\u1EC5m Anh</option>
+          <option value="moc" ${nv.diTuong === "moc" ? "selected" : ""}>Thanh Li\xEAn Anh</option>
+          <option value="thuy" ${nv.diTuong === "thuy" ? "selected" : ""}>Huy\u1EC1n Th\u1EE7y Anh</option>
+          <option value="tho" ${nv.diTuong === "tho" ? "selected" : ""}>H\u1EADu Th\u1ED5 Anh</option>
+        </select>
+        <input type="number" id="vktt-inp-tuctue" class="vktt-inp" step="0.1" placeholder="${nv.tucTue || 1}" style="width:50px;flex:none;" />
+        <button id="vktt-btn-extra-realm" class="vktt-btn vktt-btn-sm">L\u01B0u</button>
+      </div>
+    </div>
+
+    <!-- KH\u1ED0I 3: TH\u1EC2 CH\u1EA4T (6 TH\u1EC2 CH\u1EA4T G\u1ED0C) & LINH C\u0102N -->
+    <div class="vktt-card">
+      <div class="vktt-card-hdr">\u{1F9EC} 3. Th\u1EC3 Ch\u1EA5t Chu\u1EA9n Game & Linh C\u0103n</div>
+      <div class="vktt-row">
+        <select id="vktt-sel-tc" class="vktt-select" style="flex:1;">
+          <option value="the_chat.hoang_co" ${nv.theChat === "the_chat.hoang_co" ? "selected" : ""}>\u{1F451} Hoang C\u1ED5 Th\xE1nh Th\u1EC3 (121 \xF4)</option>
+          <option value="the_chat.cuu_am" ${nv.theChat === "the_chat.cuu_am" ? "selected" : ""}>\u2744\uFE0F C\u1EEDu \xC2m Tuy\u1EC7t M\u1EA1ch (B\u0103ng)</option>
+          <option value="the_chat.kiem_cot" ${nv.theChat === "the_chat.kiem_cot" ? "selected" : ""}>\u2694\uFE0F Ki\u1EBFm C\u1ED1t Th\u1EC3 (Ki\u1EBFm +25%)</option>
+          <option value="the_chat.bach_thao" ${nv.theChat === "the_chat.bach_thao" ? "selected" : ""}>\u{1F33F} B\xE1ch Th\u1EA3o Th\u1EC3 (\u0110an tu)</option>
+          <option value="the_chat.thiet_cot" ${nv.theChat === "the_chat.thiet_cot" ? "selected" : ""}>\u{1F6E1}\uFE0F Thi\u1EBFt C\u1ED1t Th\u1EC3 (Kh\xED huy\u1EBFt)</option>
+          <option value="the_chat.pham_the" ${nv.theChat === "the_chat.pham_the" ? "selected" : ""}>\u{1F464} Ph\xE0m Th\u1EC3</option>
+        </select>
+        <button id="vktt-btn-tc" class="vktt-btn vktt-btn-purple vktt-btn-sm">G\xE1n Th\u1EC3 Ch\u1EA5t</button>
+      </div>
+
+      <div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(229,184,105,0.25);">
+        <label class="vktt-label">T\xEDch ch\u1ECDn H\u1EC7 Linh C\u0103n:</label>
+        <div class="vktt-linhcan-grid">
+          <label class="vktt-chk-label"><input type="checkbox" name="vktt-lc-he" value="kim" ${nv.linhCan?.he?.includes("kim") ? "checked" : ""}> \u2694\uFE0FKim</label>
+          <label class="vktt-chk-label"><input type="checkbox" name="vktt-lc-he" value="moc" ${nv.linhCan?.he?.includes("moc") ? "checked" : ""}> \u{1F33F}M\u1ED9c</label>
+          <label class="vktt-chk-label"><input type="checkbox" name="vktt-lc-he" value="thuy" ${nv.linhCan?.he?.includes("thuy") ? "checked" : ""}> \u{1F4A7}Th\u1EE7y</label>
+          <label class="vktt-chk-label"><input type="checkbox" name="vktt-lc-he" value="hoa" ${nv.linhCan?.he?.includes("hoa") ? "checked" : ""}> \u{1F525}H\u1ECFa</label>
+          <label class="vktt-chk-label"><input type="checkbox" name="vktt-lc-he" value="tho" ${nv.linhCan?.he?.includes("tho") ? "checked" : ""}> \u26F0\uFE0FTh\u1ED5</label>
+          <label class="vktt-chk-label" style="color:#70dbff;"><input type="checkbox" name="vktt-lc-he" value="bang" ${nv.linhCan?.he?.includes("bang") ? "checked" : ""}> \u2744\uFE0FB\u0103ng</label>
+          <label class="vktt-chk-label" style="color:#aaffaa;"><input type="checkbox" name="vktt-lc-he" value="phong" ${nv.linhCan?.he?.includes("phong") ? "checked" : ""}> \u{1F32A}\uFE0FPhong</label>
+          <label class="vktt-chk-label" style="color:#ffff70;"><input type="checkbox" name="vktt-lc-he" value="loi" ${nv.linhCan?.he?.includes("loi") ? "checked" : ""}> \u26A1L\xF4i</label>
         </div>
-        <div class="vktt-field">
-          <label class="vktt-label">C\xF4ng T\xEDch</label>
-          <div class="vktt-input-group">
-            <input type="number" id="vktt-inp-ct" class="vktt-input" placeholder="99999" />
-            <button id="vktt-btn-ct" class="vktt-btn">G\xE1n</button>
-          </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button id="vktt-btn-gan-lc" class="vktt-btn vktt-btn-green vktt-btn-sm" style="flex:1;">\u{1F331} G\xE1n Linh C\u0103n & M\xE0u M\u1EA1ch</button>
+          <button id="vktt-btn-go-lc" class="vktt-btn vktt-btn-ghost vktt-btn-sm">G\u1EE1 (V\xF4)</button>
         </div>
       </div>
     </div>
 
+    <!-- KH\u1ED0I 4: TH\u1EA4T \u0110\u1EA0I CH\u1EC8 S\u1ED0 TU CH\xC2N (T\xCDCH CH\u1ECCN THU\u1ED8C T\xCDNH) -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">\u{1F31F} C\u1EA3nh Gi\u1EDBi & \u0110\u1ED9t Ph\xE1</div>
-      <div class="vktt-field">
-        <label class="vktt-label">Ch\u1ECDn C\u1EA3nh Gi\u1EDBi \u0110\u1EC9nh Phong</label>
-        <div class="vktt-input-group">
-          <select id="vktt-sel-cg" class="vktt-select" style="flex:1;">
-            <option value="9">\u0110\u1ED9 Ki\u1EBFp \u0110\u1EC9nh Phong (Kim \u0110an Ph\u1EA9m 9)</option>
-            <option value="8">\u0110\u1EA1i Th\u1EEBa \u0110\u1EC9nh Phong</option>
-            <option value="7">H\u1EE3p Th\u1EC3 \u0110\u1EC9nh Phong</option>
-            <option value="6">Luy\u1EC7n H\u01B0 \u0110\u1EC9nh Phong</option>
-            <option value="5">H\xF3a Th\u1EA7n \u0110\u1EC9nh Phong</option>
-            <option value="4">Nguy\xEAn Anh \u0110\u1EC9nh Phong</option>
-            <option value="3">Kim \u0110an \u0110\u1EC9nh Phong</option>
-            <option value="2">Tr\xFAc C\u01A1 \u0110\u1EC9nh Phong</option>
-            <option value="1">Luy\u1EC7n Kh\xED</option>
-          </select>
-          <button id="vktt-btn-cg" class="vktt-btn vktt-btn-cyan">\u0110\u1ED9t Ph\xE1</button>
-        </div>
+      <div class="vktt-card-hdr">
+        <span>\u{1F4CA} 4. Th\u1EA5t \u0110\u1EA1i Ch\u1EC9 S\u1ED1 Tu Ch\xE2n</span>
+        <button id="vktt-btn-toggle-all-stat" class="vktt-btn vktt-btn-ghost" style="height:24px;padding:0 7px;font-size:10.5px;">T\xEDch T\u1EA5t C\u1EA3</button>
       </div>
+
+      <div class="vktt-stat-row">
+        <label class="vktt-stat-chk-wrap"><input type="checkbox" class="vktt-stat-chk" data-stat="ngo_tinh" checked> \u{1F4A1} Ng\u1ED9 t\xEDnh:</label>
+        <input type="number" id="vktt-inp-ngo-tinh" class="vktt-inp" placeholder="${cs.ngo_tinh || 500}">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-set-stat" data-stat="ngo_tinh">G\xE1n</button>
+      </div>
+      <div class="vktt-stat-row">
+        <label class="vktt-stat-chk-wrap"><input type="checkbox" class="vktt-stat-chk" data-stat="can_cot" checked> \u{1F9B4} C\u0103n c\u1ED1t:</label>
+        <input type="number" id="vktt-inp-can-cot" class="vktt-inp" placeholder="${cs.can_cot || 500}">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-set-stat" data-stat="can_cot">G\xE1n</button>
+      </div>
+      <div class="vktt-stat-row">
+        <label class="vktt-stat-chk-wrap"><input type="checkbox" class="vktt-stat-chk" data-stat="dao_tam" checked> \u{1F9D8} \u0110\u1EA1o t\xE2m:</label>
+        <input type="number" id="vktt-inp-dao-tam" class="vktt-inp" placeholder="${cs.dao_tam || 500}">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-set-stat" data-stat="dao_tam">G\xE1n</button>
+      </div>
+      <div class="vktt-stat-row">
+        <label class="vktt-stat-chk-wrap"><input type="checkbox" class="vktt-stat-chk" data-stat="than_phap" checked> \u26A1 Th\xE2n ph\xE1p:</label>
+        <input type="number" id="vktt-inp-than-phap" class="vktt-inp" placeholder="${cs.than_phap || 500}">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-set-stat" data-stat="than_phap">G\xE1n</button>
+      </div>
+      <div class="vktt-stat-row">
+        <label class="vktt-stat-chk-wrap"><input type="checkbox" class="vktt-stat-chk" data-stat="khi_van" checked> \u{1F340} Kh\xED v\u1EADn:</label>
+        <input type="number" id="vktt-inp-khi-van" class="vktt-inp" placeholder="${cs.khi_van || 500}">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-set-stat" data-stat="khi_van">G\xE1n</button>
+      </div>
+      <div class="vktt-stat-row">
+        <label class="vktt-stat-chk-wrap"><input type="checkbox" class="vktt-stat-chk" data-stat="tam_ma"> \u{1F479} T\xE2m ma:</label>
+        <input type="number" id="vktt-inp-tam-ma" class="vktt-inp" placeholder="${cs.tam_ma || 0}">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-set-stat" data-stat="tam_ma">G\xE1n</button>
+      </div>
+      <div class="vktt-stat-row">
+        <label class="vktt-stat-chk-wrap"><input type="checkbox" class="vktt-stat-chk" data-stat="than_thuc" checked> \u{1F441}\uFE0F Th\u1EA7n th\u1EE9c:</label>
+        <input type="number" id="vktt-inp-than-thuc" class="vktt-inp" placeholder="${cs.than_thuc || 500}">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-set-stat" data-stat="than_thuc">G\xE1n</button>
+      </div>
+
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button id="vktt-btn-stat-200" class="vktt-btn vktt-btn-cyan vktt-btn-sm" style="flex:1;">\u26A1 \u0110\xE3 T\xEDch = 200</button>
+        <button id="vktt-btn-stat-600" class="vktt-btn vktt-btn-sm" style="flex:1;">\u{1F525} \u0110\xE3 T\xEDch = 600</button>
+      </div>
+      <button id="vktt-btn-clear-tam-ma" class="vktt-btn vktt-btn-ghost vktt-btn-block" style="margin-top:5px;height:30px;font-size:11px;">
+        \u{1F9F9} X\xF3a S\u1EA1ch T\xE2m Ma (= 0)
+      </button>
     </div>
 
+    <!-- KH\u1ED0I 5: LU\xC2N H\u1ED2I, L\xC3O \u0110\xD2 & TH\xC0NH T\u1EF0U -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">\u{1F525} Th\u1EC3 Ch\u1EA5t & Linh C\u0103n</div>
-      <div class="vktt-field">
-        <label class="vktt-label">Ch\u1ECDn Th\u1EC3 Ch\u1EA5t T\u1ED1i Th\u01B0\u1EE3ng</label>
-        <div class="vktt-input-group">
-          <select id="vktt-sel-tc" class="vktt-select" style="flex:1;">
-            <option value="the_chat.hon_don_dao_the">H\u1ED7n \u0110\u1ED9n \u0110\u1EA1o Th\u1EC3 (Khu\xF4n 10x10)</option>
-            <option value="the_chat.tien_thien_thanh_the_dao_thai">Ti\xEAn Thi\xEAn Th\xE1nh Th\u1EC3 \u0110\u1EA1o Thai (10x10)</option>
-            <option value="the_chat.thai_co_than_the">Th\xE1i C\u1ED5 Th\u1EA7n Th\u1EC3 (10x10)</option>
-            <option value="the_chat.van_kiep_bat_diet_the">V\u1EA1n Ki\u1EBFp B\u1EA5t Di\u1EC7t Th\u1EC3 (10x10)</option>
-            <option value="the_chat.am_duong_hon_don_the">\xC2m D\u01B0\u01A1ng H\u1ED7n \u0110\u1ED9n Th\u1EC3 (10x10)</option>
-            <option value="the_chat.pham_the">Ph\xE0m Th\u1EC3 (M\u1EB7c \u0111\u1ECBnh)</option>
-          </select>
-          <button id="vktt-btn-tc" class="vktt-btn vktt-btn-purple">T\u1EA9y T\u1EE7y</button>
-        </div>
+      <div class="vktt-card-hdr">\u{1F30C} 5. \u0110i\u1EC3m Lu\xE2n H\u1ED3i, L\xE3o \u0110\xF2 & Th\xE0nh T\u1EF1u</div>
+      <div class="vktt-row">
+        <span class="vktt-lbl">\u0110i\u1EC3m Lu\xE2n H\u1ED3i:</span>
+        <input type="number" id="vktt-inp-dlh" class="vktt-inp" placeholder="${meta.diemLuanHoi || 999999}" />
+        <button id="vktt-btn-dlh" class="vktt-btn vktt-btn-sm">G\xE1n</button>
       </div>
-    </div>
-
-    <div class="vktt-card">
-      <div class="vktt-card-hdr">\u{1F3C6} Lu\xE2n H\u1ED3i, L\xE3o \u0110\xF2 & Th\xE0nh T\u1EF1u</div>
-      <button id="vktt-btn-all-achieve" class="vktt-btn vktt-btn-block">M\u1EDF Kh\xF3a To\xE0n B\u1ED9 17 L\xE3o \u0110\xF2 & 28 Th\xE0nh T\u1EF1u</button>
+      <div class="vktt-row">
+        <span class="vktt-lbl">S\u1ED1 Ki\u1EBFp:</span>
+        <input type="number" id="vktt-inp-kiep" class="vktt-inp" placeholder="${meta.kiep || 38}" />
+        <button id="vktt-btn-kiep" class="vktt-btn vktt-btn-sm">G\xE1n</button>
+      </div>
+      <button id="vktt-btn-all-achieve" class="vktt-btn vktt-btn-purple vktt-btn-block" style="margin-top:6px;">
+        \u{1F30C} Max 999,999 \u0110i\u1EC3m + M\u1EDF Kh\xF3a 17 L\xE3o \u0110\xF2 & 28 Th\xE0nh T\u1EF1u
+      </button>
     </div>
   `;
   }
@@ -1286,82 +1827,234 @@
     const btnTen = document.getElementById("vktt-btn-ten");
     if (btnTen) {
       btnTen.onclick = () => {
-        const v = (document.getElementById("vktt-inp-ten")?.value || "").trim();
+        const inp = document.getElementById("vktt-inp-ten");
+        const v = (inp?.value || inp?.placeholder || "").trim();
         if (v) {
           updateNhanVat({ ten: v });
           notify(`\u2705 \u0110\xE3 \u0111\u1ED5i \u0110\u1EA1o Hi\u1EC7u th\xE0nh: ${v}`);
+          renderTabContent("tab-nhan-vat");
         }
       };
     }
     const btnLt = document.getElementById("vktt-btn-lt");
     if (btnLt) {
       btnLt.onclick = () => {
-        const v = parseInt(document.getElementById("vktt-inp-lt")?.value || "999999", 10);
+        const v = readInputOrPlaceholder("vktt-inp-lt", 999999);
         updateNhanVat({ linhThach: v });
         notify(`\u{1F48E} \u0110\xE3 g\xE1n Linh Th\u1EA1ch = ${v.toLocaleString()}!`);
+        renderTabContent("tab-nhan-vat");
       };
     }
     const btnTv = document.getElementById("vktt-btn-tv");
     if (btnTv) {
       btnTv.onclick = () => {
-        const v = parseInt(document.getElementById("vktt-inp-tv")?.value || "999999", 10);
+        const v = readInputOrPlaceholder("vktt-inp-tv", 999999);
         updateNhanVat({ tuVi: v });
         notify(`\u2728 \u0110\xE3 g\xE1n Tu Vi = ${v.toLocaleString()}!`);
+        renderTabContent("tab-nhan-vat");
       };
     }
     const btnTnt = document.getElementById("vktt-btn-tnt");
     if (btnTnt) {
       btnTnt.onclick = () => {
-        const v = parseInt(document.getElementById("vktt-inp-tnt")?.value || "5000", 10);
+        const v = readInputOrPlaceholder("vktt-inp-tnt", 5e3);
         updateNhanVat({ thoNguyenThem: v });
         notify(`\u23F3 \u0110\xE3 g\xE1n Th\u1ECD Nguy\xEAn Th\xEAm = +${v} n\u0103m!`);
+        renderTabContent("tab-nhan-vat");
       };
     }
     const btnTuoi = document.getElementById("vktt-btn-tuoi");
     if (btnTuoi) {
       btnTuoi.onclick = () => {
-        const v = parseInt(document.getElementById("vktt-inp-tuoi")?.value || "18", 10);
+        const v = readInputOrPlaceholder("vktt-inp-tuoi", 18);
         updateNhanVat({ tuoi: v });
         notify(`\u23F3 \u0110\xE3 g\xE1n Tu\u1ED5i = ${v}!`);
+        renderTabContent("tab-nhan-vat");
       };
     }
     const btnCh = document.getElementById("vktt-btn-ch");
     if (btnCh) {
       btnCh.onclick = () => {
-        const v = parseInt(document.getElementById("vktt-inp-ch")?.value || "99999", 10);
+        const v = readInputOrPlaceholder("vktt-inp-ch", 99999);
         updateNhanVat({ congHien: v });
         notify(`\u{1F4DC} \u0110\xE3 g\xE1n C\u1ED1ng Hi\u1EBFn = ${v.toLocaleString()}!`);
+        renderTabContent("tab-nhan-vat");
       };
     }
     const btnCt = document.getElementById("vktt-btn-ct");
     if (btnCt) {
       btnCt.onclick = () => {
-        const v = parseInt(document.getElementById("vktt-inp-ct")?.value || "99999", 10);
-        const state = getGameState();
-        if (!state || !state.run) return notify("\u26A0\uFE0F H\xE3y v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
-        const run = copyObj(state.run);
-        if (run.tongMon) run.tongMon = mergeObj(run.tongMon, { congTich: v });
-        setGameState({ run });
+        const v = readInputOrPlaceholder("vktt-inp-ct", 99999);
+        updateTongMon(v);
         notify(`\u{1F3DB}\uFE0F \u0110\xE3 g\xE1n ${v.toLocaleString()} \u0111i\u1EC3m C\xF4ng T\xEDch! H\xE3y C\xE1o lui r\u1ED3i m\u1EDF l\u1EA1i Ch\u1EA5p s\u1EF1 \u0111\u01B0\u1EDDng.`);
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const btnCapbac = document.getElementById("vktt-btn-capbac");
+    if (btnCapbac) {
+      btnCapbac.onclick = () => {
+        const sel = document.getElementById("vktt-sel-capbac");
+        const cb = parseInt(sel?.value || "4", 10);
+        const curCt = readInputOrPlaceholder("vktt-inp-ct", 5e3);
+        updateTongMon(curCt, cb);
+        notify(`\u{1F3DB}\uFE0F \u0110\xE3 g\xE1n Ch\u1EE9c V\u1ECB T\xF4ng M\xF4n = C\u1EA5p ${cb}!`);
+        renderTabContent("tab-nhan-vat");
       };
     }
     const btnCg = document.getElementById("vktt-btn-cg");
     if (btnCg) {
       btnCg.onclick = () => {
-        const idx = parseInt(document.getElementById("vktt-sel-cg")?.value || "9", 10);
-        setRealm(idx);
+        const cg = parseInt(document.getElementById("vktt-sel-cg")?.value || "5", 10);
+        const tcg = parseInt(document.getElementById("vktt-sel-tcg")?.value || "3", 10);
+        setRealm(cg, tcg);
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const btnExtraRealm = document.getElementById("vktt-btn-extra-realm");
+    if (btnExtraRealm) {
+      btnExtraRealm.onclick = () => {
+        const kd = parseInt(document.getElementById("vktt-sel-kimdan")?.value || "1", 10);
+        const yc = document.getElementById("vktt-sel-ycanh")?.value || "Ki\u1EBFm \xFD";
+        const dt = document.getElementById("vktt-sel-dituong")?.value || "kim";
+        const tt = parseFloat(document.getElementById("vktt-inp-tuctue")?.value || "1.0");
+        setExtraRealm(kd, yc, dt, tt);
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const btnClearBinhCanh = document.getElementById("vktt-btn-clear-binh-canh");
+    if (btnClearBinhCanh) {
+      btnClearBinhCanh.onclick = () => {
+        updateNhanVat({ binhCanh: 0, thuongThe: 0 });
+        notify("\u{1F48A} \u0110\xE3 x\xF3a s\u1EA1ch B\xECnh C\u1EA3nh & Th\u01B0\u01A1ng Th\u1EBF!");
+        renderTabContent("tab-nhan-vat");
       };
     }
     const btnTc = document.getElementById("vktt-btn-tc");
     if (btnTc) {
       btnTc.onclick = () => {
-        const tcKey = document.getElementById("vktt-sel-tc")?.value || "the_chat.hon_don_dao_the";
+        const tcKey = document.getElementById("vktt-sel-tc")?.value || "the_chat.hoang_co";
         setPhysique(tcKey);
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const btnGanLc = document.getElementById("vktt-btn-gan-lc");
+    if (btnGanLc) {
+      btnGanLc.onclick = () => {
+        const chks = document.querySelectorAll('input[name="vktt-lc-he"]:checked');
+        const sel = [];
+        chks.forEach((c) => sel.push(c.value));
+        setLinhCan(sel);
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const btnGoLc = document.getElementById("vktt-btn-go-lc");
+    if (btnGoLc) {
+      btnGoLc.onclick = () => {
+        resetLinhCan();
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const statBtns = document.querySelectorAll(".vktt-btn-set-stat");
+    statBtns.forEach((btn) => {
+      btn.onclick = () => {
+        const statKey = btn.getAttribute("data-stat");
+        if (!statKey) return;
+        const domKey = statKey.replace("_", "-");
+        const v = readInputOrPlaceholder(`vktt-inp-${domKey}`, statKey === "tam_ma" ? 0 : 500);
+        updateChiSo(statKey, v);
+        notify(`\u{1F4CA} \u0110\xE3 g\xE1n ${statKey} = ${v}!`);
+        renderTabContent("tab-nhan-vat");
+      };
+    });
+    const btnToggleAllStat = document.getElementById("vktt-btn-toggle-all-stat");
+    if (btnToggleAllStat) {
+      let allCheckedState = false;
+      btnToggleAllStat.onclick = () => {
+        const chks = document.querySelectorAll(".vktt-stat-chk");
+        allCheckedState = !allCheckedState;
+        chks.forEach((c) => c.checked = allCheckedState);
+        btnToggleAllStat.innerText = allCheckedState ? "B\u1ECF T\xEDch H\u1EBFt" : "T\xEDch T\u1EA5t C\u1EA3";
+      };
+    }
+    function applyCheckedStats(val) {
+      const chks = document.querySelectorAll(".vktt-stat-chk:checked");
+      if (!chks.length) {
+        return notify("\u26A0\uFE0F H\xE3y t\xEDch ch\u1ECDn \xEDt nh\u1EA5t 1 thu\u1ED9c t\xEDnh \u0111\u1EC3 g\xE1n!");
+      }
+      const patch = {};
+      chks.forEach((c) => {
+        const stat = c.getAttribute("data-stat");
+        if (stat) patch[stat] = stat === "tam_ma" ? 0 : val;
+      });
+      updateBatchChiSo(patch);
+      notify(`\u26A1 \u0110\xE3 g\xE1n ${Object.keys(patch).length} ch\u1EC9 s\u1ED1 \u0111\xE3 t\xEDch = ${val}!`);
+      renderTabContent("tab-nhan-vat");
+    }
+    const btnStat200 = document.getElementById("vktt-btn-stat-200");
+    if (btnStat200) btnStat200.onclick = () => applyCheckedStats(200);
+    const btnStat600 = document.getElementById("vktt-btn-stat-600");
+    if (btnStat600) btnStat600.onclick = () => applyCheckedStats(600);
+    const btnClearTamMa = document.getElementById("vktt-btn-clear-tam-ma");
+    if (btnClearTamMa) {
+      btnClearTamMa.onclick = () => {
+        updateChiSo("tam_ma", 0);
+        notify("\u{1F9F9} \u0110\xE3 x\xF3a s\u1EA1ch T\xE2m Ma = 0!");
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const btnDlh = document.getElementById("vktt-btn-dlh");
+    if (btnDlh) {
+      btnDlh.onclick = () => {
+        const v = readInputOrPlaceholder("vktt-inp-dlh", 999999);
+        updateMetaLuanHoi(v);
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const btnKiep = document.getElementById("vktt-btn-kiep");
+    if (btnKiep) {
+      btnKiep.onclick = () => {
+        const state = getGameState();
+        const curDiem = state?.meta?.diemLuanHoi || 999999;
+        const v = readInputOrPlaceholder("vktt-inp-kiep", 38);
+        updateMetaLuanHoi(curDiem, v);
+        renderTabContent("tab-nhan-vat");
       };
     }
     const btnAchieve = document.getElementById("vktt-btn-all-achieve");
     if (btnAchieve) {
-      btnAchieve.onclick = unlockAllAchievementsAndFerrymen;
+      btnAchieve.onclick = () => {
+        unlockAllAchievementsAndFerrymen();
+        renderTabContent("tab-nhan-vat");
+      };
+    }
+    const btnAllInOne = document.getElementById("vktt-btn-all-in-one");
+    if (btnAllInOne) {
+      btnAllInOne.onclick = () => {
+        updateNhanVat({
+          linhThach: 999999999,
+          tuVi: 999999999,
+          thoNguyenThem: 9999,
+          congHien: 999999,
+          binhCanh: 0,
+          thuongThe: 0,
+          chiSo: {
+            ngo_tinh: 600,
+            can_cot: 600,
+            dao_tam: 600,
+            than_phap: 600,
+            khi_van: 600,
+            than_thuc: 600,
+            tam_ma: 0
+          }
+        });
+        unlockAllMeridians();
+        unlockAllProfessions();
+        unlockAllRecipes();
+        unlockAllSkills();
+        unlockAllAchievementsAndFerrymen();
+        notify("\u{1F680} SI\xCAU BUFF TO\xC0N DI\u1EC6N TH\xC0NH C\xD4NG! \u0110\u1EA7y \u0111\u1EE7 linh th\u1EA1ch, tu vi, ch\u1EC9 s\u1ED1 600, ngh\u1EC1, \u0111an ph\u01B0\u01A1ng, kinh m\u1EA1ch & th\xE0nh t\u1EF1u!");
+        renderTabContent("tab-nhan-vat");
+      };
     }
   }
   function getTabKhoDoHtml() {
@@ -1371,27 +2064,27 @@
       <button id="vktt-btn-godpack" class="vktt-btn vktt-btn-block" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
         \u{1F451} K\xCDCH HO\u1EA0T G\xD3I TH\u1EA6N \u0110\u1EA0O (Ph\u1EA9m 8-9 + 99 Th\u1EA7n \u0110an)
       </button>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <button id="vktt-btn-all-items" class="vktt-btn vktt-btn-cyan" style="flex:1;">\u{1F31F} Nh\u1EADn 422+ V\u1EADt Ph\u1EA9m</button>
+        <button id="vktt-btn-bag-99" class="vktt-btn vktt-btn-ghost" style="flex:1;">\u{1F522} M\u1ECDi \u0110\u1ED3 x99</button>
+      </div>
     </div>
 
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u{1F50D} Th\xEAm V\u1EADt Ph\u1EA9m B\u1EA5t K\u1EF3</div>
       <div class="vktt-field">
         <label class="vktt-label">T\xECm theo t\xEAn ho\u1EB7c ID</label>
-        <input type="text" id="vktt-search-item" class="vktt-input" placeholder="G\xF5 t\xEAn v\u1EADt ph\u1EA9m (Vd: b\xE0n \u0111\xE0o, ki\u1EBFm, ph\xF9...)" />
+        <input type="text" id="vktt-search-item" class="vktt-inp" placeholder="G\xF5 t\xEAn v\u1EADt ph\u1EA9m (Vd: b\xE0n \u0111\xE0o, ki\u1EBFm, ph\xF9...)" style="width:100%;" />
         <div id="vktt-item-results" class="vktt-dropdown-list" style="display:none;"></div>
       </div>
-      <div class="vktt-field">
+      <div class="vktt-field" style="margin-top:6px;">
         <label class="vktt-label">ID V\u1EADt Ph\u1EA9m \u0110\xE3 Ch\u1ECDn</label>
-        <input type="text" id="vktt-selected-item-id" class="vktt-input" placeholder="item.xxxx..." />
+        <input type="text" id="vktt-selected-item-id" class="vktt-inp" placeholder="item.xxxx..." style="width:100%;" />
       </div>
-      <div class="vktt-grid-2">
-        <div class="vktt-field">
-          <label class="vktt-label">S\u1ED1 L\u01B0\u1EE3ng</label>
-          <input type="number" id="vktt-item-count" class="vktt-input" value="10" />
-        </div>
-        <div class="vktt-field" style="display:flex;align-items:flex-end;">
-          <button id="vktt-btn-add-item" class="vktt-btn vktt-btn-cyan vktt-btn-block">Th\xEAm V\xE0o T\xFAi</button>
-        </div>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:6px;">
+        <span class="vktt-lbl" style="width:65px;">S\u1ED1 L\u01B0\u1EE3ng:</span>
+        <input type="number" id="vktt-item-count" class="vktt-inp" value="10" style="width:70px;flex:none;" />
+        <button id="vktt-btn-add-item" class="vktt-btn vktt-btn-cyan vktt-btn-sm" style="flex:1;">Th\xEAm V\xE0o T\xFAi</button>
       </div>
     </div>
 
@@ -1411,6 +2104,39 @@
   function bindTabKhoDoEvents() {
     const btnGodPack = document.getElementById("vktt-btn-godpack");
     if (btnGodPack) btnGodPack.onclick = applyGodPack;
+    const btnAllItems = document.getElementById("vktt-btn-all-items");
+    if (btnAllItems) {
+      btnAllItems.onclick = () => {
+        const state = getGameState();
+        if (!state?.run?.nhanVat) return notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+        const nhanVat = copyObj(state.run.nhanVat);
+        const tuiDo = copyObj(nhanVat.tuiDo || {});
+        for (const id in PRESET_ITEMS) {
+          const info = PRESET_ITEMS[id];
+          const q = info.cat === "\u0110an D\u01B0\u1EE3c" || info.cat === "Linh D\u01B0\u1EE3c" || info.cat === "Ph\xF9 L\u1EE5c" || info.cat === "Kho\xE1ng Th\u1EA1ch & Y\xEAu \u0110an" ? 50 : 1;
+          tuiDo[id] = Math.max(tuiDo[id] || 0, q);
+        }
+        nhanVat.tuiDo = tuiDo;
+        nhanVat.oTuiThem = Math.max(nhanVat.oTuiThem || 0, 350);
+        updateNhanVat(nhanVat);
+        notify("\u{1F31F} \u0110\xE3 th\xEAm tr\u1ECDn b\u1ED9 422+ v\u1EADt ph\u1EA9m v\xE0o t\xFAi \u0111\u1ED3 (+350 \xF4 t\xFAi)!");
+      };
+    }
+    const btnBag99 = document.getElementById("vktt-btn-bag-99");
+    if (btnBag99) {
+      btnBag99.onclick = () => {
+        const state = getGameState();
+        if (!state?.run?.nhanVat) return notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+        const nhanVat = copyObj(state.run.nhanVat);
+        const tuiDo = copyObj(nhanVat.tuiDo || {});
+        for (const k in tuiDo) {
+          tuiDo[k] = 99;
+        }
+        nhanVat.tuiDo = tuiDo;
+        updateNhanVat(nhanVat);
+        notify("\u{1F522} \u0110\xE3 \u0111\u1EB7t s\u1ED1 l\u01B0\u1EE3ng m\u1ECDi v\u1EADt ph\u1EA9m trong t\xFAi = 99!");
+      };
+    }
     const searchInp = document.getElementById("vktt-search-item");
     const resultsDiv = document.getElementById("vktt-item-results");
     const selectedIdInp = document.getElementById("vktt-selected-item-id");
@@ -1481,7 +2207,7 @@
           const trangBi = copyObj(nhanVat.trangBi || {});
           trangBi[slot] = itemId;
           nhanVat.trangBi = trangBi;
-          setGameState({ run: mergeObj(state.run, { nhanVat }) });
+          updateNhanVat(nhanVat);
           notify(`\u{1F6E1}\uFE0F \u0110\xE3 trang b\u1ECB b\u1EA3o v\u1EADt: ${itemId}!`);
         };
       }
@@ -1491,24 +2217,24 @@
     return `
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u{1F300} \u0110\xE3 Th\xF4ng Kinh M\u1EA1ch</div>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:10px;">
-        T\u1EF1 \u0111\u1ED9ng t\xEDnh to\xE1n ma tr\u1EADn huy\u1EC7t \u0111\u1EA1o theo Th\u1EC3 Ch\u1EA5t hi\u1EC7n t\u1EA1i, m\u1EDF th\xF4ng to\xE0n b\u1ED9 m\xE0 kh\xF4ng g\xE2y crash h\xE0m <code>Lt(t, n)</code> c\u1EE7a game.
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
+        M\u1EDF to\xE0n b\u1ED9 kinh m\u1EA1ch, \u0111\u1ED3ng b\u1ED9 m\xE0u theo h\u1EC7 Linh C\u0103n v\xE0 b\u1EA3o to\xE0n c\xE1c m\u1EA3nh gh\xE9p hi\u1EC7n c\xF3 m\xE0 kh\xF4ng g\xE2y crash game.
       </p>
       <button id="vktt-btn-meridian" class="vktt-btn vktt-btn-block" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);">
-        \u{1F300} \u0110\xC3 TH\xD4NG TO\xC0N B\u1ED8 HUY\u1EC6T \u0110\u1EA0O KINH M\u1EA0CH (100% An To\xE0n)
+        \u{1F300} \u0110\xC3 TH\xD4NG TO\xC0N B\u1ED8 KINH M\u1EA0CH (100% AN TO\xC0N)
       </button>
     </div>
 
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u{1F4DC} L\u0129nh Ng\u1ED9 To\xE0n Di\u1EC7n</div>
-      <button id="vktt-btn-all-profs" class="vktt-btn vktt-btn-cyan vktt-btn-block" style="margin-bottom:8px;">
-        \u2692\uFE0F H\u1ECDc To\xE0n B\u1ED9 Ngh\u1EC1 Nghi\u1EC7p C\u1EA5p 5 (T\xF4ng S\u01B0)
+      <button id="vktt-btn-all-profs" class="vktt-btn vktt-btn-cyan vktt-btn-block" style="margin-bottom:6px;">
+        \u2692\uFE0F L\xEAn T\xF4ng S\u01B0 3 Ngh\u1EC1 (\u0110an, Ph\xF9, B\u1EA3o)
       </button>
-      <button id="vktt-btn-all-recipes" class="vktt-btn vktt-btn-purple vktt-btn-block" style="margin-bottom:8px;">
-        \u{1F525} L\u0129nh Ng\u1ED9 101 \u0110an Ph\u01B0\u01A1ng & \u0110\u1ED3 Ph\u1ED5
+      <button id="vktt-btn-all-recipes" class="vktt-btn vktt-btn-purple vktt-btn-block" style="margin-bottom:6px;">
+        \u{1F525} L\u0129nh Ng\u1ED9 To\xE0n B\u1ED9 101 \u0110an Ph\u01B0\u01A1ng & \u0110\u1ED3 Ph\u1ED5
       </button>
       <button id="vktt-btn-all-skills" class="vktt-btn vktt-btn-block">
-        \u26A1 H\u1ECDc 87 C\xF4ng Ph\xE1p & K\u1EF9 Ph\xE1p C\u1EF1c Ph\u1EA9m (C\u1EA5p 10)
+        \u26A1 H\u1ECDc To\xE0n B\u1ED9 87 K\u1EF9 Ph\xE1p & C\xF4ng Ph\xE1p C\u1EF1c Ph\u1EA9m
       </button>
     </div>
   `;
@@ -1530,20 +2256,20 @@
     return `
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u26A1 T\u0103ng T\u1ED1c \u0110\u1ED9 Game (Speed Hack)</div>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:8px;">
-        Tua nhanh t\u1ED1c \u0111\u1ED9 di chuy\u1EC3n tr\xEAn map v\xE0 v\xF2ng l\u1EB7p th\u1EDDi gian trong game.
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
+        Tua nhanh t\u1ED1c \u0111\u1ED9 di chuy\u1EC3n v\xE0 v\xF2ng l\u1EB7p th\u1EDDi gian trong game.
       </p>
-      <div class="vktt-grid-2" style="grid-template-columns: repeat(4, 1fr);gap:6px;">
-        <button class="vktt-btn vktt-speed-btn ${speed === 1 ? "vktt-btn-cyan" : "vktt-btn-ghost"}" data-speed="1">1x (Chu\u1EA9n)</button>
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:5px;">
+        <button class="vktt-btn vktt-speed-btn ${speed === 1 ? "vktt-btn-cyan" : "vktt-btn-ghost"}" data-speed="1">1x</button>
         <button class="vktt-btn vktt-speed-btn ${speed === 2 ? "vktt-btn-cyan" : "vktt-btn-ghost"}" data-speed="2">2x</button>
         <button class="vktt-btn vktt-speed-btn ${speed === 3 ? "vktt-btn-cyan" : "vktt-btn-ghost"}" data-speed="3">3x</button>
-        <button class="vktt-btn vktt-speed-btn ${speed === 5 ? "vktt-btn-cyan" : "vktt-btn-ghost"}" data-speed="5">5x (Nhanh)</button>
+        <button class="vktt-btn vktt-speed-btn ${speed === 5 ? "vktt-btn-cyan" : "vktt-btn-ghost"}" data-speed="5">5x</button>
       </div>
     </div>
 
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u{1F9D8} T\u1EF1 \u0110\u1ED9ng Tu Luy\u1EC7n</div>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:8px;">
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
         T\u1EF1 \u0111\u1ED9ng t\u0103ng tu vi li\xEAn t\u1EE5c theo th\u1EDDi gian th\u1EF1c m\xE0 kh\xF4ng c\u1EA7n ng\u01B0\u1EDDi ch\u01A1i ph\u1EA3i canh b\u1EA5m.
       </p>
       <button id="vktt-btn-auto-cultivate" class="vktt-btn vktt-btn-block ${autoC ? "vktt-btn-red" : "vktt-btn-green"}">
@@ -1553,7 +2279,7 @@
 
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u{1F496} T\u1EF1 \u0110\u1ED9ng H\u1ED3i Ph\u1EE5c Sinh L\u1EF1c & Ch\xE2n Nguy\xEAn</div>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:8px;">
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
         Khi Kh\xED Huy\u1EBFt ho\u1EB7c Ch\xE2n Nguy\xEAn gi\u1EA3m d\u01B0\u1EDBi 60%, t\u1EF1 \u0111\u1ED9ng h\u1ED3i ph\u1EE5c v\u1EC1 m\u1EE9c t\u1ED1i \u0111a ngay l\u1EADp t\u1EE9c.
       </p>
       <button id="vktt-btn-auto-recovery" class="vktt-btn vktt-btn-block ${autoR ? "vktt-btn-red" : "vktt-btn-green"}">
@@ -1590,7 +2316,7 @@
     return `
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u{1F4BE} Xu\u1EA5t File Save</div>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:8px;">
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
         T\u1EA3i to\xE0n b\u1ED9 ti\u1EBFn tr\xECnh tu ti\xEAn ra file JSON v\u1EC1 m\xE1y \u0111i\u1EC7n tho\u1EA1i c\u1EE7a b\u1EA1n.
       </p>
       <button id="vktt-btn-export-save" class="vktt-btn vktt-btn-cyan vktt-btn-block">
@@ -1600,17 +2326,17 @@
 
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u{1F4C2} N\u1EA1p File Save</div>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:8px;">
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
         Ch\u1ECDn file save JSON \u0111\xE3 xu\u1EA5t t\u1EEB tr\u01B0\u1EDBc \u0111\u1EC3 kh\xF4i ph\u1EE5c ti\u1EBFn tr\xECnh.
       </p>
       <input type="file" id="vktt-inp-save-file" accept=".json" style="display:none;" />
-      <button id="vktt-btn-import-file" class="vktt-btn vktt-btn-purple vktt-btn-block" style="margin-bottom:8px;">
+      <button id="vktt-btn-import-file" class="vktt-btn vktt-btn-purple vktt-btn-block" style="margin-bottom:6px;">
         \u{1F4E4} Ch\u1ECDn File Save JSON \u0110\u1EC3 N\u1EA1p
       </button>
       <div class="vktt-field">
         <label class="vktt-label">Ho\u1EB7c D\xE1n N\u1ED9i Dung Save JSON Tr\u1EF1c Ti\u1EBFp</label>
-        <textarea id="vktt-txt-save" class="vktt-input" style="height:70px;padding:8px;font-size:11px;" placeholder='D\xE1n chu\u1ED7i JSON v\xE0o \u0111\xE2y...'></textarea>
-        <button id="vktt-btn-import-text" class="vktt-btn vktt-btn-ghost vktt-btn-block" style="margin-top:6px;">
+        <textarea id="vktt-txt-save" class="vktt-inp" style="height:65px;padding:6px;font-size:11px;width:100%;" placeholder='D\xE1n chu\u1ED7i JSON v\xE0o \u0111\xE2y...'></textarea>
+        <button id="vktt-btn-import-text" class="vktt-btn vktt-btn-ghost vktt-btn-block" style="margin-top:5px;">
           Kh\xF4i Ph\u1EE5c T\u1EEB Chu\u1ED7i D\xE1n
         </button>
       </div>
@@ -1618,7 +2344,7 @@
 
     <div class="vktt-card">
       <div class="vktt-card-hdr" style="color:#f87171;">\u26A0\uFE0F T\u1EA9y T\u1EE7y & Kh\xF4i Ph\u1EE5c Kh\u1EA9n C\u1EA5p</div>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:8px;">
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
         X\xF3a to\xE0n b\u1ED9 b\u1ED9 nh\u1EDB \u0111\u1EC7m game \u0111\u1EC3 kh\u1EAFc ph\u1EE5c m\xE0n h\xECnh crash/\u0111\u01A1.
       </p>
       <button id="vktt-btn-clear-cache" class="vktt-btn vktt-btn-red vktt-btn-block">

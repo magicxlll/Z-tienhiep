@@ -27,6 +27,20 @@ export function mergeObj<T, U>(a: T, b: U): T & U {
   return out;
 }
 
+export function uniqueStrings(arr1: string[], arr2: string[]): string[] {
+  const seen: Record<string, boolean> = {};
+  const out: string[] = [];
+  const list = (arr1 || []).concat(arr2 || []);
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i];
+    if (item !== undefined && item !== null && item !== '' && !seen[item]) {
+      seen[item] = true;
+      out.push(item);
+    }
+  }
+  return out;
+}
+
 export function getGameState(): any {
   try {
     if (gWin.game && gWin.game.store) {
@@ -48,12 +62,47 @@ export function setGameState(partial: any): void {
   }
 }
 
+export function persistGameSave(run?: any): void {
+  try {
+    if (gWin.game) {
+      const targetRun = run || gWin.game.store?.getState()?.run;
+      if (targetRun && typeof gWin.game.saveNow === 'function') {
+        gWin.game.saveNow(targetRun);
+      } else if (targetRun && typeof gWin.game.scheduleSave === 'function') {
+        gWin.game.scheduleSave(targetRun);
+      }
+    }
+  } catch (e) {
+    console.error('[VKTT Bridge] Error persisting run:', e);
+  }
+}
+
+export function persistGameMeta(updater: (meta: any) => void): void {
+  try {
+    if (gWin.game && typeof gWin.game.ben === 'function') {
+      gWin.game.ben((m: any) => {
+        updater(m);
+      });
+      return;
+    }
+    const store = gWin.game?.store;
+    if (store) {
+      const state = store.getState();
+      const meta = copyObj(state.meta || {});
+      updater(meta);
+      store.setState({ meta });
+    }
+  } catch (e) {
+    console.error('[VKTT Bridge] Error persisting meta:', e);
+  }
+}
+
 export function waitForGame(onReady: () => void): void {
   const timer = setInterval(() => {
     try {
       if (gWin.game && gWin.game.store) {
         clearInterval(timer);
-        console.log('[VKTT MOD v3.0] Kết nối thành công tới Game Store!');
+        console.log('[VKTT MOD v3.0] Kết nối thành công tới Game Store & Engine!');
         onReady();
       }
     } catch (e) {}

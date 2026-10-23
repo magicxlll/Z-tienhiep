@@ -1,4 +1,4 @@
-import { gWin, copyObj, mergeObj, getGameState, setGameState } from './bridge';
+import { gWin, copyObj, mergeObj, uniqueStrings, getGameState, setGameState, persistGameSave, persistGameMeta } from './bridge';
 import { PRESET_ITEMS, THE_CHAT_DB, ALL_TOP_SKILLS, ALL_RECIPES, MO_KHOA_DATA, ALL_THANH_TUU } from '../data/presets';
 import { getItemInfo } from '../data/items';
 
@@ -50,7 +50,9 @@ export function updateNhanVat(patchObj: Record<string, any>): boolean {
     return false;
   }
   const nextNv = mergeObj(state.run.nhanVat, patchObj);
-  setGameState({ run: mergeObj(state.run, { nhanVat: nextNv }) });
+  const nextRun = mergeObj(state.run, { nhanVat: nextNv });
+  setGameState({ run: nextRun });
+  persistGameSave(nextRun);
   return true;
 }
 
@@ -63,6 +65,48 @@ export function updateChiSo(k: string, v: number): void {
   const cs = copyObj(state.run.nhanVat.chiSo || {});
   cs[k] = v;
   updateNhanVat({ chiSo: cs });
+}
+
+export function updateBatchChiSo(statsObj: Record<string, number>): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const cs = copyObj(state.run.nhanVat.chiSo || {});
+  for (const k in statsObj) {
+    cs[k] = statsObj[k];
+  }
+  updateNhanVat({ chiSo: cs });
+}
+
+export function updateTongMon(congTich: number, capBac?: number): void {
+  const state = getGameState();
+  if (!state || !state.run) {
+    notify('⚠️ Hãy vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const run = copyObj(state.run);
+  
+  function recursiveAddCongTich(obj: any): void {
+    if (!obj || typeof obj !== 'object') return;
+    if (Object.prototype.hasOwnProperty.call(obj, 'congTich') && typeof obj.congTich === 'number') {
+      obj.congTich = congTich;
+    }
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] === 'object' && obj[key] !== null) {
+        recursiveAddCongTich(obj[key]);
+      }
+    }
+  }
+  recursiveAddCongTich(run);
+
+  const tmPatch: any = { congTich };
+  if (capBac !== undefined) tmPatch.capBac = capBac;
+  run.tongMon = mergeObj(run.tongMon || { slot: "slot.1115", congTich: 5000 }, tmPatch);
+
+  setGameState({ run });
+  persistGameSave(run);
 }
 
 export function buildSyncedXepTui(oldXep: string[] | undefined, tuiDo: Record<string, number>): string[] {
@@ -106,7 +150,7 @@ export function addItem(itemId: string, count: number = 1): void {
     nhanVat.oTuiThem = Math.max(nhanVat.oTuiThem || 0, 150);
     nhanVat.xepTui = buildSyncedXepTui(nhanVat.xepTui, tuiDo);
 
-    setGameState({ run: mergeObj(state.run, { nhanVat }) });
+    updateNhanVat(nhanVat);
     const info = getItemInfo(cleanId);
     notify(`🎁 Đã thêm +${count} [${info.name}] vào túi đồ!`);
   } catch (e) {
@@ -146,7 +190,7 @@ export function applyGodPack(): void {
     luyen_bao: 'item.khi_lo_tien'
   });
 
-  setGameState({ run: mergeObj(state.run, { nhanVat }) });
+  updateNhanVat(nhanVat);
   notify('👑 Đã kích hoạt GÓI THẦN ĐẠO v3.0 (Trang bị cực phẩm Phẩm 8-9 + 99 Thần Dược)!');
 }
 
@@ -155,16 +199,13 @@ export function unlockAllProfessions(): void {
   if (!state || !state.run || !state.run.nhanVat) {
     return notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
   }
-  const ngheNghiep = {
-    luyen_dan: { cap: 5, kinhNghiem: 10000 },
-    luyen_khi: { cap: 5, kinhNghiem: 10000 },
-    che_phu: { cap: 5, kinhNghiem: 10000 },
-    tran_phap: { cap: 5, kinhNghiem: 10000 },
-    ngu_thu: { cap: 5, kinhNghiem: 10000 },
-    khoi_loi: { cap: 5, kinhNghiem: 10000 }
+  const nghe = {
+    luyen_dan: { bac: 4, kinhNghiem: 9999 },
+    che_phu: { bac: 4, kinhNghiem: 9999 },
+    luyen_bao: { bac: 4, kinhNghiem: 9999 }
   };
-  updateNhanVat({ ngheNghiep });
-  notify('📜 Đã thông tuệ TOÀN BỘ NGHỀ NGHIỆP CẤP 5 (Tông Sư)!');
+  updateNhanVat({ nghe });
+  notify('📜 Đã lên Tông Sư 3 Nghề (Luyện Đan, Chế Phù, Luyện Khí)!');
 }
 
 export function unlockAllRecipes(): void {
@@ -173,11 +214,8 @@ export function unlockAllRecipes(): void {
     return notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
   }
   const nhanVat = copyObj(state.run.nhanVat);
-  const dp = copyObj(nhanVat.danPhuong || {});
-  for (const r of ALL_RECIPES) {
-    dp[r] = true;
-  }
-  updateNhanVat({ danPhuong: dp });
+  const updatedDonPhuong = uniqueStrings(nhanVat.donPhuong || [], ALL_RECIPES);
+  updateNhanVat({ donPhuong: updatedDonPhuong });
   notify(`🔥 Đã lĩnh ngộ toàn bộ ${ALL_RECIPES.length} ĐAN PHƯƠNG & ĐỒ PHỔ!`);
 }
 
@@ -187,12 +225,33 @@ export function unlockAllSkills(): void {
     return notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
   }
   const nhanVat = copyObj(state.run.nhanVat);
-  const kp = copyObj(nhanVat.kyPhap || {});
-  for (const s of ALL_TOP_SKILLS) {
-    kp[s] = { cap: 10, tang: 10 };
+  const oldKm = copyObj(nhanVat.kinhMach || {});
+  oldKm.daLinhNgo = uniqueStrings(oldKm.daLinhNgo || [], ALL_TOP_SKILLS);
+  updateNhanVat({ kinhMach: oldKm });
+  notify(`⚡ Đã thông thạo ${ALL_TOP_SKILLS.length} CÔNG PHÁP & KỸ NĂNG CỰC PHẨM!`);
+}
+
+export function parseKhuonFallback(khuonStr: string): { rong: number; cao: number; vung: number[] } {
+  const rawLines = khuonStr.replace(/^\s+|\s+$/g, '').split('\n');
+  const lines: string[][] = [];
+  for (let i = 0; i < rawLines.length; i++) {
+    const rowStr = rawLines[i].replace(/^\s+|\s+$/g, '');
+    if (rowStr.length > 0) lines.push(rowStr.split(/\s+/));
   }
-  updateNhanVat({ kyPhap: kp });
-  notify(`⚡ Đã thông thạo ${ALL_TOP_SKILLS.length} CÔNG PHÁP & KỸ NĂNG ĐẠI THÀNH!`);
+  const rong = lines[0] ? lines[0].length : 11;
+  const cao = lines.length;
+  const vung: number[] = [];
+  for (let r = 0; r < cao; r++) {
+    for (let c = 0; c < rong; c++) {
+      const ch = lines[r][c];
+      if (ch === 'D') vung.push(0);
+      else if (ch === '.') vung.push(-1);
+      else if (/^[0-5]$/.test(ch)) vung.push(Number(ch));
+      else if (/^[a-f]$/.test(ch)) vung.push(ch.charCodeAt(0) - 97);
+      else vung.push(-1);
+    }
+  }
+  return { rong, cao, vung };
 }
 
 export function unlockAllMeridians(): void {
@@ -201,100 +260,255 @@ export function unlockAllMeridians(): void {
     return notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
   }
 
-  const nv = state.run.nhanVat;
-  const tcKey = nv.theChat || 'the_chat.pham_the';
-  const tcData = THE_CHAT_DB[tcKey] || THE_CHAT_DB['the_chat.pham_the'];
-
-  const rawLines = tcData.khuon.trim().split('\n');
-  const lines: string[][] = [];
-  for (const r of rawLines) {
-    const s = r.trim();
-    if (s.length > 0) lines.push(s.split(/\s+/));
+  const nv = copyObj(state.run.nhanVat);
+  const oldKm = copyObj(nv.kinhMach || {});
+  const trangThai: string[] = [];
+  if (oldKm.trangThai && oldKm.trangThai.length) {
+    for (let i = 0; i < oldKm.trangThai.length; i++) trangThai.push('thong');
   }
-
-  const vung: number[] = [];
-  for (let r = 0; r < lines.length; r++) {
-    for (let c = 0; c < lines[r].length; c++) {
-      const ch = lines[r][c];
-      if (ch === '.') vung.push(-1);
-      else if (ch === 'D') vung.push(0);
-      else vung.push(1);
-    }
+  const mau = oldKm.mau ? [...oldKm.mau] : [];
+  const heList = (nv.linhCan && nv.linhCan.he && nv.linhCan.he.length) ? nv.linhCan.he : ['kim'];
+  for (let j = 0; j < mau.length; j++) {
+    if (mau[j] === 'vo_sac') mau[j] = heList[j % heList.length];
   }
+  oldKm.mau = mau;
+  oldKm.trangThai = trangThai;
+  oldKm.daLinhNgo = uniqueStrings(oldKm.daLinhNgo || [], ALL_TOP_SKILLS);
+  oldKm.cho = { mo: 99, doiMau: 99 };
+  nv.kinhMach = oldKm;
 
-  const allHuyet: number[] = [];
-  for (let i = 0; i < vung.length; i++) {
-    if (vung[i] === 1) allHuyet.push(i);
-  }
-
-  const km = copyObj(nv.kinhMach || {});
-  km.huyetThem = allHuyet;
-  km.daKhaiThong = true;
-  updateNhanVat({ kinhMach: km });
-  notify(`🌀 Đã đã thông TOÀN BỘ ${allHuyet.length} HUYỆT ĐẠO KINH MẠCH (100% An Toàn)!`);
+  updateNhanVat(nv);
+  notify('🌀 Đã mở thông toàn bộ Kinh Mạch (99 Lượt) & lĩnh ngộ 87 Kỹ Pháp!');
 }
 
-export function setRealm(canhGioiIndex: number): void {
-  const REALM_MAP: Record<number, { ten: string; tuViMax: number }> = {
-    1: { ten: 'Luyện Khí', tuViMax: 100 },
-    2: { ten: 'Trúc Cơ', tuViMax: 500 },
-    3: { ten: 'Kim Đan', tuViMax: 2000 },
-    4: { ten: 'Nguyên Anh', tuViMax: 8000 },
-    5: { ten: 'Hóa Thần', tuViMax: 25000 },
-    6: { ten: 'Luyện Hư', tuViMax: 80000 },
-    7: { ten: 'Hợp Thể', tuViMax: 250000 },
-    8: { ten: 'Đại Thừa', tuViMax: 800000 },
-    9: { ten: 'Độ Kiếp', tuViMax: 3000000 }
+export function setRealm(canhGioiIndex: number, tieuCanhGioiIndex: number = 3): void {
+  const cg = Math.max(0, Math.min(5, Math.floor(canhGioiIndex)));
+  const tcg = Math.max(0, Math.min(3, Math.floor(tieuCanhGioiIndex)));
+
+  const REALM_NAMES: Record<number, string> = {
+    0: 'Phàm Nhân',
+    1: 'Luyện Khí',
+    2: 'Trúc Cơ',
+    3: 'Kết Đan',
+    4: 'Nguyên Anh',
+    5: 'Hóa Thần'
   };
 
-  const target = REALM_MAP[canhGioiIndex] || REALM_MAP[9];
+  const SUB_REALM_NAMES: Record<number, string> = {
+    0: 'Sơ kỳ',
+    1: 'Trung kỳ',
+    2: 'Hậu kỳ',
+    3: 'Đại viên mãn'
+  };
+
+  updateNhanVat({
+    canhGioi: cg,
+    tieuCanhGioi: tcg,
+    binhCanh: 0
+  });
+
+  notify(`📈 Đã chuyển Cảnh Giới: ${REALM_NAMES[cg]} - ${SUB_REALM_NAMES[tcg]} (Xóa bình cảnh)!`);
+}
+
+export function setExtraRealm(kimDan: number, yCanh: string, diTuong: string, tucTue?: number): void {
   const patch: any = {
-    canhGioi: { cap: canhGioiIndex, tang: 9, ten: target.ten },
-    tuVi: target.tuViMax,
-    tuViMax: target.tuViMax,
-    kimDan: { pham: 9, ten: 'Cửu Chuyển Cực Phẩm Kim Đan' },
-    yCanh: { cap: 10, ten: 'Viên Mãn Kiếm Ý' },
-    diTuong: 'Hỗn Độn Sơ Khai'
+    kimDan: Math.max(1, Math.min(5, kimDan || 1)),
+    yCanh: yCanh || 'Kiếm ý',
+    diTuong: diTuong || 'kim'
   };
-
+  if (tucTue !== undefined && !isNaN(tucTue)) {
+    patch.tucTue = tucTue;
+  }
   updateNhanVat(patch);
-  notify(`🌟 Đã đột phá tới CẢNH GIỚI: ${target.ten} Đỉnh Phong (Cửu Chuyển Kim Đan)!`);
+  notify(`✨ Đã lưu Kim Đan Phẩm ${patch.kimDan}, ${patch.yCanh}, Dị Tượng (${patch.diTuong})!`);
 }
 
 export function setPhysique(theChatKey: string): void {
-  const tc = THE_CHAT_DB[theChatKey];
-  if (!tc) return;
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
 
-  const patch: any = {
-    theChat: theChatKey,
-    linhCan: {
-      loai: 'thien_linh_can',
-      ngu_hanh: ['kim', 'moc', 'thuy', 'hoa', 'tho'],
-      do_tinh_thuan: 100
+  const content = state.content;
+  const updatedNhanVat = copyObj(state.run.nhanVat);
+  const oldKm = copyObj(updatedNhanVat.kinhMach || {});
+  updatedNhanVat.theChat = theChatKey;
+
+  try {
+    let tcData: any = null;
+    if (content && content.theChat) {
+      tcData = typeof content.theChat.get === 'function' ? content.theChat.get(theChatKey) : content.theChat[theChatKey];
     }
-  };
 
-  updateNhanVat(patch);
-  unlockAllMeridians();
-  notify(`🔥 Đã tái tạo Thể Chất: [${tc.ten}] & Thiên Linh Căn Ngũ Hành!`);
+    let vungArr: number[] = [];
+    let rong = 11, cao = 11;
+    if (tcData) {
+      const tcBase = (typeof gWin.Kg === 'function') ? gWin.Kg(tcData) : tcData;
+      vungArr = tcBase.vung || tcData.vung || [];
+      rong = tcBase.rong || tcData.rong || 11;
+      cao = tcBase.cao || tcData.cao || 11;
+      if (tcBase.thienPhu || tcData.thienPhu) {
+        updatedNhanVat.thienPhuTheChat = tcBase.thienPhu || tcData.thienPhu;
+      }
+    }
+    if (!vungArr.length && THE_CHAT_DB[theChatKey]) {
+      const fb = parseKhuonFallback(THE_CHAT_DB[theChatKey].khuon);
+      vungArr = fb.vung;
+      rong = fb.rong;
+      cao = fb.cao;
+    }
+
+    if (vungArr.length) {
+      const heList = (updatedNhanVat.linhCan && updatedNhanVat.linhCan.he && updatedNhanVat.linhCan.he.length)
+        ? updatedNhanVat.linhCan.he
+        : ['vo_sac'];
+      const newTrangThai: string[] = [];
+      const newMau: string[] = [];
+      for (let i = 0; i < vungArr.length; i++) {
+        newTrangThai.push("thong");
+        newMau.push(vungArr[i] < 0 ? "vo_sac" : heList[i % heList.length]);
+      }
+
+      const keptManh: any[] = [];
+      if (oldKm.manh && oldKm.manh.length) {
+        for (let mi = 0; mi < oldKm.manh.length; mi++) {
+          const m = oldKm.manh[mi];
+          if (m.x < rong && m.y < cao) keptManh.push(m);
+        }
+      }
+      const keptSkills = uniqueStrings(oldKm.daLinhNgo || [], ALL_TOP_SKILLS);
+
+      updatedNhanVat.kinhMach = {
+        mau: newMau,
+        trangThai: newTrangThai,
+        huyetThem: oldKm.huyetThem || [],
+        manh: keptManh,
+        daLinhNgo: keptSkills,
+        cho: { mo: 99, doiMau: 99 }
+      };
+    }
+  } catch (err) {
+    console.error('Lỗi khi thiết lập thể chất:', err);
+  }
+
+  updateNhanVat(updatedNhanVat);
+  const tcName = THE_CHAT_DB[theChatKey]?.ten || theChatKey;
+  notify(`🧬 Đã gán [${tcName}], thông toàn bộ Kinh Mạch & bảo toàn Kỹ Pháp!`);
+}
+
+export function setLinhCan(selectedHe: string[]): void {
+  if (!selectedHe || selectedHe.length === 0) {
+    notify('⚠️ Chọn ít nhất 1 hệ Linh Căn!');
+    return;
+  }
+
+  let isBienDi = false;
+  for (const h of selectedHe) {
+    if (h === 'bang' || h === 'phong' || h === 'loi') isBienDi = true;
+  }
+
+  let pham = 'tap', tuLuyen = 1.0, dotPha = 0;
+  if (isBienDi) {
+    pham = 'bien_di';
+    tuLuyen = 1.2;
+    dotPha = 0.05;
+  } else if (selectedHe.length === 1) {
+    pham = 'thien';
+    tuLuyen = 1.3;
+    dotPha = 0.1;
+  } else if (selectedHe.length === 2) {
+    pham = 'song';
+    tuLuyen = 1.0;
+  } else {
+    pham = 'tap';
+    tuLuyen = 0.8;
+    dotPha = -0.05;
+  }
+
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+
+  const nv = copyObj(state.run.nhanVat);
+  if (nv.kinhMach && nv.kinhMach.mau) {
+    const km = copyObj(nv.kinhMach);
+    const newMau: string[] = [];
+    for (let mi = 0; mi < km.mau.length; mi++) {
+      newMau.push(km.mau[mi] === 'vo_sac' ? 'vo_sac' : selectedHe[mi % selectedHe.length]);
+    }
+    km.mau = newMau;
+    nv.kinhMach = km;
+  }
+
+  nv.linhCan = mergeObj(nv.linhCan || {}, {
+    pham,
+    he: selectedHe,
+    isBienDi,
+    tuLuyen,
+    dotPha
+  });
+
+  updateNhanVat(nv);
+  notify(`🌱 Đã gán Linh Căn ${pham.toUpperCase()} (${selectedHe.join(', ')}) & đồng bộ màu mạch!`);
+}
+
+export function resetLinhCan(): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) return;
+  const nv = copyObj(state.run.nhanVat);
+  nv.linhCan = mergeObj(nv.linhCan || {}, {
+    pham: 'vo',
+    he: [],
+    isBienDi: false,
+    tuLuyen: 0.5,
+    dotPha: 0
+  });
+  updateNhanVat(nv);
+  notify('🌱 Đã gỡ về Vô Linh Căn!');
+}
+
+export function updateMetaLuanHoi(diem: number, kiep?: number): void {
+  persistGameMeta((meta: any) => {
+    meta.diemLuanHoi = diem;
+    meta.diemTong = Math.max(meta.diemTong || 0, diem);
+    if (kiep !== undefined) {
+      meta.kiep = kiep;
+    }
+  });
+
+  if (kiep !== undefined) {
+    const state = getGameState();
+    if (state?.run) {
+      const run = copyObj(state.run);
+      run.kiep = kiep;
+      setGameState({ run });
+      persistGameSave(run);
+    }
+  }
+
+  notify(`🌌 Đã gán Điểm Luân Hồi = ${diem.toLocaleString()}${kiep !== undefined ? `, Số Kiếp = ${kiep}` : ''}!`);
 }
 
 export function unlockAllAchievementsAndFerrymen(): void {
   const state = getGameState();
   if (!state) return notify('⚠️ Chưa kết nối được game store!');
 
-  // Update profile
-  const profile = copyObj(state.profile || {});
-  const moKhoa = copyObj(profile.moKhoa || {});
-  for (const m of MO_KHOA_DATA) moKhoa[m] = true;
+  persistGameMeta((meta: any) => {
+    meta.diemLuanHoi = 999999;
+    meta.diemTong = Math.max(meta.diemTong || 0, 999999);
 
-  const tt = copyObj(profile.thanhTuu || {});
-  for (const a of ALL_THANH_TUU) tt[a] = true;
+    const moKhoa = copyObj(meta.moKhoa || {});
+    for (const m of MO_KHOA_DATA) {
+      moKhoa[m.id] = m.max;
+    }
+    meta.moKhoa = moKhoa;
 
-  profile.moKhoa = moKhoa;
-  profile.thanhTuu = tt;
-  profile.luanHoi = Math.max(profile.luanHoi || 0, 999);
+    const ttIds = ALL_THANH_TUU.map(a => a.id);
+    meta.tienLo = mergeObj(meta.tienLo || {}, { thanhTuu: ttIds });
+  });
 
-  setGameState({ profile });
-  notify(`🏆 Đã mở khóa ${MO_KHOA_DATA.length} LÃO ĐÒ và ${ALL_THANH_TUU.length} THÀNH TỰU!`);
+  notify(`🏆 Đã Max 999,999 Điểm Luân Hồi + Mở Khóa 17 Lão Đò & 28 Thành Tựu!`);
 }
