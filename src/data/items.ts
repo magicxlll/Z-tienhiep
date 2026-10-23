@@ -1,13 +1,36 @@
 import { PRESET_ITEMS, QUALITY_COLORS } from './presets';
-import { getGameState } from '../core/bridge';
+import { getGameState, gWin } from '../core/bridge';
 
 export interface ItemInfo {
   id: string;
   name: string;
   quality: number;
   cat: string;
+  he?: string[];
+  hinh?: string[];
   desc?: string;
+  isShaped?: boolean;
 }
+
+export const CATEGORY_NAMES: Record<string, string> = {
+  all: 'Tất Cả Loại',
+  cong_phap: 'Công Pháp',
+  dan_duoc: 'Đan Dược',
+  phap_khi: 'Pháp Khí',
+  linh_duoc: 'Linh Dược',
+  yeu_tai: 'Yêu Tài',
+  nguyen_lieu: 'Nguyên Liệu / Quặng',
+  phu_luc: 'Phù Lục',
+  di_hoa: 'Dị Hỏa',
+  dung_cu: 'Dụng Cụ Luyện Chế',
+  phuong_tien: 'Phương Tiện',
+  tru_vat: 'Trữ Vật',
+  don_phuong: 'Đơn Phương / Đồ Phổ',
+  di_bao: 'Dị Bảo',
+  lenh_bai: 'Lệnh Bài',
+  dac_san: 'Đặc Sản',
+  tap_vat: 'Tạp Vật',
+};
 
 export function removeVietnameseTones(str: string): string {
   return str
@@ -21,6 +44,27 @@ export function removeVietnameseTones(str: string): string {
 export function getItemInfo(itemId: string): ItemInfo {
   const normId = itemId.startsWith('item.') ? itemId : `item.${itemId}`;
   
+  // 1. Try runtime live game content first for 100% precision
+  try {
+    const liveItems = gWin.game?.env?.content?.items;
+    if (liveItems && typeof liveItems.get === 'function') {
+      const liveData = liveItems.get(normId);
+      if (liveData) {
+        return {
+          id: normId,
+          name: liveData.ten || liveData.name || normId.replace('item.', ''),
+          quality: liveData.pham_cap || liveData.phamCap || 1,
+          cat: liveData.loai || 'khac',
+          he: liveData.he || [],
+          hinh: liveData.hinh || [],
+          desc: liveData.mo_ta || liveData.desc || '',
+          isShaped: !!(liveData.hinh && liveData.hinh.length)
+        };
+      }
+    }
+  } catch (e) {}
+
+  // 2. Preset items
   if (PRESET_ITEMS[normId]) {
     const p = PRESET_ITEMS[normId];
     return {
@@ -32,11 +76,11 @@ export function getItemInfo(itemId: string): ItemInfo {
     };
   }
 
-  // Fallback to game dynamic content
+  // 3. Fallback to state.content
   try {
     const state = getGameState();
     const content = state?.content || {};
-    const itemObj = content.item || {};
+    const itemObj = content.items || content.item || {};
     const rawKey = normId.replace('item.', '');
 
     let itemData: any = null;
@@ -51,49 +95,61 @@ export function getItemInfo(itemId: string): ItemInfo {
         id: normId,
         name: itemData.ten || itemData.name || rawKey,
         quality: itemData.pham_cap || itemData.phamCap || 1,
-        cat: itemData.loai || 'Vật phẩm',
-        desc: itemData.mo_ta || itemData.desc || ''
+        cat: itemData.loai || 'khac',
+        he: itemData.he || [],
+        hinh: itemData.hinh || [],
+        desc: itemData.mo_ta || itemData.desc || '',
+        isShaped: !!(itemData.hinh && itemData.hinh.length)
       };
     }
   } catch (e) {}
 
-  // Pretty format id
+  // Pretty format fallback
   const parts = normId.replace('item.', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1));
   return {
     id: normId,
     name: parts.join(' '),
     quality: 1,
-    cat: 'Tự do',
-    desc: 'Vật phẩm tự do'
+    cat: 'khac',
+    desc: 'Vật phẩm tu tiên'
   };
 }
 
 let cachedAllItems: ItemInfo[] | null = null;
+let lastCacheTime = 0;
 
 export function getAllAvailableItems(): ItemInfo[] {
-  if (cachedAllItems) return cachedAllItems;
+  const now = Date.now();
+  // Invalidate cache every 10s to pick up newly unlocked or dynamic game items
+  if (cachedAllItems && (now - lastCacheTime < 10000)) return cachedAllItems;
 
   const map = new Map<string, ItemInfo>();
 
-  // 1. Add all presets
-  for (const id in PRESET_ITEMS) {
-    if (Object.prototype.hasOwnProperty.call(PRESET_ITEMS, id)) {
-      const p = PRESET_ITEMS[id];
-      map.set(id, {
-        id,
-        name: p.name,
-        quality: p.quality,
-        cat: p.cat,
-        desc: p.desc
+  // 1. Scan dynamic items from live game environment (988 items)
+  try {
+    const liveItems = gWin.game?.env?.content?.items;
+    if (liveItems && typeof liveItems.forEach === 'function') {
+      liveItems.forEach((val: any, key: string) => {
+        const fullId = key.startsWith('item.') ? key : `item.${key}`;
+        map.set(fullId, {
+          id: fullId,
+          name: val.ten || val.name || key,
+          quality: val.pham_cap || val.phamCap || 1,
+          cat: val.loai || 'khac',
+          he: val.he || [],
+          hinh: val.hinh || [],
+          desc: val.mo_ta || val.desc || '',
+          isShaped: !!(val.hinh && val.hinh.length)
+        });
       });
     }
-  }
+  } catch (e) {}
 
-  // 2. Scan dynamic items from game.content.item
+  // 2. Scan from store state if any
   try {
     const state = getGameState();
     const content = state?.content || {};
-    const itemObj = content.item || {};
+    const itemObj = content.items || content.item || {};
 
     if (itemObj && typeof itemObj.forEach === 'function') {
       itemObj.forEach((val: any, key: string) => {
@@ -103,34 +159,72 @@ export function getAllAvailableItems(): ItemInfo[] {
             id: fullId,
             name: val.ten || val.name || key,
             quality: val.pham_cap || val.phamCap || 1,
-            cat: val.loai || 'Vật phẩm',
-            desc: val.mo_ta || val.desc || ''
+            cat: val.loai || 'khac',
+            he: val.he || [],
+            hinh: val.hinh || [],
+            desc: val.mo_ta || val.desc || '',
+            isShaped: !!(val.hinh && val.hinh.length)
           });
         }
       });
-    } else if (itemObj && typeof itemObj === 'object') {
-      for (const key of Object.keys(itemObj)) {
-        const fullId = key.startsWith('item.') ? key : `item.${key}`;
-        if (!map.has(fullId)) {
-          const val = itemObj[key];
-          map.set(fullId, {
-            id: fullId,
-            name: val?.ten || val?.name || key,
-            quality: val?.pham_cap || val?.phamCap || 1,
-            cat: val?.loai || 'Vật phẩm',
-            desc: val?.mo_ta || val?.desc || ''
-          });
-        }
-      }
     }
   } catch (e) {}
+
+  // 3. Fallback presets
+  for (const id in PRESET_ITEMS) {
+    if (Object.prototype.hasOwnProperty.call(PRESET_ITEMS, id)) {
+      if (!map.has(id)) {
+        const p = PRESET_ITEMS[id];
+        map.set(id, {
+          id,
+          name: p.name,
+          quality: p.quality || 1,
+          cat: p.cat || 'khac',
+          desc: p.desc
+        });
+      }
+    }
+  }
 
   cachedAllItems = Array.from(map.values()).sort((a, b) => {
     if (b.quality !== a.quality) return b.quality - a.quality;
     return a.name.localeCompare(b.name, 'vi');
   });
 
+  lastCacheTime = now;
   return cachedAllItems;
+}
+
+export function filterItems(
+  catFilter: string = 'all',
+  qualityFilter: number = -1,
+  searchQuery: string = '',
+  offset: number = 0,
+  limit: number = 50
+): { items: ItemInfo[]; total: number } {
+  let list = getAllAvailableItems();
+
+  if (catFilter && catFilter !== 'all') {
+    list = list.filter(it => it.cat === catFilter);
+  }
+
+  if (qualityFilter > 0) {
+    list = list.filter(it => it.quality === qualityFilter);
+  }
+
+  if (searchQuery && searchQuery.trim()) {
+    const cleanQ = removeVietnameseTones(searchQuery.trim());
+    const rawQ = searchQuery.trim().toLowerCase();
+    list = list.filter(it => {
+      const nameNorm = removeVietnameseTones(it.name);
+      const idNorm = it.id.toLowerCase();
+      return nameNorm.includes(cleanQ) || idNorm.includes(rawQ);
+    });
+  }
+
+  const total = list.length;
+  const items = list.slice(offset, offset + limit);
+  return { items, total };
 }
 
 export function searchItems(query: string, maxResults = 30): ItemInfo[] {

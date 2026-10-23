@@ -642,6 +642,152 @@
   border-radius: 3px;
   font-weight: 700;
 }
+
+/* SUB-TABS */
+.vktt-subtabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.vktt-subtabs::-webkit-scrollbar {
+  display: none;
+}
+.vktt-subtab-btn {
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.vktt-subtab-btn.active {
+  background: linear-gradient(135deg, rgba(229, 184, 105, 0.2) 0%, rgba(183, 132, 56, 0.25) 100%);
+  color: #e5b869;
+  border-color: #e5b869;
+  font-weight: 700;
+}
+
+/* FILTER BARS & CONTROLS */
+.vktt-filter-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ITEM CATALOG */
+.vktt-catalog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.vktt-catalog-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(19, 23, 36, 0.85);
+  border: 1px solid #232a3f;
+  border-radius: 8px;
+  padding: 6px 8px;
+  gap: 6px;
+  min-width: 0;
+}
+.vktt-item-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.vktt-item-name {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.vktt-item-meta {
+  font-size: 10px;
+  color: #94a3b8;
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.vktt-item-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* RECIPE CARDS */
+.vktt-recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 440px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.vktt-recipe-card {
+  background: rgba(19, 23, 36, 0.9);
+  border: 1px solid #283149;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.vktt-recipe-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-bottom: 4px;
+}
+.vktt-recipe-ing-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 10.5px;
+  margin: 2px 0;
+}
+.vktt-ing-tag {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 2px 5px;
+  color: #cbd5e1;
+}
+.vktt-ing-tag.has {
+  border-color: #059669;
+  color: #34d399;
+}
+.vktt-ing-tag.lack {
+  border-color: #b91c1c;
+  color: #f87171;
+}
+.vktt-recipe-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
 `;
 
   // src/data/presets.ts
@@ -664,11 +810,49 @@
   var ALL_THANH_TUU = [{ "id": "thanh_tuu.canh_gioi.luyen_khi", "ten": "B\u01B0\u1EDBc l\xEAn ti\xEAn l\u1ED9 (Luy\u1EC7n Kh\xED)" }, { "id": "thanh_tuu.canh_gioi.truc_co", "ten": "Tr\xFAc c\u01A1 th\xE0nh c\xF4ng" }, { "id": "thanh_tuu.canh_gioi.ket_dan", "ten": "Ch\xE2n nh\xE2n (Kim \u0110an)" }, { "id": "thanh_tuu.canh_gioi.nguyen_anh", "ten": "L\xE3o t\u1ED5 (Nguy\xEAn Anh)" }, { "id": "thanh_tuu.canh_gioi.hoa_than", "ten": "\u0110\u1EA1i n\u0103ng (H\xF3a Th\u1EA7n)" }, { "id": "thanh_tuu.pham_chat.2", "ten": "\u0110\u1EA1o c\u01A1 Ho\xE0n M\u1EF9" }, { "id": "thanh_tuu.pham_chat.3", "ten": "Kim \u0111an Nh\u1EA5t ph\u1EA9m" }, { "id": "thanh_tuu.pham_chat.4", "ten": "D\u1ECB anh (D\u1ECB t\u01B0\u1EE3ng Nguy\xEAn Anh)" }, { "id": "thanh_tuu.tong_mon.chan_truyen", "ten": "Ch\xE2n truy\u1EC1n \u0111\u1EC7 t\u1EED" }, { "id": "thanh_tuu.tong_mon.truong_lao", "ten": "Tr\u01B0\u1EDFng l\xE3o m\xF4n ph\xE1i" }, { "id": "thanh_tuu.dao_lu", "ten": "K\u1EBFt l\xE0m \u0111\u1EA1o l\u1EEF" }, { "id": "thanh_tuu.ket_nghia", "ten": "K\u1EBFt ngh\u0129a kim lan" }, { "id": "thanh_tuu.thien_kieu_bang", "ten": "\u0110\u1EE9ng \u0111\u1EA7u Thi\xEAn Ki\xEAu B\u1EA3ng" }, { "id": "thanh_tuu.tam_ma", "ten": "Ch\xE9m t\xE2m ma" }, { "id": "thanh_tuu.nuoc.ung", "ten": "Tr\xFAc c\u01A1 \u1EDF \u0110\u1EA1i Ung" }, { "id": "thanh_tuu.nuoc.thinh", "ten": "Tr\xFAc c\u01A1 \u1EDF Th\u1ECBnh Qu\u1ED1c" }, { "id": "thanh_tuu.nuoc.luong", "ten": "Tr\xFAc c\u01A1 \u1EDF L\u01B0\u01A1ng Qu\u1ED1c" }, { "id": "thanh_tuu.nuoc.minh", "ten": "Tr\xFAc c\u01A1 \u1EDF B\u1EAFc Minh" }, { "id": "thanh_tuu.nuoc.viem", "ten": "Tr\xFAc c\u01A1 \u1EDF Vi\xEAm Qu\u1ED1c" }, { "id": "thanh_tuu.nghe.luyen_dan", "ten": "\u0110an s\u01B0 (M\u1EDF \u0110an T\xE2m)" }, { "id": "thanh_tuu.nghe.che_phu", "ten": "Ph\xF9 s\u01B0 (M\u1EDF Ph\xF9 T\xE2m)" }, { "id": "thanh_tuu.nghe.luyen_bao", "ten": "Kh\xED s\u01B0 (M\u1EDF Kh\xED T\xE2m)" }, { "id": "thanh_tuu.nghe.tong_su", "ten": "T\xF4ng s\u01B0 m\u1ED9t ngh\u1EC1" }, { "id": "thanh_tuu.chet.het_tho", "ten": "Th\u1ECD t\u1EADn" }, { "id": "thanh_tuu.chet.tu_tran", "ten": "T\u1EED tr\u1EADn" }, { "id": "thanh_tuu.chet.dot_pha", "ten": "Th\xE2n t\u1EED \u0111\u1EA1o ti\xEAu" }, { "id": "thanh_tuu.chet.tu_vong", "ten": "B\u1ECF m\u1EA1ng" }, { "id": "thanh_tuu.chet.tu_bo", "ten": "T\u1EF1 t\xE1n c\xF4ng" }];
 
   // src/data/items.ts
+  var CATEGORY_NAMES = {
+    all: "T\u1EA5t C\u1EA3 Lo\u1EA1i",
+    cong_phap: "C\xF4ng Ph\xE1p",
+    dan_duoc: "\u0110an D\u01B0\u1EE3c",
+    phap_khi: "Ph\xE1p Kh\xED",
+    linh_duoc: "Linh D\u01B0\u1EE3c",
+    yeu_tai: "Y\xEAu T\xE0i",
+    nguyen_lieu: "Nguy\xEAn Li\u1EC7u / Qu\u1EB7ng",
+    phu_luc: "Ph\xF9 L\u1EE5c",
+    di_hoa: "D\u1ECB H\u1ECFa",
+    dung_cu: "D\u1EE5ng C\u1EE5 Luy\u1EC7n Ch\u1EBF",
+    phuong_tien: "Ph\u01B0\u01A1ng Ti\u1EC7n",
+    tru_vat: "Tr\u1EEF V\u1EADt",
+    don_phuong: "\u0110\u01A1n Ph\u01B0\u01A1ng / \u0110\u1ED3 Ph\u1ED5",
+    di_bao: "D\u1ECB B\u1EA3o",
+    lenh_bai: "L\u1EC7nh B\xE0i",
+    dac_san: "\u0110\u1EB7c S\u1EA3n",
+    tap_vat: "T\u1EA1p V\u1EADt"
+  };
   function removeVietnameseTones(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
   }
   function getItemInfo(itemId) {
     const normId = itemId.startsWith("item.") ? itemId : `item.${itemId}`;
+    try {
+      const liveItems = gWin.game?.env?.content?.items;
+      if (liveItems && typeof liveItems.get === "function") {
+        const liveData = liveItems.get(normId);
+        if (liveData) {
+          return {
+            id: normId,
+            name: liveData.ten || liveData.name || normId.replace("item.", ""),
+            quality: liveData.pham_cap || liveData.phamCap || 1,
+            cat: liveData.loai || "khac",
+            he: liveData.he || [],
+            hinh: liveData.hinh || [],
+            desc: liveData.mo_ta || liveData.desc || "",
+            isShaped: !!(liveData.hinh && liveData.hinh.length)
+          };
+        }
+      }
+    } catch (e) {
+    }
     if (PRESET_ITEMS[normId]) {
       const p = PRESET_ITEMS[normId];
       return {
@@ -682,7 +866,7 @@
     try {
       const state = getGameState();
       const content = state?.content || {};
-      const itemObj = content.item || {};
+      const itemObj = content.items || content.item || {};
       const rawKey = normId.replace("item.", "");
       let itemData = null;
       if (typeof itemObj.get === "function") {
@@ -695,8 +879,11 @@
           id: normId,
           name: itemData.ten || itemData.name || rawKey,
           quality: itemData.pham_cap || itemData.phamCap || 1,
-          cat: itemData.loai || "V\u1EADt ph\u1EA9m",
-          desc: itemData.mo_ta || itemData.desc || ""
+          cat: itemData.loai || "khac",
+          he: itemData.he || [],
+          hinh: itemData.hinh || [],
+          desc: itemData.mo_ta || itemData.desc || "",
+          isShaped: !!(itemData.hinh && itemData.hinh.length)
         };
       }
     } catch (e) {
@@ -706,30 +893,39 @@
       id: normId,
       name: parts.join(" "),
       quality: 1,
-      cat: "T\u1EF1 do",
-      desc: "V\u1EADt ph\u1EA9m t\u1EF1 do"
+      cat: "khac",
+      desc: "V\u1EADt ph\u1EA9m tu ti\xEAn"
     };
   }
   var cachedAllItems = null;
+  var lastCacheTime = 0;
   function getAllAvailableItems() {
-    if (cachedAllItems) return cachedAllItems;
+    const now = Date.now();
+    if (cachedAllItems && now - lastCacheTime < 1e4) return cachedAllItems;
     const map = /* @__PURE__ */ new Map();
-    for (const id in PRESET_ITEMS) {
-      if (Object.prototype.hasOwnProperty.call(PRESET_ITEMS, id)) {
-        const p = PRESET_ITEMS[id];
-        map.set(id, {
-          id,
-          name: p.name,
-          quality: p.quality,
-          cat: p.cat,
-          desc: p.desc
+    try {
+      const liveItems = gWin.game?.env?.content?.items;
+      if (liveItems && typeof liveItems.forEach === "function") {
+        liveItems.forEach((val, key) => {
+          const fullId = key.startsWith("item.") ? key : `item.${key}`;
+          map.set(fullId, {
+            id: fullId,
+            name: val.ten || val.name || key,
+            quality: val.pham_cap || val.phamCap || 1,
+            cat: val.loai || "khac",
+            he: val.he || [],
+            hinh: val.hinh || [],
+            desc: val.mo_ta || val.desc || "",
+            isShaped: !!(val.hinh && val.hinh.length)
+          });
         });
       }
+    } catch (e) {
     }
     try {
       const state = getGameState();
       const content = state?.content || {};
-      const itemObj = content.item || {};
+      const itemObj = content.items || content.item || {};
       if (itemObj && typeof itemObj.forEach === "function") {
         itemObj.forEach((val, key) => {
           const fullId = key.startsWith("item.") ? key : `item.${key}`;
@@ -738,57 +934,58 @@
               id: fullId,
               name: val.ten || val.name || key,
               quality: val.pham_cap || val.phamCap || 1,
-              cat: val.loai || "V\u1EADt ph\u1EA9m",
-              desc: val.mo_ta || val.desc || ""
+              cat: val.loai || "khac",
+              he: val.he || [],
+              hinh: val.hinh || [],
+              desc: val.mo_ta || val.desc || "",
+              isShaped: !!(val.hinh && val.hinh.length)
             });
           }
         });
-      } else if (itemObj && typeof itemObj === "object") {
-        for (const key of Object.keys(itemObj)) {
-          const fullId = key.startsWith("item.") ? key : `item.${key}`;
-          if (!map.has(fullId)) {
-            const val = itemObj[key];
-            map.set(fullId, {
-              id: fullId,
-              name: val?.ten || val?.name || key,
-              quality: val?.pham_cap || val?.phamCap || 1,
-              cat: val?.loai || "V\u1EADt ph\u1EA9m",
-              desc: val?.mo_ta || val?.desc || ""
-            });
-          }
-        }
       }
     } catch (e) {
+    }
+    for (const id in PRESET_ITEMS) {
+      if (Object.prototype.hasOwnProperty.call(PRESET_ITEMS, id)) {
+        if (!map.has(id)) {
+          const p = PRESET_ITEMS[id];
+          map.set(id, {
+            id,
+            name: p.name,
+            quality: p.quality || 1,
+            cat: p.cat || "khac",
+            desc: p.desc
+          });
+        }
+      }
     }
     cachedAllItems = Array.from(map.values()).sort((a, b) => {
       if (b.quality !== a.quality) return b.quality - a.quality;
       return a.name.localeCompare(b.name, "vi");
     });
+    lastCacheTime = now;
     return cachedAllItems;
   }
-  function searchItems(query, maxResults = 30) {
-    const items = getAllAvailableItems();
-    if (!query || !query.trim()) {
-      return items.slice(0, maxResults);
+  function filterItems(catFilter = "all", qualityFilter = -1, searchQuery = "", offset = 0, limit = 50) {
+    let list = getAllAvailableItems();
+    if (catFilter && catFilter !== "all") {
+      list = list.filter((it) => it.cat === catFilter);
     }
-    const cleanQ = removeVietnameseTones(query.trim());
-    const rawQ = query.trim().toLowerCase();
-    const results = [];
-    for (const item of items) {
-      const nameNorm = removeVietnameseTones(item.name);
-      const idNorm = item.id.toLowerCase();
-      const catNorm = removeVietnameseTones(item.cat);
-      let score = 0;
-      if (nameNorm === cleanQ || idNorm === rawQ) score = 100;
-      else if (nameNorm.startsWith(cleanQ) || idNorm.includes(rawQ)) score = 80;
-      else if (nameNorm.includes(cleanQ)) score = 60;
-      else if (catNorm.includes(cleanQ)) score = 40;
-      if (score > 0) {
-        results.push({ item, score: score + item.quality * 2 });
-      }
+    if (qualityFilter > 0) {
+      list = list.filter((it) => it.quality === qualityFilter);
     }
-    results.sort((a, b) => b.score - a.score);
-    return results.slice(0, maxResults).map((r) => r.item);
+    if (searchQuery && searchQuery.trim()) {
+      const cleanQ = removeVietnameseTones(searchQuery.trim());
+      const rawQ = searchQuery.trim().toLowerCase();
+      list = list.filter((it) => {
+        const nameNorm = removeVietnameseTones(it.name);
+        const idNorm = it.id.toLowerCase();
+        return nameNorm.includes(cleanQ) || idNorm.includes(rawQ);
+      });
+    }
+    const total = list.length;
+    const items = list.slice(offset, offset + limit);
+    return { items, total };
   }
 
   // src/core/mutator.ts
@@ -1241,6 +1438,4849 @@
       meta.tienLo = mergeObj(meta.tienLo || {}, { thanhTuu: ttIds });
     });
     notify(`\u{1F3C6} \u0110\xE3 Max 999,999 \u0110i\u1EC3m Lu\xE2n H\u1ED3i + M\u1EDF Kh\xF3a 17 L\xE3o \u0110\xF2 & 28 Th\xE0nh T\u1EF1u!`);
+  }
+
+  // src/modules/optimizer.ts
+  var FALLBACK_KHUON = {
+    "the_chat.hoang_co": `
+. . 5 5 4 4 4 5 5 . .
+. 3 3 3 2 2 2 3 3 3 .
+5 3 2 2 1 1 1 2 2 3 5
+5 3 2 2 1 1 1 2 2 3 5
+4 2 1 1 0 0 0 1 1 2 4
+4 2 1 1 0 D 0 1 1 2 4
+4 2 1 1 0 0 0 1 1 2 4
+5 3 2 2 1 1 1 2 2 3 5
+5 3 2 2 1 1 1 2 2 3 5
+. 3 3 3 2 2 2 3 3 3 .
+. . 5 5 4 4 4 5 5 . .
+`,
+    "the_chat.kiem_cot": `
+. . f . .
+. 5 4 5 .
+5 4 e 4 5
+4 4 3 4 4
+4 3 d 3 4
+3 3 2 3 3
+3 2 c 2 3
+2 2 1 2 2
+2 1 b 1 2
+1 0 0 0 1
+1 0 D 0 1
+1 0 0 0 1
+. 1 1 1 .
+`,
+    "the_chat.thiet_cot": `
+. . f 5 4 4 4 5 5 . .
+. 3 3 3 2 2 2 3 3 3 .
+5 3 2 2 1 1 1 2 2 3 5
+4 2 1 1 0 0 0 1 1 c 4
+4 2 1 1 0 D 0 1 1 2 4
+4 2 1 1 0 0 0 1 1 2 4
+5 3 2 2 1 1 1 2 2 3 5
+. 3 3 3 2 2 2 3 3 3 .
+. . 5 5 4 e 4 5 5 . .
+`,
+    "the_chat.bach_thao": `
+. . f 4 e 4 5 . .
+. d 3 2 2 2 3 3 .
+5 3 2 1 1 1 2 3 5
+4 2 1 0 0 0 1 c 4
+4 2 1 0 D 0 1 2 4
+4 2 1 0 0 0 1 2 4
+5 3 2 1 b 1 2 3 5
+. 3 3 2 2 2 3 3 .
+. . 5 4 e 4 5 . .
+`,
+    "the_chat.pham_the": `
+. . f 4 e 4 5 . .
+. d 3 2 2 2 3 3 .
+5 3 2 1 1 1 2 3 5
+4 2 1 0 0 0 1 c 4
+4 2 1 0 D 0 1 2 4
+4 2 1 0 0 0 1 2 4
+5 3 2 1 b 1 2 3 5
+. 3 3 2 2 2 3 3 .
+. . 5 4 e 4 5 . .
+`,
+    "the_chat.cuu_am": `
+. 5 4 e 4 5 .
+f d 2 b 2 3 5
+4 c 0 0 0 2 4
+4 1 0 D 0 1 e
+4 2 0 0 0 c 4
+5 3 2 b 2 3 5
+. 5 3 d 3 f .
+`
+  };
+  function parseKhuon(khuonStr) {
+    const lines = khuonStr.trim().split("\n").map((l) => l.trim().split(/\s+/));
+    const cao = lines.length;
+    const rong = lines[0].length;
+    const vung = [];
+    let danDien = -1;
+    lines.forEach((row, y) => {
+      row.forEach((cell, x) => {
+        const idx = y * rong + x;
+        if (cell === "D") {
+          danDien = idx;
+          vung.push(0);
+        } else if (cell === ".") {
+          vung.push(-1);
+        } else {
+          vung.push(parseInt(cell, 16) || 0);
+        }
+      });
+    });
+    return { rong, cao, danDien, vung };
+  }
+  function getMeridianLayout(physiqueId) {
+    try {
+      const liveTc = gWin.game?.env?.content?.theChat?.get(physiqueId);
+      if (liveTc && liveTc.khuon) {
+        return parseKhuon(liveTc.khuon);
+      }
+    } catch (e) {
+    }
+    const fbStr = FALLBACK_KHUON[physiqueId] || FALLBACK_KHUON["the_chat.pham_the"];
+    return parseKhuon(fbStr);
+  }
+  function getOffsets(hinh, rot) {
+    let pts = [];
+    hinh.forEach((row, y) => {
+      [...row].forEach((ch, x) => {
+        if (ch !== ".") pts.push([x, y]);
+      });
+    });
+    for (let i = 0; i < (rot % 4 + 4) % 4; i++) {
+      pts = pts.map(([x, y]) => [-y, x]);
+    }
+    const minX = Math.min(...pts.map((p) => p[0]));
+    const minY = Math.min(...pts.map((p) => p[1]));
+    return pts.map(([x, y]) => [x - minX, y - minY]);
+  }
+  function packShards(layout, candidates, maxCount = 12) {
+    const placed = [];
+    const occupied = /* @__PURE__ */ new Set();
+    if (layout.danDien >= 0) {
+      occupied.add(layout.danDien);
+    }
+    const sorted = [...candidates].sort((a, b) => {
+      if (b.quality !== a.quality) return b.quality - a.quality;
+      return (b.hinh?.length || 0) - (a.hinh?.length || 0);
+    });
+    for (const item of sorted) {
+      if (!item.hinh || !item.hinh.length) continue;
+      if (placed.some((p) => p.item === item.id)) continue;
+      let bestPos = null;
+      for (let rot = 0; rot < 4 && !bestPos; rot++) {
+        const offsets = getOffsets(item.hinh, rot);
+        const w = Math.max(...offsets.map((p) => p[0])) + 1;
+        const h = Math.max(...offsets.map((p) => p[1])) + 1;
+        for (let y = 0; y <= layout.cao - h; y++) {
+          for (let x = 0; x <= layout.rong - w; x++) {
+            let valid = true;
+            const cellIndices = [];
+            for (const [ox, oy] of offsets) {
+              const cx = x + ox;
+              const cy = y + oy;
+              const idx = cy * layout.rong + cx;
+              if (cx < 0 || cy < 0 || cx >= layout.rong || cy >= layout.cao || layout.vung[idx] < 0 || occupied.has(idx)) {
+                valid = false;
+                break;
+              }
+              cellIndices.push(idx);
+            }
+            if (valid) {
+              bestPos = { x, y, rot, cells: cellIndices };
+              break;
+            }
+          }
+          if (bestPos) break;
+        }
+      }
+      if (bestPos) {
+        const primaryEl = item.he && item.he.length && item.he[0] !== "vo_sac" ? item.he[0] : "kim";
+        placed.push({
+          item: item.id,
+          x: bestPos.x,
+          y: bestPos.y,
+          xoay: bestPos.rot,
+          cells: bestPos.cells,
+          element: primaryEl
+        });
+        bestPos.cells.forEach((idx) => occupied.add(idx));
+        if (placed.length >= maxCount) break;
+      }
+    }
+    return placed;
+  }
+  var TOP_EQUIPMENT = {
+    tru_vat: "item.can_khon_gioi",
+    // Phẩm 8, Càn Khôn Giới (+1000 ô)
+    di_hoa: "item.cuu_u_hoang_hoa",
+    // Phẩm 8, Cửu U Hoàng Hỏa
+    luyen_dan: "item.dan_lo_tien",
+    // Phẩm 6, Thái Thượng đan lô
+    che_phu: "item.phu_but_tien",
+    // Phẩm 6, Lôi Mộc Phù Bút
+    luyen_bao: "item.khi_lo_tien",
+    // Phẩm 6, Thái Sơ đỉnh
+    di_lai: "item.thai_hu_chu"
+    // Phẩm 8, Thái Hư Chu
+  };
+  var ELEMENT_BUILDS = {
+    kim: {
+      name: "\u2694\uFE0F Ki\u1EBFm T\xF4ng / Kim Tu",
+      elements: ["kim", "loi"],
+      linhCanPham: "thien",
+      items: [
+        "item.yeu_hoang_huyet_kinh",
+        "item.bat_chiet_kiem",
+        "item.doan_thien_chien_ky",
+        "item.toai_thien_kiem",
+        "item.huyet_ma_thien_dao",
+        "item.canh_kim_chan_kinh",
+        "item.thien_loi_chinh_phap",
+        "item.tu_tieu_loi_dien",
+        "item.bat_diet_kim_than",
+        "item.tru_tien_kiem"
+      ]
+    },
+    hoa: {
+      name: "\u{1F525} H\u1ECFa Tu / Vi\xEAm \u0110\u1EBF",
+      elements: ["hoa", "moc"],
+      linhCanPham: "thien",
+      items: [
+        "item.yeu_hoang_huyet_kinh",
+        "item.doan_thien_chien_ky",
+        "item.dai_nhat_phat_an",
+        "item.phan_thien_chan_hoa",
+        "item.chuc_dung_hoa_dien",
+        "item.hon_thien_lang",
+        "item.cuu_vi_huyen_dang",
+        "item.hoa_lan_truong",
+        "item.hoa_loan_vu_y",
+        "item.van_tuong_dien"
+      ]
+    },
+    thuy: {
+      name: "\u2744\uFE0F Th\u1EE7y / B\u0103ng Tu",
+      elements: ["thuy", "bang"],
+      linhCanPham: "thien",
+      items: [
+        "item.thai_co_long_lan",
+        "item.nghich_lan_thuan",
+        "item.truong_sinh_chan_kinh",
+        "item.thai_am_han_kinh",
+        "item.huyen_vu_chan_kinh",
+        "item.ngoc_tinh_binh",
+        "item.tran_hai_than_chuy",
+        "item.hoa_long_truong",
+        "item.thien_bang_cung",
+        "item.ly_long_giap"
+      ]
+    },
+    moc: {
+      name: "\u{1F33F} M\u1ED9c Tu / Tr\u01B0\u1EDDng Sinh",
+      elements: ["moc", "phong"],
+      linhCanPham: "thien",
+      items: [
+        "item.truong_sinh_chan_kinh",
+        "item.cuu_thien_cuong_phong",
+        "item.con_bang_chan_quyet",
+        "item.kien_moc_thien_kinh",
+        "item.van_hon_phien",
+        "item.hat_vi_tien",
+        "item.thanh_loan_tram",
+        "item.tu_sa_doc_cham",
+        "item.thanh_de_truong_xuan_kinh",
+        "item.van_thi_doc_vu"
+      ]
+    },
+    tho: {
+      name: "\u26F0\uFE0F Th\u1ED5 Tu / B\u1EA5t Di\u1EC7t",
+      elements: ["tho", "kim"],
+      linhCanPham: "thien",
+      items: [
+        "item.yeu_hoang_huyet_kinh",
+        "item.thai_co_long_lan",
+        "item.khon_nguyen_than_kinh",
+        "item.hau_tho_than_bi",
+        "item.hung_tam_kinh",
+        "item.vien_tam_moc_ngu",
+        "item.huyen_hoang_tao_hoa_kinh",
+        "item.huyen_hoang_chuong",
+        "item.huyen_nham_chan_kinh",
+        "item.thai_son_ap_dinh"
+      ]
+    },
+    loi_phong: {
+      name: "\u26A1 L\xF4i / Phong Tu (Cu\u1ED3ng B\u1EA1o)",
+      elements: ["loi", "phong"],
+      linhCanPham: "bien_di",
+      items: [
+        "item.thien_loi_chinh_phap",
+        "item.cuu_thien_cuong_phong",
+        "item.tu_tieu_loi_dien",
+        "item.con_bang_chan_quyet",
+        "item.van_hon_phien",
+        "item.tu_tieu_than_kiem",
+        "item.cuu_tieu_ngu_loi_quyet",
+        "item.thien_cuong_loi_quyet",
+        "item.thanh_minh_phong_kinh",
+        "item.oanh_thien_loi_chuy"
+      ]
+    },
+    toan_nang: {
+      name: "\u{1F31F} To\xE0n N\u0103ng Th\u1EA7n C\u1EA5p (Top Ph\u1EA9m 8)",
+      elements: ["kim", "moc", "thuy", "hoa", "tho", "bang", "phong", "loi"],
+      linhCanPham: "thien",
+      items: [
+        "item.luan_hoi_chan_kinh",
+        "item.yeu_hoang_huyet_kinh",
+        "item.phong_thien_an",
+        "item.bat_chiet_kiem",
+        "item.tam_sinh_thach",
+        "item.thai_co_long_lan",
+        "item.doan_thien_chien_ky",
+        "item.nghich_lan_thuan",
+        "item.van_kiep_hon_dang",
+        "item.toai_thien_kiem"
+      ]
+    }
+  };
+  function autoOptimizeFromBag() {
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) {
+      notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return false;
+    }
+    const nv = copyObj(state.run.nhanVat);
+    const tuiDo = copyObj(nv.tuiDo || {});
+    const layout = getMeridianLayout(nv.theChat || "the_chat.pham_the");
+    const candidateItems = [];
+    for (const itemId in tuiDo) {
+      if (tuiDo[itemId] > 0) {
+        const info = getItemInfo(itemId);
+        if (info.isShaped && info.hinh && info.hinh.length) {
+          candidateItems.push(info);
+        }
+      }
+    }
+    if (candidateItems.length === 0) {
+      notify("\u26A0\uFE0F Trong t\xFAi ch\u01B0a c\xF3 c\xF4ng ph\xE1p ho\u1EB7c ph\xE1p kh\xED c\xF3 m\u1EA3nh gh\xE9p \u0111\u1EC3 b\u1ED1 tr\xED!");
+      return false;
+    }
+    const placed = packShards(layout, candidateItems, 12);
+    if (placed.length === 0) {
+      notify("\u26A0\uFE0F Kh\xF4ng t\xECm \u0111\u01B0\u1EE3c v\u1ECB tr\xED h\u1EE3p l\u1EC7 \u0111\u1EC3 \u0111\u1EB7t c\xE1c m\u1EA3nh hi\u1EC7n c\xF3!");
+      return false;
+    }
+    const oldKm = copyObj(nv.kinhMach || {});
+    const totalCells = layout.rong * layout.cao;
+    const mau = oldKm.mau && oldKm.mau.length === totalCells ? [...oldKm.mau] : new Array(totalCells).fill("kim");
+    const trangThai = new Array(totalCells).fill("an");
+    for (let i = 0; i < totalCells; i++) {
+      if (layout.vung[i] >= 0) {
+        trangThai[i] = "thong";
+      }
+    }
+    placed.forEach((p) => {
+      p.cells.forEach((idx) => {
+        mau[idx] = p.element;
+      });
+    });
+    const newManh = placed.map((p) => ({
+      item: p.item,
+      x: p.x,
+      y: p.y,
+      xoay: p.xoay
+    }));
+    oldKm.manh = newManh;
+    oldKm.mau = mau;
+    oldKm.trangThai = trangThai;
+    oldKm.cho = { mo: 99, doiMau: 99 };
+    nv.kinhMach = oldKm;
+    const currentTrangBi = copyObj(nv.trangBi || {});
+    const allAvailable = getAllAvailableItems();
+    const slotItems = {
+      tru_vat: [],
+      di_hoa: [],
+      luyen_dan: [],
+      che_phu: [],
+      luyen_bao: [],
+      di_lai: []
+    };
+    allAvailable.forEach((it) => {
+      if ((tuiDo[it.id] || 0) > 0) {
+        if (it.cat === "tru_vat") slotItems.tru_vat.push(it);
+        else if (it.cat === "di_hoa") slotItems.di_hoa.push(it);
+        else if (it.cat === "dung_cu") {
+          if (it.id.includes("dan_lo")) slotItems.luyen_dan.push(it);
+          else if (it.id.includes("phu_but")) slotItems.che_phu.push(it);
+          else if (it.id.includes("khi_lo")) slotItems.luyen_bao.push(it);
+        } else if (it.cat === "phuong_tien") slotItems.di_lai.push(it);
+      }
+    });
+    for (const slotKey in slotItems) {
+      const list = slotItems[slotKey].sort((a, b) => b.quality - a.quality);
+      if (list.length > 0) {
+        currentTrangBi[slotKey] = list[0].id;
+      }
+    }
+    nv.trangBi = currentTrangBi;
+    const nextRun = copyObj(state.run);
+    nextRun.nhanVat = nv;
+    setGameState({ run: nextRun });
+    persistGameSave(nextRun);
+    notify(`\u26A1 B\u1ED1 tr\xED th\xE0nh c\xF4ng ${placed.length} m\u1EA3nh t\u1ED1i \u01B0u & trang b\u1ECB 6 m\xF3n \u0111\u1ED3 t\u1EEB t\xFAi!`);
+    return true;
+  }
+  function applyElementalBuild(buildKey) {
+    const build = ELEMENT_BUILDS[buildKey];
+    if (!build) {
+      notify("\u26A0\uFE0F Kh\xF4ng t\xECm th\u1EA5y c\u1EA5u h\xECnh h\u1EC7 n\xE0y!");
+      return false;
+    }
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) {
+      notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return false;
+    }
+    const nv = copyObj(state.run.nhanVat);
+    const tuiDo = copyObj(nv.tuiDo || {});
+    const layout = getMeridianLayout(nv.theChat || "the_chat.pham_the");
+    build.items.forEach((id) => {
+      tuiDo[id] = Math.max(tuiDo[id] || 0, 1);
+    });
+    const currentTrangBi = copyObj(nv.trangBi || {});
+    for (const [slot, id] of Object.entries(TOP_EQUIPMENT)) {
+      tuiDo[id] = Math.max(tuiDo[id] || 0, 1);
+      currentTrangBi[slot] = id;
+    }
+    nv.trangBi = currentTrangBi;
+    const candidateItems = build.items.map((id) => getItemInfo(id)).filter((it) => it.isShaped);
+    const placed = packShards(layout, candidateItems, 12);
+    const totalCells = layout.rong * layout.cao;
+    const primaryEl = build.elements[0] || "kim";
+    const mau = new Array(totalCells).fill(primaryEl);
+    const trangThai = new Array(totalCells).fill("an");
+    for (let i = 0; i < totalCells; i++) {
+      if (layout.vung[i] >= 0) {
+        trangThai[i] = "thong";
+      }
+    }
+    placed.forEach((p) => {
+      p.cells.forEach((idx) => {
+        mau[idx] = p.element;
+      });
+    });
+    const oldKm = copyObj(nv.kinhMach || {});
+    oldKm.manh = placed.map((p) => ({
+      item: p.item,
+      x: p.x,
+      y: p.y,
+      xoay: p.xoay
+    }));
+    oldKm.mau = mau;
+    oldKm.trangThai = trangThai;
+    oldKm.cho = { mo: 99, doiMau: 99 };
+    nv.kinhMach = oldKm;
+    nv.linhCan = {
+      pham: build.linhCanPham || "thien",
+      he: [...build.elements]
+    };
+    nv.tuiDo = tuiDo;
+    nv.oTuiThem = Math.max(nv.oTuiThem || 0, Object.keys(tuiDo).length + 80);
+    nv.xepTui = buildSyncedXepTui(nv.xepTui, tuiDo);
+    const nextRun = copyObj(state.run);
+    nextRun.nhanVat = nv;
+    setGameState({ run: nextRun });
+    persistGameSave(nextRun);
+    notify(`\u{1F680} \u0110\xE3 \xE1p d\u1EE5ng ${build.name}: B\u1ED1 tr\xED ${placed.length} m\u1EA3nh c\u1EF1c ph\u1EA9m, trang b\u1ECB 6 th\u1EA7n kh\xED!`);
+    return true;
+  }
+
+  // src/data/recipes.ts
+  var FALLBACK_RECIPES = [
+    {
+      "id": "dp.hoi_xuan_dan",
+      "nghe": "luyen_dan",
+      "ten": "H\u1ED3i Xu\xE2n \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.hoi_xuan_dan",
+      "chu": [
+        {
+          "id": "item.son_sam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 2,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng nh\u1EADp m\xF4n, th\u1EA7y lang n\xE0o c\u0169ng thu\u1ED9c. S\xE2m n\xFAi ph\u1EA3i ninh l\u1EEDa nh\u1ECF, l\u1EEDa to th\xEC d\u01B0\u1EE3c t\xEDnh bay h\u1EBFt."
+    },
+    {
+      "id": "dp.bo_khi_dan",
+      "nghe": "luyen_dan",
+      "ten": "B\u1ED5 Kh\xED \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.bo_khi_dan",
+      "chu": [
+        {
+          "id": "item.thanh_tam_thao",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "mo_ta": "M\u1ED9t v\u1ECB Thanh T\xE2m Th\u1EA3o, kh\xF4ng k\xE9n l\u1EEDa. \u0110an \u0111\u1ED3 th\u01B0\u1EDDng luy\u1EC7n \u0111\u01A1n n\xE0y t\u1EDBi m\xF2n tay \u0111\u1EC3 t\u1EADp canh l\xF2."
+    },
+    {
+      "id": "dp.sinh_co_dan",
+      "nghe": "luyen_dan",
+      "ten": "Sinh C\u01A1 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.sinh_co_dan",
+      "chu": [
+        {
+          "id": "item.huyet_linh_chi",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "moc"
+          ],
+          "pham": 2,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "mo_ta": "Huy\u1EBFt Linh Chi l\xE0m ch\u1EE7, th\xEAm m\u1ED9t v\u1ECB linh d\u01B0\u1EE3c h\u1EC7 m\u1ED9c l\xE0m ph\u1EE5. Ph\u1EA3i l\u1EEDa v\u0103n \u1EE7 ba ng\xE0y, n\xF3ng v\u1ED9i th\xEC \u0111an n\u1EE9t."
+    },
+    {
+      "id": "dp.tu_linh_dan",
+      "nghe": "luyen_dan",
+      "ten": "T\u1EE5 Linh \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tu_linh_dan",
+      "chu": [
+        {
+          "id": "item.yeu_dan_1",
+          "so": 3
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "L\u1EA5y y\xEAu \u0111an l\xE0m l\xF5i. V\u1ECF y\xEAu \u0111an c\u1EE9ng, ph\u1EA3i m\xE3nh h\u1ECFa m\u1EDBi ph\xE1 \u0111\u01B0\u1EE3c, linh kh\xED b\xEAn trong m\u1EDBi ch\u1ECBu tan ra."
+    },
+    {
+      "id": "dp.bao_huyet_dan",
+      "nghe": "luyen_dan",
+      "ten": "B\u1EA1o Huy\u1EBFt \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.bao_huyet_dan",
+      "chu": [
+        {
+          "id": "item.huyet_linh_chi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "C\xF9ng m\u1ED9t v\u1ECB Huy\u1EBFt Linh Chi v\u1EDBi Sinh C\u01A1 \u0110an, nh\u01B0ng \u0111\u1ED1t b\u1EB1ng l\u1EEDa v\u0169 cho huy\u1EBFt kh\xED s\xF4i l\xEAn. \u0110an ra \u0111\u1ECF nh\u01B0 than h\u1ED3ng."
+    },
+    {
+      "id": "dp.truc_co_dan",
+      "nghe": "luyen_dan",
+      "ten": "Tr\xFAc C\u01A1 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.truc_co_dan",
+      "chu": [
+        {
+          "id": "item.huyet_linh_chi",
+          "so": 1
+        },
+        {
+          "id": "item.thanh_tam_thao",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng t\xF4ng m\xF4n gi\u1EEF k\xEDn, kh\xF4ng truy\u1EC1n ra ph\u01B0\u1EDDng th\u1ECB. M\u1ED7i l\xF2 ch\u1EC9 ra m\u1ED9t vi\xEAn, may l\u1EAFm m\u1EDBi \u0111\u01B0\u1EE3c hai."
+    },
+    {
+      "id": "dp.kim_sang_duoc",
+      "nghe": "luyen_dan",
+      "ten": "Kim Sang D\u01B0\u1EE3c ph\u01B0\u01A1ng",
+      "ra": "item.kim_sang_duoc",
+      "chu": [
+        {
+          "id": "item.sa_can_thao",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "mo_ta": "R\u1EC5 c\u1ECF c\xE1t gi\xE3 n\xE1t, sao kh\xF4, t\xE1n b\u1ED9t. Kh\xF4ng k\xE9n l\u1EEDa, ch\u1EC9 k\xE9n tay, gi\xE3 kh\xF4ng nhuy\u1EC5n th\xEC r\u1EAFc v\xE0o v\u1EBFt th\u01B0\u01A1ng th\u1EA5y x\xF3t."
+    },
+    {
+      "id": "dp.hoi_xuan_dan_thuy",
+      "nghe": "luyen_dan",
+      "ten": "H\u1ED3i Xu\xE2n \u0110an ph\u01B0\u01A1ng (s\u01B0\u01A1ng sen)",
+      "ra": "item.hoi_xuan_dan",
+      "chu": [
+        {
+          "id": "item.ha_diep_suong",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 2,
+      "mo_ta": "B\u1EA3n \u0111\u01A1n ph\u01B0\u01A1ng c\u1EE7a d\xE2n v\u1EA1n ch\xE0i, l\u1EA5y s\u01B0\u01A1ng l\xE1 sen thay s\xE2m n\xFAi. L\u1EEDa ph\u1EA3i nh\u1ECF h\u01A1n c\u1EA3 \u0111om \u0111\xF3m, s\u01B0\u01A1ng g\u1EB7p n\xF3ng l\xE0 bay."
+    },
+    {
+      "id": "dp.bo_khi_dan_cot",
+      "nghe": "luyen_dan",
+      "ten": "B\u1ED5 Kh\xED \u0110an ph\u01B0\u01A1ng (c\u1ED1t hoa)",
+      "ra": "item.bo_khi_dan",
+      "chu": [
+        {
+          "id": "item.bach_cot_hoa",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 3,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng c\u1EE7a th\u1EE3 s\u0103n Lang Hoang, d\xF9ng hoa m\u1ECDc tr\xEAn x\u01B0\u01A1ng y\xEAu. Ph\u1EA3i \u0111\u1ED1t l\u1EEDa m\u1EA1nh cho tan \xE2m kh\xED, kh\xF4ng th\xEC u\u1ED1ng v\xE0o l\u1EA1nh b\u1EE5ng."
+    },
+    {
+      "id": "dp.bao_huyet_dan_mac",
+      "nghe": "luyen_dan",
+      "ten": "B\u1EA1o Huy\u1EBFt \u0110an ph\u01B0\u01A1ng (m\u1EA1c \u0111\u1EB1ng)",
+      "ra": "item.bao_huyet_dan",
+      "chu": [
+        {
+          "id": "item.hoa_mac_dang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng c\u1EE7a \u0111\u1ED9i l\u1EA1c \u0111\xE0 v\u01B0\u1EE3t sa m\u1EA1c. D\xE2y \u0111\u1EB1ng \u0111\xE3 mang l\u1EEDa s\u1EB5n, th\xEAm l\u1EEDa v\u0169 n\u1EEFa th\xEC \u0111an d\u1EC5 n\u1ED5 l\xF2."
+    },
+    {
+      "id": "dp.thong_mach_dan",
+      "nghe": "luyen_dan",
+      "ten": "Th\xF4ng M\u1EA1ch \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thong_mach_dan",
+      "chu": [
+        {
+          "id": "item.kim_mach_dao",
+          "so": 1
+        },
+        {
+          "id": "item.mach_hoa_thao",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 6,
+      "mo_ta": "H\u1EA1t l\xFAa kim s\u1EAFc l\xE0m m\u0169i nh\u1ECDn, hoa d\u1EA1i l\xE0m ch\u1EA5t d\u1EABn. Ph\u1EA3i d\xF9ng l\u1EEDa m\u1EA1nh cho h\u1EA1t m\u1EC1m ra, l\u1EEDa y\u1EBFu th\xEC \u0111an c\xF2n gai, u\u1ED1ng v\xE0o \u0111\xE2m kinh m\u1EA1ch."
+    },
+    {
+      "id": "dp.tay_tuy_dan",
+      "nghe": "luyen_dan",
+      "ten": "T\u1EA9y T\u1EE7y \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tay_tuy_dan",
+      "chu": [
+        {
+          "id": "item.loi_sa_hoa",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 8,
+      "mo_ta": "D\xF9ng hoa tr\xFAng s\xE9t \u0111\u1EC3 ph\u1EA1t t\u1EE7y. L\u1EEDa ph\u1EA3i g\u1EA5p, hoa g\u1EB7p l\u1EEDa ch\u1EADm s\u1EBD t\u1EAFt d\u01B0 l\xF4i, \u0111an ra ch\u1EC9 c\xF2n l\xE0 c\xE1nh hoa kh\xF4."
+    },
+    {
+      "id": "dp.thanh_tam_dan",
+      "nghe": "luyen_dan",
+      "ten": "Thanh T\xE2m \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thanh_tam_dan",
+      "chu": [
+        {
+          "id": "item.thanh_tam_thao",
+          "so": 2
+        },
+        {
+          "id": "item.thuy_tien_can",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 8,
+      "mo_ta": "C\u1ECF t\u0129nh t\xE2m th\xEAm c\u1EE7 th\u1EE7y ti\xEAn ng\xE2m l\u1EA1nh. Ng\u01B0\u1EDDi luy\u1EC7n m\xE0 n\xF3ng l\xF2ng th\xEC \u0111an c\u0169ng n\xF3ng, \u0111\xFAng c\xE1i b\u1EC7nh n\xF3 \u0111\u1ECBnh ch\u1EEFa."
+    },
+    {
+      "id": "dp.tuc_mach_cao",
+      "nghe": "luyen_dan",
+      "ten": "T\u1EE5c M\u1EA1ch Cao ph\u01B0\u01A1ng",
+      "ra": "item.tuc_mach_cao",
+      "chu": [
+        {
+          "id": "item.tung_tam_chi",
+          "so": 1
+        },
+        {
+          "id": "item.mang_huyet_hoa",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "N\u1EA5m t\xF9ng v\u1EDBi hoa huy\u1EBFt, ninh th\xE0nh cao \u0111\u1EB7c nh\u01B0 nh\u1EF1a. L\u1EEDa v\u0103n \u1EE7 ba ng\xE0y, v\u1EDBt b\u1ECDt \u0111\u1EE7 b\u1EA3y l\u1EA7n, b\u1ECF s\xF3t m\u1ED9t l\u1EA7n l\xE0 cao n\u1ED5i c\u1EB7n."
+    },
+    {
+      "id": "dp.hoan_hon_dan",
+      "nghe": "luyen_dan",
+      "ten": "Ho\xE0n H\u1ED3n \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.hoan_hon_dan",
+      "chu": [
+        {
+          "id": "item.co_moc_tam",
+          "so": 1
+        },
+        {
+          "id": "item.mang_huyet_hoa",
+          "so": 1
+        },
+        {
+          "id": "item.yeu_dan_2",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 30,
+      "mo_ta": "L\xF5i g\u1ED7 gi\xE0 gi\u1EEF h\u1ED3n, hoa huy\u1EBFt gi\u1EEF kh\xED, y\xEAu \u0111an l\xE0m c\u1EA7u n\u1ED1i. Ba v\u1ECB t\xEDnh kh\xE1c nhau, l\u1EEDa ph\u1EA3i \u0111\u1EC1u nh\u01B0 nh\u1ECBp th\u1EDF ng\u01B0\u1EDDi ng\u1EE7."
+    },
+    {
+      "id": "dp.ngung_nguyen_dan",
+      "nghe": "luyen_dan",
+      "ten": "Ng\u01B0ng Nguy\xEAn \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.ngung_nguyen_dan",
+      "chu": [
+        {
+          "id": "item.tram_uyen_tao",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 30,
+      "mo_ta": "Rong v\u1EF1c s\xE2u n\xE9n th\xE0nh gi\u1ECDt th\u1EE7y ng\xE2n. L\u1EEDa v\u0103n, l\u1EEDa n\xE0o m\u1EA1nh qu\xE1 l\xE0 rong cu\u1ED9n l\u1EA1i th\xE0nh c\u1EE5c, kh\xF4ng tan n\u1EEFa."
+    },
+    {
+      "id": "dp.duyen_tho_dan",
+      "nghe": "luyen_dan",
+      "ten": "Duy\xEAn Th\u1ECD \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.duyen_tho_dan",
+      "chu": [
+        {
+          "id": "item.co_moc_tam",
+          "so": 1
+        },
+        {
+          "id": "item.kim_tue_mach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng c\u1EE7a \u0111an ph\xF2ng c\xE1c \u0111\u1EA1i t\xF4ng, ng\u01B0\u1EDDi ngo\xE0i c\u1EA7u c\u1EA3 \u0111\u1EDDi kh\xF4ng \u0111\u01B0\u1EE3c. L\xF5i c\xE2y s\u1ED1ng qua ba tri\u1EC1u, b\xF4ng l\xFAa m\u1ECDc xuy\xEAn b\u0103ng, l\u1EEDa v\u0103n ph\u1EA3i gi\u1EEF su\u1ED1t b\u1EA3y ng\xE0y b\u1EA3y \u0111\xEAm."
+    },
+    {
+      "id": "dp.ket_kim_dan",
+      "nghe": "luyen_dan",
+      "ten": "K\u1EBFt Kim \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.ket_kim_dan",
+      "chu": [
+        {
+          "id": "item.tu_nham_hoa",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 40,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng t\xF4ng m\xF4n ch\u1EC9 trao cho \u0111\u1EC7 t\u1EED \u0111\xE3 s\u1EAFp K\u1EBFt \u0110an. Hoa \u0111\xE1 kh\xF3 th\u1EA5m l\u1EEDa, l\u1EEDa v\u0103n ph\u1EA3i nung l\xE2u cho th\u1EA5u t\u1EADn l\xF5i, v\u1ED9i m\u1ED9t kh\u1EAFc l\xE0 h\u1ECFng c\u1EA3 l\xF2."
+    },
+    {
+      "id": "dp.duong_anh_dan",
+      "nghe": "luyen_dan",
+      "ten": "D\u01B0\u1EE1ng Anh \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.duong_anh_dan",
+      "chu": [
+        {
+          "id": "item.giao_chau_lien",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "tho"
+          ],
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "H\u1EA1t sen giao l\xE0m ch\u1EE7, m\u1ED9t v\u1ECB th\u1ED5 linh d\u01B0\u1EE3c l\xE0m n\u1EC1n \u0111\u1EC3 gi\u1EEF anh kh\u1ECFi tr\xF4i. Ph\u1EA3i l\xE0 \u0110an t\xF4ng s\u01B0 m\u1EDBi d\xE1m nh\xF3m l\xF2, l\u1EEDa l\u1EC7ch m\u1ED9t t\u01A1 l\xE0 u\u1ED5ng c\u1EA3 h\u1EA1t sen."
+    },
+    {
+      "id": "dp.cuu_chuyen_kim_dan",
+      "nghe": "luyen_dan",
+      "ten": "C\u1EEDu Chuy\u1EC3n Kim \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.cuu_chuyen_kim_dan",
+      "chu": [
+        {
+          "id": "item.van_nien_tung_chi",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "hoa"
+          ],
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 50,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng c\u1ED5 truy\u1EC1n t\u1EEB tr\u01B0\u1EDBc Thi\xEAn M\xF4n kh\xE9p, n\xE9t ch\u1EEF \u0111\xE3 nh\xF2e \u1EDF hai ch\u1ED7. Luy\u1EC7n ch\xEDn l\u1EA7n, m\u1ED7i l\u1EA7n \u0111\u1ED5i l\u1EEDa m\u1ED9t nh\u1ECBp, ng\u01B0\u1EDDi n\xE0o \u0111\u1EE9t h\u01A1i gi\u1EEFa ch\u1EEBng th\xEC l\xF2 h\u1ECFng."
+    },
+    {
+      "id": "dp.pha_chuong_dan",
+      "nghe": "luyen_dan",
+      "ten": "Ph\xE1 Ch\u01B0\u1EDBng \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.pha_chuong_dan",
+      "chu": [
+        {
+          "id": "item.khai_khieu_chau",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 20,
+      "mo_ta": "M\u1ED9t h\u1EA1t Khai Khi\u1EBFu Ch\xE2u, l\u1EEDa v\u0169 nung cho v\u1ECF ch\xE2u n\u1EE9t r\u1ED3i m\u1EDBi h\u1EA1 l\u1EEDa. V\u1ECF ch\u01B0a n\u1EE9t m\xE0 h\u1EA1 l\u1EEDa th\xEC \u0111an ra ch\u1EC9 l\xE0 h\xF2n s\u1ECFi."
+    },
+    {
+      "id": "dp.toai_bich_dan",
+      "nghe": "luyen_dan",
+      "ten": "To\xE1i B\xEDch \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.toai_bich_dan",
+      "chu": [
+        {
+          "id": "item.xuyen_bich_giac",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 60,
+      "mo_ta": "S\u1EEBng Xuy\xEAn B\xEDch m\xE0i th\xE0nh b\u1ED9t, l\u1EEDa v\u0169 \u0111\u1ED1t ba ng\xE0y cho b\u1ED9t ch\u1EA3y th\xE0nh n\u01B0\u1EDBc \u0111\xE1. L\xF2 ph\u1EA3i d\xE0y, s\u1EEBng c\xF2n gi\u1EEF s\u1EE9c h\xFAc, l\xF2 m\u1ECFng l\xE0 th\u1EE7ng."
+    },
+    {
+      "id": "dp.thong_huyen_dan",
+      "nghe": "luyen_dan",
+      "ten": "Th\xF4ng Huy\u1EC1n \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thong_huyen_dan",
+      "chu": [
+        {
+          "id": "item.huyen_quan_tuy",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "M\u1ED9t gi\u1ECDt Huy\u1EC1n Quan T\u1EE7y, l\u1EEDa v\u0103n \u1EE7 b\u1ED1n m\u01B0\u01A1i ch\xEDn ng\xE0y cho t\u1EE7y k\u1EBFt th\xE0nh s\u1EE3i. L\u1EEDa m\u1EA1nh th\xEC s\u1EE3i \u0111\u1EE9t, \u0111an ra ch\u1EC9 c\xF2n m\xE0u t\xEDm."
+    },
+    {
+      "id": "dp.pha_hu_dan",
+      "nghe": "luyen_dan",
+      "ten": "Ph\xE1 H\u01B0 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.pha_hu_dan",
+      "chu": [
+        {
+          "id": "item.hu_linh_phach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "M\u1EDF h\u1ED9p ng\u1ECDc ngay tr\xEAn mi\u1EC7ng l\xF2 cho H\u01B0 Linh Ph\xE1ch r\u01A1i v\xE0o, ch\u1EADm m\u1ED9t h\u01A1i l\xE0 n\xF3 tan m\u1EA5t. L\u1EEDa v\u0103n gi\u1EEF ba th\xE1ng, kh\xF4ng \u0111\u01B0\u1EE3c nh\xECn v\xE0o l\xF2."
+    },
+    {
+      "id": "dp.tich_doc_dan",
+      "nghe": "luyen_dan",
+      "ten": "T\u1ECBch \u0110\u1ED9c \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tich_doc_dan",
+      "chu": [
+        {
+          "id": "item.thiem_to",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 3,
+      "mo_ta": "M\u1ED9t gi\u1ECDt m\u1EE7 c\xF3c pha v\xE0o n\u01B0\u1EDBc thu\u1ED1c, l\u1EEDa v\u0103n ninh t\u1EDBi khi h\u1EBFt m\xF9i h\u1EAFc. C\xF2n m\xF9i m\xE0 \u0111\xE3 v\xEA vi\xEAn th\xEC \u0111an th\xE0nh thu\u1ED1c \u0111\u1ED9c."
+    },
+    {
+      "id": "dp.trang_dam_dan",
+      "nghe": "luyen_dan",
+      "ten": "Tr\xE1ng \u0110\u1EA3m \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.trang_dam_dan",
+      "chu": [
+        {
+          "id": "item.hung_dam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 4,
+      "mo_ta": "\u0110\u01A1n c\u1EE7a th\u1EA7y lang Vi\xEAm Qu\u1ED1c. M\u1EADt g\u1EA5u kh\xF4 c\u1EE9ng nh\u01B0 \u0111\xE1, ph\u1EA3i v\u0169 h\u1ECFa n\u01B0\u1EDBng cho n\u1EE9t r\u1ED3i m\u1EDBi ninh."
+    },
+    {
+      "id": "dp.thanh_vu_dan",
+      "nghe": "luyen_dan",
+      "ten": "Thanh V\u1EE5 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thanh_vu_dan",
+      "chu": [
+        {
+          "id": "item.thanh_vu_tra",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 2,
+      "mo_ta": "\u0110\u01A1n c\u1EE7a tr\xE0 trang, c\xF4 m\u1ED9t v\xF2 Thanh V\u1EE5 tr\xE0 th\xE0nh hai vi\xEAn. L\u1EEDa to th\xEC tr\xE0 kh\xE9t, \u0111an ra \u0111\u1EAFng m\xE0 kh\xF4ng c\xF2n t\xE1c d\u1EE5ng."
+    },
+    {
+      "id": "dp.tuy_ha_dan",
+      "nghe": "luyen_dan",
+      "ten": "T\xFAy H\xE0 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tuy_ha_dan",
+      "chu": [
+        {
+          "id": "item.bach_hoa_tuu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 2,
+      "mo_ta": "\u0110\u01A1n c\u1EE7a t\u1EEDu ph\u01B0\u1EDDng, n\u1EA5u B\xE1ch Hoa t\u1EEDu b\u1EB1ng l\u1EEDa m\u1EA1nh cho bay h\u1EBFt h\u01A1i r\u01B0\u1EE3u, gi\u1EEF l\u1EA1i men linh kh\xED. L\u1EEDa nh\u1ECF th\xEC \u0111an ra c\xF2n say."
+    },
+    {
+      "id": "dp.bach_giai_dan",
+      "nghe": "luyen_dan",
+      "ten": "B\xE1ch Gi\u1EA3i \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.bach_giai_dan",
+      "chu": [
+        {
+          "id": "item.xa_dam",
+          "so": 1
+        },
+        {
+          "id": "item.hat_doc_nang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 5,
+      "mo_ta": "L\u1EA5y \u0111\u1ED9c c\xF4ng \u0111\u1ED9c: n\u1ECDc b\u1ECD c\u1EA1p m\u1EDF \u0111\u01B0\u1EDDng, m\u1EADt r\u1EAFn theo sau m\xE0 gi\u1EA3i. L\u1EEDa v\u0103n, th\u1EE9 t\u1EF1 b\u1ECF thu\u1ED1c sai m\u1ED9t b\u01B0\u1EDBc l\xE0 luy\u1EC7n ra \u0111\u1ED9c d\u01B0\u1EE3c."
+    },
+    {
+      "id": "dp.dinh_than_dan",
+      "nghe": "luyen_dan",
+      "ten": "\u0110\u1ECBnh Th\u1EA7n \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.dinh_than_dan",
+      "chu": [
+        {
+          "id": "item.vien_tam_huyet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 5,
+      "mo_ta": "\u0110\u01A1n do m\u1ED9t v\u1ECB s\u01B0 ch\xF9a Kim C\u01B0\u01A1ng ch\xE9p l\u1EA1i. T\xE2m huy\u1EBFt v\u01B0\u1EE3n g\u1EB7p l\u1EEDa m\u1EA1nh th\xEC s\xF4i, \u0111an ra l\xE0m ng\u01B0\u1EDDi u\u1ED1ng n\xF3ng n\u1EA3y h\u01A1n tr\u01B0\u1EDBc."
+    },
+    {
+      "id": "dp.bang_phach_dan",
+      "nghe": "luyen_dan",
+      "ten": "B\u0103ng Ph\xE1ch \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.bang_phach_dan",
+      "chu": [
+        {
+          "id": "item.bang_phach_lien",
+          "so": 2
+        },
+        {
+          "id": "item.ngu_chau",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "Sen b\u0103ng l\xE0m ch\u1EE7, ng\u01B0 ch\xE2u gi\u1EEF h\xE0n kh\xED kh\u1ECFi tan. L\u1EEDa ph\u1EA3i nh\u1ECF m\xE0 \u0111\u1EC1u, l\xF2 n\xF3ng qu\xE1 th\xEC sen ch\u1EA3y th\xE0nh n\u01B0\u1EDBc l\xE3."
+    },
+    {
+      "id": "dp.duong_khi_dan",
+      "nghe": "luyen_dan",
+      "ten": "D\u01B0\u1EE1ng Kh\xED \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.duong_khi_dan",
+      "chu": [
+        {
+          "id": "item.son_sam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 2,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng c\u1EE7a ng\u01B0\u1EDDi gi\u1EEF ch\xF9a, ch\xE9p cho k\u1EBB mu\u1ED1n t\u1EADp ng\u1ED3i thi\u1EC1n. S\xE2m n\xFAi ninh l\u1EEDa nh\u1ECF t\u1EDBi khi n\u01B0\u1EDBc \u0111\u1EB7c nh\u01B0 m\u1EADt."
+    },
+    {
+      "id": "dp.khai_nguyen_dan",
+      "nghe": "luyen_dan",
+      "ten": "Khai Nguy\xEAn \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.khai_nguyen_dan",
+      "chu": [
+        {
+          "id": "item.thiem_to",
+          "so": 1
+        },
+        {
+          "id": "item.thanh_tam_thao",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 4,
+      "mo_ta": "M\u1EE7 c\xF3c m\u1EDF kinh, c\u1ECF t\u0129nh t\xE2m gi\u1EEF kh\xED. Ph\u1EA3i ninh t\u1EDBi khi h\u1EBFt m\xF9i h\u1EAFc, c\xF2n m\xF9i th\xEC ng\u01B0\u1EDDi u\u1ED1ng \u0111au b\u1EE5ng ba ng\xE0y."
+    },
+    {
+      "id": "dp.tu_khi_dan",
+      "nghe": "luyen_dan",
+      "ten": "T\u1EE5 Kh\xED \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tu_khi_dan",
+      "chu": [
+        {
+          "id": "item.mach_hoa_thao",
+          "so": 2
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 2,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 4,
+      "mo_ta": "Hoa d\u1EA1i l\xE0m n\u1EC1n, m\u1ED9t m\xF3n y\xEAu t\xE0i b\u1EA5t k\u1EF3 l\xE0m l\xF5i gom kh\xED. \u0110an s\u01B0 ph\u01B0\u1EDDng th\u1ECB luy\u1EC7n \u0111\u01A1n n\xE0y nhi\u1EC1u h\u01A1n c\u01A1m \u0103n."
+    },
+    {
+      "id": "dp.ngung_khi_dan",
+      "nghe": "luyen_dan",
+      "ten": "Ng\u01B0ng Kh\xED \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.ngung_khi_dan",
+      "chu": [
+        {
+          "id": "item.hac_vu",
+          "so": 1
+        },
+        {
+          "id": "item.thuy_tien_can",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": "L\xF4ng h\u1EA1c \u0111\u1ED1t th\xE0nh tro, h\xF2a v\u1EDBi n\u01B0\u1EDBc c\u1EE7 th\u1EE7y ti\xEAn. L\u1EEDa v\u0103n, l\xF2 ph\u1EA3i \u0111\u1EADy k\xEDn, h\u1EDF m\u1ED9t khe l\xE0 linh kh\xED theo kh\xF3i bay m\u1EA5t."
+    },
+    {
+      "id": "dp.boi_nguyen_dan",
+      "nghe": "luyen_dan",
+      "ten": "B\u1ED3i Nguy\xEAn \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.boi_nguyen_dan",
+      "chu": [
+        {
+          "id": "item.kim_tue_mach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": "M\u1ED9t b\xF4ng l\xFAa kim tu\u1EC7, l\u1EEDa v\u0103n \u1EE7 \u0111\u1EE7 ch\xEDn ng\xE0y. \u0110\u01A1n d\u1EC5, c\xE1i kh\xF3 l\xE0 ki\u1EBFm \u0111\u01B0\u1EE3c l\xFAa."
+    },
+    {
+      "id": "dp.tinh_nguyen_dan",
+      "nghe": "luyen_dan",
+      "ten": "Tinh Nguy\xEAn \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tinh_nguyen_dan",
+      "chu": [
+        {
+          "id": "item.giao_long_lan",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "thuy"
+          ],
+          "pham": 2,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "mo_ta": "V\u1EA9y giao long ng\xE2m trong n\u01B0\u1EDBc linh d\u01B0\u1EE3c h\u1EC7 th\u1EE7y b\u1EA3y ng\xE0y cho m\u1EC1m r\u1ED3i m\u1EDBi v\xE0o l\xF2. V\u1EA9y ch\u01B0a m\u1EC1m m\xE0 nh\xF3m l\u1EEDa th\xEC n\u1EE9t l\xF2."
+    },
+    {
+      "id": "dp.kim_lo_dan",
+      "nghe": "luyen_dan",
+      "ten": "Kim L\u1ED9 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.kim_lo_dan",
+      "chu": [
+        {
+          "id": "item.xich_tinh_qua",
+          "so": 2
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 20,
+      "mo_ta": "Hai qu\u1EA3 x\xEDch tinh \xE9p l\u1EA5y n\u01B0\u1EDBc, m\u1ED9t m\xF3n y\xEAu t\xE0i l\xE0m l\xF5i. L\u1EEDa v\u0169 c\xF4 t\u1EDBi khi m\u1EB7t n\u01B0\u1EDBc n\u1ED5i s\u01B0\u01A1ng v\xE0ng th\xEC t\u1EAFt l\xF2."
+    },
+    {
+      "id": "dp.long_ho_dan",
+      "nghe": "luyen_dan",
+      "ten": "Long H\u1ED5 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.long_ho_dan",
+      "chu": [
+        {
+          "id": "item.cuu_khuc_hoang_tinh",
+          "so": 1
+        },
+        {
+          "id": "item.tu_kim",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 50,
+      "mo_ta": "Ho\xE0ng tinh l\xE0m long, t\u1EED kim l\xE0m h\u1ED5. Hai v\u1ECB ph\u1EA3i v\xE0o l\xF2 c\xF9ng m\u1ED9t h\u01A1i th\u1EDF, l\u1EC7ch nhau l\xE0 m\u1ED9t v\u1ECB nu\u1ED1t m\u1EA5t v\u1ECB kia."
+    },
+    {
+      "id": "dp.boi_anh_dan",
+      "nghe": "luyen_dan",
+      "ten": "B\u1ED3i Anh \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.boi_anh_dan",
+      "chu": [
+        {
+          "id": "item.cuu_tue_linh_dao",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "moc"
+          ],
+          "pham": 2,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 80,
+      "mo_ta": "\u0110\xE0o ch\xEDn tu\u1EC7 l\xE0m ch\u1EE7, m\u1ED9t v\u1ECB m\u1ED9c linh d\u01B0\u1EE3c d\u1EABn d\u01B0\u1EE3c kh\xED. L\u1EEDa v\u0103n \u1EE7 b\u1ED1n m\u01B0\u01A1i ch\xEDn ng\xE0y, ng\u01B0\u1EDDi canh l\xF2 kh\xF4ng \u0111\u01B0\u1EE3c r\u1EDDi n\u1EEDa b\u01B0\u1EDBc."
+    },
+    {
+      "id": "dp.huyen_anh_dan",
+      "nghe": "luyen_dan",
+      "ten": "Huy\u1EC1n Anh \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.huyen_anh_dan",
+      "chu": [
+        {
+          "id": "item.yeu_vuong_noi_dan",
+          "so": 1
+        },
+        {
+          "id": "item.mang_hon_chi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng c\u1ED5, vi\u1EBFt r\u1EB1ng n\u1ED9i \u0111an y\xEAu v\u01B0\u01A1ng c\xF2n gi\u1EEF ch\xFAt linh tr\xED, ph\u1EA3i l\u1EEDa v\u0169 \u0111\u1ED1t s\u1EA1ch r\u1ED3i m\u1EDBi d\xE1m cho nguy\xEAn anh nu\u1ED1t."
+    },
+    {
+      "id": "dp.duong_than_dan",
+      "nghe": "luyen_dan",
+      "ten": "D\u01B0\u1EE1ng Th\u1EA7n \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.duong_than_dan",
+      "chu": [
+        {
+          "id": "item.yeu_vuong_noi_dan",
+          "so": 1
+        },
+        {
+          "id": "item.nhat_luan_hoa",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "Hoa m\u1EB7t tr\u1EDDi v\xE0 n\u1ED9i \u0111an y\xEAu v\u01B0\u01A1ng, m\u1ED9t d\u01B0\u01A1ng m\u1ED9t \xE2m. L\u1EEDa v\u0103n gi\u1EEF ba th\xE1ng, \u0111an ra \u1EA5m m\xE0 kh\xF4ng b\u1ECFng tay m\u1EDBi l\xE0 th\xE0nh."
+    },
+    {
+      "id": "dp.thai_hu_dan",
+      "nghe": "luyen_dan",
+      "ten": "Th\xE1i H\u01B0 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thai_hu_dan",
+      "chu": [
+        {
+          "id": "item.van_nien_ban_dao",
+          "so": 1
+        },
+        {
+          "id": "item.yeu_vuong_noi_dan",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "\u0110\u01A1n ph\u01B0\u01A1ng ch\xE9p tr\xEAn v\xE1ch \u0111\xE1 m\u1ED9t \u0111\u1ED9ng ph\u1EE7 c\u1ED5, ch\u1EEF cu\u1ED1i b\u1ECB \u0111\u1EE5c m\u1EA5t. B\xE0n \u0111\xE0o v\u1EA1n n\u0103m l\xE0m ch\u1EE7, l\xF2 ph\u1EA3i \u0111\u1ED1t su\u1ED1t m\u1ED9t n\u0103m kh\xF4ng t\u1EAFt."
+    },
+    {
+      "id": "dp.loi_am_dan",
+      "nghe": "luyen_dan",
+      "ten": "L\xF4i \xC2m \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.loi_am_dan",
+      "chu": [
+        {
+          "id": "item.loi_kiep_truc",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "moc"
+          ],
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 40,
+      "mo_ta": "\u0110\u1ED1t tr\xFAc tr\xFAng s\xE9t b\u1EB1ng l\u1EEDa v\u0169 cho d\u01B0 l\xF4i b\u1EADt ra, m\u1ED9t v\u1ECB m\u1ED9c linh d\u01B0\u1EE3c gi\u1EEF l\u1EA1i trong l\xF2. L\u1EEDa v\u0103n th\xEC s\xE9t t\u1EAFt, \u0111an ra ch\u1EC9 l\xE0 than tr\xFAc."
+    },
+    {
+      "id": "dp.tinh_phach_dan",
+      "nghe": "luyen_dan",
+      "ten": "T\u0129nh Ph\xE1ch \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tinh_phach_dan",
+      "chu": [
+        {
+          "id": "item.han_ngoc_sam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "S\xE2m b\u0103ng ninh l\u1EEDa nh\u1ECF trong n\u1ED3i \u0111\u1EA5t k\xEA tr\xEAn tuy\u1EBFt. L\xF2 n\xF3ng qu\xE1 th\xEC h\xE0n kh\xED b\u1ED1c h\u1EBFt, \u0111an ra ch\u1EC9 c\xF2n v\u1ECB \u0111\u1EAFng."
+    },
+    {
+      "id": "dp.luyen_cot_dan",
+      "nghe": "luyen_dan",
+      "ten": "Luy\u1EC7n C\u1ED1t \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.luyen_cot_dan",
+      "chu": [
+        {
+          "id": "item.huyet_bo_de",
+          "so": 1
+        },
+        {
+          "id": "item.lang_vuong_cot",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 50,
+      "mo_ta": "X\u01B0\u01A1ng s\xF3i v\u01B0\u01A1ng nung \u0111\u1ECF, r\u01B0\u1EDBi n\u01B0\u1EDBc huy\u1EBFt b\u1ED3 \u0111\u1EC1 l\xEAn cho x\u01B0\u01A1ng m\u1EC1m ra. L\u1EEDa v\u0169 li\u1EC1n b\u1EA3y ng\xE0y, x\u01B0\u01A1ng ch\u01B0a m\u1EC1m m\xE0 h\u1EA1 l\u1EEDa th\xEC \u0111an \u0111\u1EA7y s\u1EA1n."
+    },
+    {
+      "id": "dp.truong_xuan_dan",
+      "nghe": "luyen_dan",
+      "ten": "Tr\u01B0\u1EDDng Xu\xE2n \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.truong_xuan_dan",
+      "chu": [
+        {
+          "id": "item.thien_nien_ha_thu_o",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 60,
+      "mo_ta": "Hai c\u1EE7 h\xE0 th\u1EE7 \xF4 ngh\xECn n\u0103m, m\u1ED9t \u0111\u1EF1c m\u1ED9t c\xE1i, ninh chung l\u1EEDa v\u0103n ch\xEDn ng\xE0y. Thi\u1EBFu m\u1ED9t c\u1EE7 th\xEC \u0111an ra ch\u1EC9 \u0111en t\xF3c, kh\xF4ng th\xEAm tu\u1ED5i."
+    },
+    {
+      "id": "dp.thong_than_dan",
+      "nghe": "luyen_dan",
+      "ten": "Th\xF4ng Th\u1EA7n \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thong_than_dan",
+      "chu": [
+        {
+          "id": "item.u_minh_lan",
+          "so": 1
+        },
+        {
+          "id": "item.ung_vuong_kim_dong",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 50,
+      "mo_ta": "Lan \xE2m m\u1EDF th\u1EA7n th\u1EE9c, m\u1EAFt \u01B0ng v\u01B0\u01A1ng d\u1EABn \u0111\u01B0\u1EDDng. Ph\u1EA3i luy\u1EC7n l\xFAc n\u1EEDa \u0111\xEAm khi lan c\xF2n s\xE1ng, \u0111\u1EE3i t\u1EDBi s\xE1ng th\xEC hoa t\u1EAFt, c\xF4ng c\u1ED1c."
+    },
+    {
+      "id": "dp.tran_hon_dan",
+      "nghe": "luyen_dan",
+      "ten": "Tr\u1EA5n H\u1ED3n \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tran_hon_dan",
+      "chu": [
+        {
+          "id": "item.han_nguyet_que",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 50,
+      "mo_ta": "Hoa qu\u1EBF b\u0103ng ch\u01B0ng c\xE1ch th\u1EE7y su\u1ED1t m\u1ED9t tu\u1EA7n tr\u0103ng. L\u1EEDa v\u0103n gi\u1EEF \u0111\u1EC1u, ng\xE0y tr\u0103ng tr\xF2n m\u1EDBi m\u1EDF l\xF2."
+    },
+    {
+      "id": "dp.hoa_anh_dan",
+      "nghe": "luyen_dan",
+      "ten": "H\xF3a Anh \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.hoa_anh_dan",
+      "chu": [
+        {
+          "id": "item.xich_long_qua",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 30,
+      "mo_ta": "\u0110\u01A1n c\u1EE7a m\u1ED9t t\xE1n tu kh\xF4ng c\xF3 t\xF4ng m\xF4n ch\u1ED1ng l\u01B0ng, t\u1EF1 m\xF2 ra c\xE1ch thay D\u01B0\u1EE1ng Anh \u0110an. Qu\u1EA3 r\u1ED3ng \u0111\u1ECF ph\u1EA3i l\u1EEDa v\u0169 m\u1EDBi v\u1EE1 v\u1ECF, k\xE9m h\u01A1n \u0111\u01A1n t\xF4ng m\xF4n nh\u01B0ng ai c\u0169ng luy\u1EC7n \u0111\u01B0\u1EE3c."
+    },
+    {
+      "id": "dp.hoi_thien_dan",
+      "nghe": "luyen_dan",
+      "ten": "H\u1ED3i Thi\xEAn \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.hoi_thien_dan",
+      "chu": [
+        {
+          "id": "item.tu_van_linh_chi",
+          "so": 1
+        },
+        {
+          "id": "item.thien_chu_mau_ty",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "moc"
+          ],
+          "pham": 4,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "Linh chi t\xEDm l\xE0m ch\u1EE7, t\u01A1 nh\u1EC7n m\u1EB9 qu\u1EA5n quanh cho d\u01B0\u1EE3c l\u1EF1c kh\u1ECFi tan, th\xEAm m\u1ED9t v\u1ECB m\u1ED9c linh d\u01B0\u1EE3c \u0110\u1ECBa ph\u1EA9m tr\u1EDF l\xEAn. T\u01A1 ch\xE1y l\xE0 h\u1ECFng, l\u1EEDa kh\xF4ng \u0111\u01B0\u1EE3c l\u1EDBn h\u01A1n ng\u1ECDn n\u1EBFn."
+    },
+    {
+      "id": "dp.han_tuy_dan",
+      "nghe": "luyen_dan",
+      "ten": "H\xE0n T\u1EE7y \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.han_tuy_dan",
+      "chu": [
+        {
+          "id": "item.bang_tuy_chi",
+          "so": 1
+        },
+        {
+          "id": "item.bang_vuong_linh_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "N\u1EA5m l\xF5i b\u0103ng v\u1EDBi l\xF4ng b\u1EB1ng v\u01B0\u01A1ng. L\xF2 ph\u1EA3i \u0111\u1EB7t tr\xEAn tuy\u1EBFt, l\u1EEDa v\u0103n \u0111\u1ED1t t\u1EEB tr\xEAn xu\u1ED1ng, ng\u01B0\u1EE3c h\u1EB3n l\u1ED1i th\u01B0\u1EDDng."
+    },
+    {
+      "id": "dp.due_kim_dan",
+      "nghe": "luyen_dan",
+      "ten": "Du\u1EC7 Kim \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.due_kim_dan",
+      "chu": [
+        {
+          "id": "item.cuu_diep_kiem_thao",
+          "so": 1
+        },
+        {
+          "id": "item.hat_vuong_doc_thich",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "\u0110\u01A1n c\u1EE7a s\xE1t th\u1EE7, ch\xEDn l\xE1 ki\u1EBFm th\u1EA3o v\xE0 gai \u0111\u1ED9c h\u1EA1t v\u01B0\u01A1ng. L\u1EEDa v\u0169 \u0111\u1ED1t cho \u0111\u1ED9c tan v\xE0o l\xE1, \u0111\u1ED9c ch\u01B0a tan h\u1EBFt m\xE0 v\xEA vi\xEAn th\xEC ng\u01B0\u1EDDi u\u1ED1ng ch\u1EBFt tr\u01B0\u1EDBc k\u1EBB \u0111\u1ECBch."
+    },
+    {
+      "id": "dp.thuong_long_dan",
+      "nghe": "luyen_dan",
+      "ten": "Th\u01B0\u01A1ng Long \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thuong_long_dan",
+      "chu": [
+        {
+          "id": "item.bich_trieu_linh_tao",
+          "so": 1
+        },
+        {
+          "id": "item.giao_long_giac",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "T\u1EA3o bi\u1EBFc ng\xE2m c\xF9ng s\u1EEBng giao trong n\u01B0\u1EDBc bi\u1EC3n b\u1EA3y ng\xE0y r\u1ED3i m\u1EDBi v\xE0o l\xF2. L\u1EEDa v\u0103n, n\u01B0\u1EDBc trong l\xF2 ph\u1EA3i s\xF4i l\u0103n t\u0103n nh\u01B0 con n\u01B0\u1EDBc ng\u1EA7m."
+    },
+    {
+      "id": "dp.kim_o_dan",
+      "nghe": "luyen_dan",
+      "ten": "Kim \xD4 \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.kim_o_dan",
+      "chu": [
+        {
+          "id": "item.kim_o_qua",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "hoa"
+          ],
+          "pham": 5,
+          "so": 1
+        },
+        {
+          "loai": "yeu_tai",
+          "pham": 5,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 300,
+      "mo_ta": "Qu\u1EA3 m\u1EB7t tr\u1EDDi l\xE0m ch\u1EE7, th\xEAm m\u1ED9t v\u1ECB h\u1ECFa linh d\u01B0\u1EE3c v\xE0 m\u1ED9t m\xF3n y\xEAu t\xE0i \u0111\u1EA1i y\xEAu cho l\u1EEDa c\xF3 ch\u1ED7 b\xE1m. L\u1EEDa v\u0169 \u0111\u1ED1t ba ng\xE0y, l\xF2 \u0111\u1ECF r\u1EF1c nh\u01B0 m\u1EB7t tr\u1EDDi l\u1EB7n."
+    },
+    {
+      "id": "dp.van_tho_dan",
+      "nghe": "luyen_dan",
+      "ten": "V\u1EA1n Th\u1ECD \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.van_tho_dan",
+      "chu": [
+        {
+          "id": "item.thai_tue",
+          "so": 1
+        },
+        {
+          "id": "item.huyen_quy_long_giap",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "Th\xE1i tu\u1EBF th\u1ECBt s\u1ED1ng, mai r\xF9a tr\u0103m v\u1EA1n n\u0103m. Th\xE1i tu\u1EBF t\u1EF1 li\u1EC1n th\u1ECBt, ph\u1EA3i l\u1EA5y mai r\xF9a \u0111\xE8 l\xEAn n\xF3 su\u1ED1t b\u1ED1n m\u01B0\u01A1i ch\xEDn ng\xE0y l\u1EEDa v\u0103n."
+    },
+    {
+      "id": "dp.tao_hoa_dan",
+      "nghe": "luyen_dan",
+      "ten": "T\u1EA1o H\xF3a \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.tao_hoa_dan",
+      "chu": [
+        {
+          "id": "item.kien_moc_qua",
+          "so": 1
+        },
+        {
+          "id": "item.thai_nhac_hung_dom",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "Qu\u1EA3 Ki\u1EBFn M\u1ED9c gieo v\xE0o m\u1EADt g\u1EA5u n\xFAi ngh\xECn n\u0103m, \u0111\u1EE3i m\u1EA7m n\u1EA3y m\u1EDBi nh\xF3m l\xF2. L\u1EEDa v\u0103n, m\u1EA7m h\xE9o l\xFAc n\xE0o l\xE0 ph\u1EA3i t\u1EAFt l\u1EEDa l\xFAc \u1EA5y."
+    },
+    {
+      "id": "dp.hoa_long_dan",
+      "nghe": "luyen_dan",
+      "ten": "H\xF3a Long \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.hoa_long_dan",
+      "chu": [
+        {
+          "id": "item.hoa_long_thao",
+          "so": 1
+        },
+        {
+          "id": "item.than_huyet_dang",
+          "so": 1
+        },
+        {
+          "id": "item.hoa_long_chau",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 500,
+      "mo_ta": "C\u1ECF h\xF3a long, m\xE1u y\xEAu th\u1EA7n v\xE0 n\u1ED9i ch\xE2u giao gi\xE0, ba th\u1EE9 x\xE0 t\u1ED9c li\u1EC1u m\u1EA1ng gi\u1EEF. L\u1EEDa v\u0169 \u0111\u1ED1t t\u1EDBi khi b\xF3ng r\u1ED3ng trong ch\xE2u ch\u1ECBu b\u01A1i sang \u0111an."
+    },
+    {
+      "id": "dp.van_tam_dan",
+      "nghe": "luyen_dan",
+      "ten": "V\u1EA5n T\xE2m \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.van_tam_dan",
+      "chu": [
+        {
+          "id": "item.tuyet_long_sam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "S\xE2m r\u1ED3ng tuy\u1EBFt luy\u1EC7n trong l\xF2 b\u0103ng, ng\u01B0\u1EDDi canh l\xF2 ph\u1EA3i ng\u1ED3i tr\u01B0\u1EDBc l\xF2 h\u1ECFi l\xF2ng m\xECnh su\u1ED1t ch\xEDn ng\xE0y. Ai n\xF3ng ru\u1ED9t b\u1ECF \u0111i th\xEC l\xF2 ngu\u1ED9i."
+    },
+    {
+      "id": "dp.thien_nhat_dan",
+      "nghe": "luyen_dan",
+      "ten": "Thi\xEAn Nh\u1EA5t \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thien_nhat_dan",
+      "chu": [
+        {
+          "id": "item.thien_nhat_chan_thuy",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "M\u1ED9t gi\u1ECDt ch\xE2n th\u1EE7y, kh\xF4ng th\xEAm v\u1ECB n\xE0o. C\xE1i kh\xF3 l\xE0 gi\u1EEF cho gi\u1ECDt n\u01B0\u1EDBc n\u1EB7ng nh\u01B0 th\u1EE7y ng\xE2n \u1EA5y kh\xF4ng xuy\xEAn th\u1EE7ng \u0111\xE1y l\xF2."
+    },
+    {
+      "id": "dp.linh_lung_dan",
+      "nghe": "luyen_dan",
+      "ten": "Linh Lung \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.linh_lung_dan",
+      "chu": [
+        {
+          "id": "item.that_khieu_linh_ngau",
+          "so": 1
+        },
+        {
+          "id": "item.thien_ho_tam",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "thuy"
+          ],
+          "pham": 5,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "Ng\xF3 sen b\u1EA3y khi\u1EBFu, tim h\u1ED3 ng\xE0n n\u0103m v\xE0 m\u1ED9t v\u1ECB th\u1EE7y linh d\u01B0\u1EE3c Thi\xEAn ph\u1EA9m. Th\u1ED5i h\u01A1i qua b\u1EA3y l\u1ED7 ng\xF3 sen cho d\u01B0\u1EE3c kh\xED \u0111i \u0111\u1EC1u r\u1ED3i m\u1EDBi \u0111\u1EADy n\u1EAFp l\xF2."
+    },
+    {
+      "id": "dp.thien_loi_dan",
+      "nghe": "luyen_dan",
+      "ten": "Thi\xEAn L\xF4i \u0110an ph\u01B0\u01A1ng",
+      "ra": "item.thien_loi_dan",
+      "chu": [
+        {
+          "id": "item.thien_loi_moc_tam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 500,
+      "mo_ta": "L\xF5i g\u1ED7 ch\xEDn l\u1EA7n tr\xFAng s\xE9t, ch\u1EBB l\xE0m ba, \u0111\u1ED1t t\u1EEBng ph\u1EA7n trong \u0111\xEAm gi\xF4ng. Ph\u1EA3i m\u1EDF n\u1EAFp l\xF2 \u0111\xFAng l\xFAc s\xE9t \u0111\xE1nh xu\u1ED1ng th\xEC l\xF4i kh\xED m\u1EDBi v\xE0o \u0111an."
+    },
+    {
+      "id": "dp.bach_giai_dan_giac",
+      "nghe": "luyen_dan",
+      "ten": "B\xE1ch Gi\u1EA3i \u0110an ph\u01B0\u01A1ng (t\xEA gi\xE1c)",
+      "ra": "item.bach_giai_dan",
+      "chu": [
+        {
+          "id": "item.te_nguu_giac",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 5,
+      "mo_ta": "S\u1EEBng t\xEA m\xE0i b\u1ED9t, s\u1EAFc v\u1EDBi n\u01B0\u1EDBc su\u1ED1i t\u1EDBi khi n\u01B0\u1EDBc \u0111en l\u1EA1i. S\u1EEBng h\xFAt \u0111\u1ED9c n\xF3ng, l\u1EEDa v\u0103n gi\u1EEF cho b\u1ED9t kh\u1ECFi ch\xE1y."
+    },
+    {
+      "id": "dp.bo_khi_dan_mat",
+      "nghe": "luyen_dan",
+      "ten": "B\u1ED5 Kh\xED \u0110an ph\u01B0\u01A1ng (phong m\u1EADt)",
+      "ra": "item.bo_khi_dan",
+      "chu": [
+        {
+          "id": "item.phong_mat",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 2,
+      "mo_ta": "M\u1EADt ong \u0111\u1ED9c n\u1EA5u t\u1EDBi khi h\u1EBFt g\u1EAFt, l\xE0m ch\u1EA5t k\u1EBFt cho vi\xEAn \u0111an. N\u1EA5u non th\xEC \u0111an d\xEDnh tay, n\u1EA5u gi\xE0 th\xEC \u0111an \u0111\u1EAFng."
+    },
+    {
+      "id": "dp.hoi_xuan_dan_dia",
+      "nghe": "luyen_dan",
+      "ten": "H\u1ED3i Xu\xE2n \u0110an ph\u01B0\u01A1ng (\u0111\u1EC9a d\u1ECBch)",
+      "ra": "item.hoi_xuan_dan",
+      "chu": [
+        {
+          "id": "item.huyet_dia_dich",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 1,
+      "mo_ta": "D\u1ECBch \u0111\u1EC9a \u0111\u1EA7m c\u1EA7m m\xE1u, s\xEAn l\u1EEDa nh\u1ECF cho bay h\u1EBFt m\xF9i tanh. Lang trung ngh\xE8o hay luy\u1EC7n thay s\xE2m n\xFAi."
+    },
+    {
+      "id": "dp.thong_mach_dan_giap",
+      "nghe": "luyen_dan",
+      "ten": "Th\xF4ng M\u1EA1ch \u0110an ph\u01B0\u01A1ng (v\u1EA3y t\xEA t\xEA)",
+      "ra": "item.thong_mach_dan",
+      "chu": [
+        {
+          "id": "item.te_giap_phien",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 8,
+      "mo_ta": "V\u1EA3y t\xEA t\xEA sao v\xE0ng t\xE1n b\u1ED9t: v\u1ECB thu\u1ED1c chui \u0111\u01B0\u1EE3c qua \u0111\u1EA5t th\xEC chui \u0111\u01B0\u1EE3c qua kinh m\u1EA1ch t\u1EAFc. Sao ch\xE1y l\xE0 m\u1EA5t t\xEDnh."
+    },
+    {
+      "id": "dp.khai_nguyen_dan_nhung",
+      "nghe": "luyen_dan",
+      "ten": "Khai Nguy\xEAn \u0110an ph\u01B0\u01A1ng (l\u1ED9c nhung)",
+      "ra": "item.khai_nguyen_dan",
+      "chu": [
+        {
+          "id": "item.loc_nhung",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 4,
+      "mo_ta": "Nhung non th\xE1i m\u1ECFng nh\u01B0 gi\u1EA5y, ng\xE2m r\u01B0\u1EE3u m\u1ED9t \u0111\xEAm r\u1ED3i m\u1EDBi v\xE0o l\xF2. Nhung ch\xE1y l\xE0 ph\xED c\u1EA3 con h\u01B0\u01A1u."
+    },
+    {
+      "id": "dp.dinh_than_dan_kinh",
+      "nghe": "luyen_dan",
+      "ten": "\u0110\u1ECBnh Th\u1EA7n \u0110an ph\u01B0\u01A1ng (g\u01B0\u01A1ng c\u1ED5)",
+      "ra": "item.dinh_than_dan",
+      "chu": [
+        {
+          "id": "item.co_kinh_phien",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 5,
+      "mo_ta": "M\u1EA3nh g\u01B0\u01A1ng c\u1ED5 nung \u0111\u1ECF r\u1ED3i t\xF4i v\xE0o n\u01B0\u1EDBc thu\u1ED1c, c\xE1i b\xF3ng ch\u1EADm n\u1EEDa nh\u1ECBp trong g\u01B0\u01A1ng tan v\xE0o \u0111an. Ng\u01B0\u1EDDi luy\u1EC7n kh\xF4ng \u0111\u01B0\u1EE3c soi v\xE0o l\xF2."
+    },
+    {
+      "id": "dp.thong_than_dan_tuy",
+      "nghe": "luyen_dan",
+      "ten": "Th\xF4ng Th\u1EA7n \u0110an ph\u01B0\u01A1ng (ng\u1ECDc t\u1EE7y)",
+      "ra": "item.thong_than_dan",
+      "chu": [
+        {
+          "id": "item.ngoc_tuy",
+          "so": 2
+        },
+        {
+          "id": "item.duoc_linh_phach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 60,
+      "mo_ta": "Hai gi\u1ECDt ng\u1ECDc t\u1EE7y l\xE0m v\u1ECF, m\u1ED9t \u0111\u1ED1m d\u01B0\u1EE3c linh l\xE0m nh\xE2n. L\u1EEDa v\u0103n gi\u1EEF l\xE2u, t\u1EE7y \u0111\xF4ng l\u1EA1i trong su\u1ED1t m\u1EDBi \u0111\u01B0\u1EE3c m\u1EDF l\xF2."
+    },
+    {
+      "id": "dp.thiet_kiem",
+      "nghe": "luyen_bao",
+      "ten": "Thi\u1EBFt Ki\u1EBFm \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thiet_kiem",
+      "chu": [
+        {
+          "id": "item.thiet_khoang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "linh_thach": 1,
+      "mo_ta": "B\u1EA3n v\u1EBD nh\u1EADp m\xF4n, th\u1EE3 r\xE8n n\xE0o c\u0169ng thu\u1ED9c. M\u1ED9t c\u1EE5c qu\u1EB7ng, m\u1ED9t bu\u1ED5i quai b\xFAa, ra m\u1ED9t thanh ki\u1EBFm s\u1EAFt."
+    },
+    {
+      "id": "dp.thanh_phong_kiem",
+      "nghe": "luyen_bao",
+      "ten": "Thanh Phong Ki\u1EBFm \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thanh_phong_kiem",
+      "chu": [
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "H\xE0n thi\u1EBFt ph\u1EA3i nung l\xE2u cho t\u1EA1p ch\u1EA5t ch\u1EA3y h\u1EBFt, l\u01B0\u1EE1i ki\u1EBFm m\u1EDBi nh\u1EB9 nh\u01B0 gi\xF3. N\xF3ng v\u1ED9i th\xEC ki\u1EBFm gi\xF2n, ch\xE9m \u0111\xE1 l\xE0 m\u1EBB."
+    },
+    {
+      "id": "dp.han_thiet_dao",
+      "nghe": "luyen_bao",
+      "ten": "H\xE0n Thi\u1EBFt \u0110ao \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.han_thiet_dao",
+      "chu": [
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        },
+        {
+          "id": "item.thiet_khoang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "S\u1EAFt th\u01B0\u1EDDng l\xE0m s\u1ED1ng, h\xE0n thi\u1EBFt l\xE0m l\u01B0\u1EE1i. Ph\u1EA3i l\u1EEDa m\u1EA1nh cho hai th\u1EE9 ch\u1EA3y v\xE0o nhau, r\u1ED3i t\xF4i m\u1ED9t l\u1EA7n trong n\u01B0\u1EDBc tuy\u1EBFt."
+    },
+    {
+      "id": "dp.huyen_quy_thuan",
+      "nghe": "luyen_bao",
+      "ten": "Huy\u1EC1n Quy Thu\u1EABn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.huyen_quy_thuan",
+      "chu": [
+        {
+          "id": "item.quy_giap",
+          "so": 1
+        },
+        {
+          "id": "item.thiet_khoang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": "Mai r\xF9a y\xEAu kh\u1EAFc tr\u1EADn v\u0103n theo v\xE2n n\u1EE9t c\xF3 s\u1EB5n, vi\u1EC1n s\u1EAFt quanh m\xE9p. Kh\u1EAFc sai m\u1ED9t n\xE9t, mai v\u1EE1 \u0111\xF4i."
+    },
+    {
+      "id": "dp.thanh_suong_kiem",
+      "nghe": "luyen_bao",
+      "ten": "Thanh S\u01B0\u01A1ng Ki\u1EBFm \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thanh_suong_kiem",
+      "chu": [
+        {
+          "id": "item.han_thiet",
+          "so": 2
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 2,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "B\u1EA3n ch\xE9p l\u1EA1i t\u1EEB ki\u1EBFm Thanh V\xE2n. Hai kh\u1ED1i h\xE0n thi\u1EBFt g\u1EA5p l\u1EA1i ch\xEDn l\u1EA7n, th\xEAm m\u1ED9t v\u1ECB y\xEAu t\xE0i cho l\u01B0\u1EE1i ki\u1EBFm c\xF3 linh t\xEDnh."
+    },
+    {
+      "id": "dp.tu_kim_phi_kiem",
+      "nghe": "luyen_bao",
+      "ten": "T\u1EED Kim Phi Ki\u1EBFm \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.tu_kim_phi_kiem",
+      "chu": [
+        {
+          "id": "item.tu_kim",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "T\u1EED kim c\u1EE9ng h\u01A1n m\u1ECDi th\u1EE9 s\u1EAFt \u0111\xE1, l\u1EEDa nh\u1ECF nung c\u1EA3 n\u0103m kh\xF4ng m\u1EC1m. Ph\u1EA3i huy\u1EBFt luy\u1EC7n, \u0111\u1ED5 c\u1EA3 tinh huy\u1EBFt v\xE0o l\xF2 m\u1EDBi \xE9p n\xF3 th\xE0nh ki\u1EBFm."
+    },
+    {
+      "id": "dp.lang_nha_chuy",
+      "nghe": "luyen_bao",
+      "ten": "Lang Nha Ch\u1EE7y \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.lang_nha_chuy",
+      "ra_cuc": "item.huyet_lang_chuy",
+      "chu": [
+        {
+          "id": "item.lang_nha",
+          "so": 1
+        },
+        {
+          "id": "item.thiet_khoang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "\u0110\u01A1n c\u1EE7a th\u1EE3 r\xE8n quan \u1EA3i L\u01B0\u01A1ng Qu\u1ED1c. Nanh s\xF3i m\xE0i th\xE0nh l\u01B0\u1EE1i, \u0111\xFAc chu\xF4i s\u1EAFt b\u1ECDc l\u1EA5y. Huy\u1EBFt kh\xED s\xF3i c\xF2n trong nanh th\xEC l\u1EEDa m\u1EA1nh m\u1EDBi gi\u1EEF \u0111\u01B0\u1EE3c."
+    },
+    {
+      "id": "dp.yeu_bi_giap",
+      "nghe": "luyen_bao",
+      "ten": "Y\xEAu B\xEC Gi\xE1p \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.yeu_bi_giap",
+      "chu": [
+        {
+          "id": "item.yeu_bi",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 2,
+      "mo_ta": "Hai t\u1EA5m da y\xEAu th\xFA, m\u1ED9t th\xF9ng d\u1EA7u t\xF9ng. Nung l\xE2u cho d\u1EA7u ng\u1EA5m t\u1EADn th\u1EDB, l\u1EEDa to th\xEC da co l\u1EA1i nh\u01B0 v\u1ECF c\xE2y kh\xF4."
+    },
+    {
+      "id": "dp.chu_ty_vong",
+      "nghe": "luyen_bao",
+      "ten": "Chu Ty V\xF5ng \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.chu_ty_vong",
+      "ra_cuc": "item.thien_chu_vong",
+      "chu": [
+        {
+          "id": "item.chu_ty",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "T\u01A1 nh\u1EC7n h\u01A1 tr\xEAn l\u1EEDa nh\u1ECF cho b\u1EDBt d\xEDnh r\u1ED3i m\u1EDBi \u0111an. Th\u1EE3 Vi\xEAm Qu\u1ED1c \u0111an l\u01B0\u1EDBi n\xE0y b\xE1n cho th\u01B0\u01A1ng \u0111o\xE0n b\u1EAFt k\u1EBB c\u01B0\u1EDBp s\u1ED1ng."
+    },
+    {
+      "id": "dp.ho_vi_phat",
+      "nghe": "luyen_bao",
+      "ten": "H\u1ED3 V\u0129 Ph\u1EA5t \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.ho_vi_phat",
+      "chu": [
+        {
+          "id": "item.ho_vi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": "\u0110u\xF4i c\xE1o ph\u1EA3i hong tr\xEAn l\u1EEDa tr\u1EA7m b\u1EA3y ng\xE0y, m\u1ECB kh\xED m\u1EDBi th\u1EA5m v\xE0o c\xE1n. H\u01B0\u01A1ng tr\u1EA7m ti\u1EC1n nhi\u1EC1u h\u01A1n ti\u1EC1n l\u1EEDa."
+    },
+    {
+      "id": "dp.giao_can_cung",
+      "nghe": "luyen_bao",
+      "ten": "Giao C\xE2n Cung \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.giao_can_cung",
+      "chu": [
+        {
+          "id": "item.giao_han_can",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "nguyen_lieu",
+          "he": [
+            "kim"
+          ],
+          "so": 1
+        }
+      ],
+      "mo_ta": "G\xE2n giao l\xE0m d\xE2y, m\u1ED9t kh\u1ED1i kim thi\u1EBFt \u0111\xFAc th\xE2n cung. G\xE2n l\u1EA1nh m\xE0 l\xF2 n\xF3ng, c\u0103ng d\xE2y l\xFAc n\xE0o l\xE0 c\u1EA3 c\xE1i ngh\u1EC1."
+    },
+    {
+      "id": "dp.bach_hac_vu_y",
+      "nghe": "luyen_bao",
+      "ten": "B\u1EA1ch H\u1EA1c V\u0169 Y \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.bach_hac_vu_y",
+      "chu": [
+        {
+          "id": "item.hac_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": 'L\xF4ng h\u1EA1c k\u1EBFt b\u1EB1ng t\u01A1 t\u1EB1m tr\xEAn khung l\u1EEDa \u1EA5m. B\u1EA3n v\u1EBD ghi th\xEAm m\u1ED9t d\xF2ng nh\u1ECF d\u01B0\u1EDBi g\xF3c, n\xE9t run run, "l\xF4ng nh\u1EB7t, ch\u1EDB gi\u1EBFt".'
+    },
+    {
+      "id": "dp.tuyet_bang_kiem",
+      "nghe": "luyen_bao",
+      "ten": "Tuy\u1EBFt B\u1EB1ng Ki\u1EBFm \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.tuyet_bang_kiem",
+      "ra_cuc": "item.cuu_tieu_bang_kiem",
+      "chu": [
+        {
+          "id": "item.bang_vu",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": "L\xF4ng b\u1EB1ng c\xE0i hai b\xEAn s\u1ED1ng ki\u1EBFm h\xE0n thi\u1EBFt. L\u1EEDa to th\xEC l\xF4ng ch\xE1y, l\u1EEDa nh\u1ECF th\xEC l\xF4ng kh\xF4ng ch\u1ECBu b\xE1m v\xE0o th\xE9p."
+    },
+    {
+      "id": "dp.ho_cot_dao",
+      "nghe": "luyen_bao",
+      "ten": "H\u1ED5 C\u1ED1t \u0110ao \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.ho_cot_dao",
+      "chu": [
+        {
+          "id": "item.ho_cot",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "X\u01B0\u01A1ng h\u1ED5 gi\xE0 l\u1ED3ng trong s\u1ED1ng \u0111ao. H\u1ED5 t\xF4n k\u1EBB m\u1EA1nh, x\u01B0\u01A1ng c\u0169ng th\u1EBF, l\u1EEDa y\u1EBFu th\xEC n\xF3 kh\xF4ng ch\u1ECBu nh\u1EADn l\u01B0\u1EE1i th\xE9p."
+    },
+    {
+      "id": "dp.giao_lan_giap",
+      "nghe": "luyen_bao",
+      "ten": "Giao L\xE2n Gi\xE1p \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.giao_lan_giap",
+      "chu": [
+        {
+          "id": "item.giao_long_lan",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "mo_ta": "V\u1EA3y giao long x\u1EBFp t\u1EEBng l\u1EDBp, th\xEAm m\u1ED9t v\u1ECB y\xEAu t\xE0i l\xE0m keo. M\u1ED9t t\u1EA5m v\u1EA3y nung ba ng\xE0y m\u1EDBi m\u1EC1m ra \u0111\u1EE7 \u0111\u1EC3 kh\xE2u."
+    },
+    {
+      "id": "dp.thuong_lan_kiem",
+      "nghe": "luyen_bao",
+      "ten": "Th\u01B0\u01A1ng Lan Ki\u1EBFm c\u1ED5 ph\u1ED5",
+      "ra": "item.thuong_lan_kiem",
+      "chu": [
+        {
+          "id": "item.han_thiet",
+          "so": 3
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 4,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 20,
+      "mo_ta": "B\u1EA3n v\u1EBD tr\xEAn da d\xEA t\u1EEB th\u1EDDi c\xF2n Trung Ch\xE2u. Ba kh\u1ED1i h\xE0n thi\u1EBFt l\xE0m th\xE2n, m\u1ED9t t\u1EA5m v\u1EA3y y\xEAu th\xFA c\u1EA5p cao b\u1ECDc s\u1ED1ng, kh\xF4ng th\xEC ki\u1EBFm n\u1EE9t ngay khi ra l\xF2."
+    },
+    {
+      "id": "dp.van_yeu_phien",
+      "nghe": "luyen_bao",
+      "ten": "V\u1EA1n Y\xEAu Phi\xEAn c\u1ED5 ph\u1ED5",
+      "ra": "item.van_yeu_phien",
+      "ra_cuc": "item.yeu_hoang_phien",
+      "chu": [
+        {
+          "id": "item.yeu_vuong_noi_dan",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "mo_ta": "Kh\xED ph\u1ED5 c\u1EE7a m\u1ED9t t\xF4ng \u0111\xE3 tan, ch\xE9p t\u1EEB h\u1EA7m \u0111\xE1. L\u1EA5y n\u1ED9i \u0111an y\xEAu v\u01B0\u01A1ng l\xE0m l\xF5i, m\xE1u ng\u01B0\u1EDDi luy\u1EC7n l\xE0m m\u1EF1c v\u1EBD c\u1EDD. L\u1EEDa nh\u1ECF th\xEC n\u1ED9i \u0111an t\u1EC9nh d\u1EADy tr\u01B0\u1EDBc khi k\u1ECBp tr\u1EA5n."
+    },
+    {
+      "id": "dp.phuoc_tien_tac",
+      "nghe": "luyen_bao",
+      "ten": "Ph\u01B0\u1EE3c Ti\xEAn T\xE1c \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phuoc_tien_tac",
+      "chu": [
+        {
+          "id": "item.thien_chu_mau_ty",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "T\u01A1 nh\u1EC7n m\u1EB9 ph\u1EA3i h\u01A1 tr\xEAn l\u1EEDa nh\u1ECF b\u1EA3y ng\xE0y cho h\u1EBFt d\xEDnh, r\u1ED3i b\u1EC7n ch\xEDn s\u1EE3i l\xE0m m\u1ED9t. L\u1EEDa to th\xEC t\u01A1 co l\u1EA1i nh\u01B0 t\xF3c ch\xE1y."
+    },
+    {
+      "id": "dp.pha_giap_toan",
+      "nghe": "luyen_bao",
+      "ten": "Ph\xE1 Gi\xE1p To\u1EA3n \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.pha_giap_toan",
+      "chu": [
+        {
+          "id": "item.thuc_kim_thu_xi",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "R\u0103ng chu\u1ED9t g\u1EB7m v\xE0ng kh\u1EA3m v\xE0o m\u0169i khoan h\xE0n thi\u1EBFt. R\u0103ng c\u1EE9ng h\u01A1n th\xE9p, ph\u1EA3i l\u1EEDa m\u1EA1nh m\u1EDBi \xE9p th\xE9p \xF4m \u0111\u01B0\u1EE3c r\u0103ng."
+    },
+    {
+      "id": "dp.giao_le_chau_lien",
+      "nghe": "luyen_bao",
+      "ten": "Giao L\u1EC7 Ch\xE2u Li\xEAn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.giao_le_chau_lien",
+      "chu": [
+        {
+          "id": "item.giao_nhan_le",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "N\u01B0\u1EDBc m\u1EAFt ng\u01B0\u1EDDi c\xE1 g\u1EB7p l\u1EEDa to l\xE0 v\u1EE1. Nung trong n\u1ED3i n\u01B0\u1EDBc bi\u1EC3n, l\u1EEDa liu riu c\u1EA3 th\xE1ng, ng\u1ECDc m\u1EDBi m\u1EC1m ra \u0111\u1EE7 \u0111\u1EC3 x\xE2u."
+    },
+    {
+      "id": "dp.thong_ty_kim_con",
+      "nghe": "luyen_bao",
+      "ten": "Th\xF4ng T\xFD Kim C\xF4n \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thong_ty_kim_con",
+      "chu": [
+        {
+          "id": "item.thong_ty_vien_cot",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 50,
+      "mo_ta": "\u0110\u1ED5 \u0111\u1ED3ng n\xF3ng v\xE0o l\xF2ng x\u01B0\u01A1ng tay v\u01B0\u1EE3n, m\u1ED9t h\u01A1i cho \u0111\u1EA7y. Ng\u1EADp ng\u1EEBng n\u1EEDa nh\u1ECBp th\xEC \u0111\u1ED3ng ngu\u1ED9i gi\u1EEFa ch\u1EEBng, c\xF4n g\xE3y \u0111\xF4i."
+    },
+    {
+      "id": "dp.huyen_vu_thuan",
+      "nghe": "luyen_bao",
+      "ten": "Huy\u1EC1n V\u0169 Thu\u1EABn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.huyen_vu_thuan",
+      "chu": [
+        {
+          "id": "item.huyen_quy_long_giap",
+          "so": 1
+        },
+        {
+          "id": "item.quy_giap",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 30,
+      "mo_ta": "M\u1EA3nh mai mang huy\u1EBFt Huy\u1EC1n V\u0169 l\xE0m l\xF2ng khi\xEAn, mai r\xF9a th\u01B0\u1EDDng l\xE0m vi\u1EC1n. Kh\u1EAFc tr\u1EADn theo v\xE2n s\xF3ng, m\u1ED7i n\xE9t nung m\u1ED9t ng\xE0y."
+    },
+    {
+      "id": "dp.liet_ho_dao",
+      "nghe": "luyen_bao",
+      "ten": "Li\u1EC7t H\u1ED5 \u0110ao \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.liet_ho_dao",
+      "chu": [
+        {
+          "id": "item.liet_ho_kim_trao",
+          "so": 1
+        },
+        {
+          "id": "item.thien_ngoai_van_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 100,
+      "mo_ta": "Th\xE9p tr\u1EDDi r\u01A1i l\xF2 th\u01B0\u1EDDng kh\xF4ng nung \u0111\u1ECF, ph\u1EA3i huy\u1EBFt luy\u1EC7n. Vu\u1ED1t h\u1ED5 t\u01B0\u1EDBng \u0111\u1EB7t v\xE0o s\u1ED1ng \u0111ao l\xFAc th\xE9p c\xF2n s\xF4i, h\u1ED5 kh\xED m\u1EDBi ch\u1ECBu nh\u1EADp."
+    },
+    {
+      "id": "dp.hoa_long_truong",
+      "nghe": "luyen_bao",
+      "ten": "H\xF3a Long Tr\u01B0\u1EE3ng c\u1ED5 ph\u1ED5",
+      "ra": "item.hoa_long_truong",
+      "chu": [
+        {
+          "id": "item.hoa_long_chau",
+          "so": 1
+        },
+        {
+          "id": "item.giao_long_giac",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 5,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "\u0110\u01A1n c\u1EE7a Giao t\u1ED9c ch\xE9p tr\xEAn v\u1EA3y, t\u1EEB th\u1EDDi c\xF2n canh m\u1ED9 Trung Ch\xE2u. N\u1ED9i ch\xE2u ph\u1EA3i nung ba n\u0103m trong s\u1EEBng m\u1EDBi ch\u1ECBu \u1EDF y\xEAn."
+    },
+    {
+      "id": "dp.hat_vi_tien",
+      "nghe": "luyen_bao",
+      "ten": "H\u1EA1t V\u0129 Ti\xEAn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.hat_vi_tien",
+      "chu": [
+        {
+          "id": "item.cuu_tiet_hat_vi",
+          "so": 1
+        },
+        {
+          "id": "item.canh_kim_tinh",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "M\u1ED7i \u0111\u1ED1t \u0111u\xF4i b\u1ECDc m\u1ED9t l\u1EDBp canh kim m\u1ECFng nh\u01B0 l\xE1. \u0110u\xF4i h\u1EA1t c\xF2n s\u1ED1ng, l\u1EEDa nh\u1ECF th\xEC n\xF3 qu\u1EABy v\u1EE1 khu\xF4n."
+    },
+    {
+      "id": "dp.thien_bang_cung",
+      "nghe": "luyen_bao",
+      "ten": "Thi\xEAn B\u1EB1ng Cung \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thien_bang_cung",
+      "chu": [
+        {
+          "id": "item.bang_vuong_han_tuy",
+          "so": 1
+        },
+        {
+          "id": "item.bang_vuong_linh_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "T\u1EE7y b\u0103ng ph\u1EA3i nung trong l\u1EEDa \xE2m, \u1EA5m d\u1EA7n t\u1EEBng ch\xFAt nh\u01B0 \u1EE7 tr\u1EE9ng. N\xF3ng qu\xE1 m\u1ED9t kh\u1EAFc l\xE0 t\u1EE7y ch\u1EA3y th\xE0nh n\u01B0\u1EDBc."
+    },
+    {
+      "id": "dp.cuu_vi_huyen_dang",
+      "nghe": "luyen_bao",
+      "ten": "C\u1EEDu V\u0129 Huy\u1EC5n \u0110\u0103ng \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.cuu_vi_huyen_dang",
+      "chu": [
+        {
+          "id": "item.cuu_vi_ho_hon",
+          "so": 1
+        },
+        {
+          "id": "item.thien_ho_tam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "Tim h\u1ED3 ly l\xE0m b\u1EA5c, h\u1ED3n h\u1ED3 ly l\xE0m l\u1EEDa. Ng\u01B0\u1EDDi luy\u1EC7n ph\u1EA3i nh\xECn th\u1EB3ng v\xE0o l\u1EEDa su\u1ED1t b\u1EA3y ng\xE0y m\xE0 kh\xF4ng b\u1ECB n\xF3 m\xEA."
+    },
+    {
+      "id": "dp.thanh_bang_si",
+      "nghe": "luyen_bao",
+      "ten": "Thanh B\u1EB1ng S\xED \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thanh_bang_si",
+      "chu": [
+        {
+          "id": "item.bang_vu",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 60,
+      "mo_ta": "L\xF4ng b\u1EB1ng l\xE0m c\xE1nh ch\xEDnh, th\xEAm m\u1ED9t m\xF3n l\xF4ng v\u0169 kh\xE1c l\xE0m c\xE1nh ph\u1EE5 (l\xF4ng h\u1EA1c c\u0169ng \u0111\u01B0\u1EE3c). L\u1EEDa nh\u1ECF nung l\xE2u, l\xF4ng m\u1EDBi gi\u1EEF gi\xF3."
+    },
+    {
+      "id": "dp.kim_bang_si",
+      "nghe": "luyen_bao",
+      "ten": "Kim B\u1EB1ng S\xED \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.kim_bang_si",
+      "chu": [
+        {
+          "id": "item.tuyet_bang_cot",
+          "so": 1
+        },
+        {
+          "id": "item.bang_vu",
+          "so": 2
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 4,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "X\u01B0\u01A1ng c\xE1nh b\u1EB1ng l\xE0m s\u1ED1ng, d\xE1t v\xE0ng khi x\u01B0\u01A1ng c\xF2n \u0111\u1ECF l\u1EEDa r\u1ED3i c\u1EAFm l\xF4ng. L\u1EEDa m\u1EA1nh m\xE0 nhanh, ch\u1EADm tay th\xEC x\u01B0\u01A1ng ngu\u1ED9i n\u1EE9t."
+    },
+    {
+      "id": "dp.con_bang_si",
+      "nghe": "luyen_bao",
+      "ten": "C\xF4n B\u1EB1ng S\xED c\u1ED5 ph\u1ED5",
+      "ra": "item.con_bang_si",
+      "chu": [
+        {
+          "id": "item.bang_vuong_linh_vu",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "Hai c\u1ECDng l\xF4ng b\u1EB1ng v\u01B0\u01A1ng l\xE0m c\u1ED1t, nung trong l\u1EEDa \xE2m b\u1ED1n m\u01B0\u01A1i ch\xEDn ng\xE0y. C\xE1nh th\xE0nh th\xEC t\u1EF1 v\u1ED7, ng\u01B0\u1EDDi luy\u1EC7n ph\u1EA3i gi\u1EEF ch\u1EB7t k\u1EBBo n\xF3 bay m\u1EA5t."
+    },
+    {
+      "id": "dp.dan_lo_dia",
+      "nghe": "luyen_bao",
+      "ten": "\u0110\u1ECBa H\u1ECFa \u0111an l\xF4 \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.dan_lo_dia",
+      "chu": [
+        {
+          "id": "item.tu_kim",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 2,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 40,
+      "mo_ta": "T\u1EED kim \u0111\xFAc th\xE2n l\xF2, m\u1ED9t v\u1ECB y\xEAu t\xE0i h\xF2a v\xE0o \u0111\u1ED3ng cho l\xF2 bi\u1EBFt gi\u1EEF l\u1EEDa. L\u1EEDa m\u1EA1nh m\xE0 \u0111\u1EC1u tay, \u0111\xE1y l\xF2 m\u1EDBi ra r\xE3nh d\u1EABn li\u1EC1n m\u1EA1ch."
+    },
+    {
+      "id": "dp.phu_but_dia",
+      "nghe": "luyen_bao",
+      "ten": "T\u1EED Ng\u1ECDc Ph\xF9 B\xFAt \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phu_but_dia",
+      "chu": [
+        {
+          "id": "item.ho_vuong_tu",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 2,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "R\xE2u h\u1ED5 v\u01B0\u01A1ng h\u01A1 l\u1EEDa nh\u1ECF cho m\u1EC1m, b\xF3 l\u1EA1i l\xE0m ng\xF2i r\u1ED3i c\u1EAFm v\xE0o c\xE1n. L\u1EEDa to th\xEC r\xE2u xo\u0103n l\u1EA1i, ng\xF2i b\xFAt x\xF2e nh\u01B0 ch\u1ED5i."
+    },
+    {
+      "id": "dp.dan_lo_thien",
+      "nghe": "luyen_bao",
+      "ten": "C\u1EEDu Long \u0111an l\xF4 \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.dan_lo_thien",
+      "chu": [
+        {
+          "id": "item.thien_ngoai_van_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 30,
+      "mo_ta": "V\u1EABn thi\u1EBFt t\u1EEB tr\u1EDDi r\u01A1i xu\u1ED1ng, ph\u1EA3i l\u1EEDa m\u1EA1nh nh\u1EA5t m\u1EDBi ch\u1EA3y. \u0110\xFAc ch\xEDn con r\u1ED3ng m\u1ED9t l\u1EA7n, con n\xE0o ngu\u1ED9i tr\u01B0\u1EDBc l\xE0 c\u1EA3 l\xF2 n\u1EE9t."
+    },
+    {
+      "id": "dp.phu_but_thien",
+      "nghe": "luyen_bao",
+      "ten": "B\u1ED3 \u0110\u1EC1 Ph\xF9 B\xFAt \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phu_but_thien",
+      "chu": [
+        {
+          "id": "item.tien_hac_tho_cot",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 30,
+      "mo_ta": "X\u01B0\u01A1ng h\u1EA1c ti\xEAn l\xE0m l\xF5i c\xE1n, ngo\xE0i b\u1ECDc g\u1ED7 b\u1ED3 \u0111\u1EC1. L\u1EEDa nh\u1ECF hong b\u1ED1n m\u01B0\u01A1i ng\xE0y cho x\u01B0\u01A1ng v\u1EDBi g\u1ED7 \u0103n v\xE0o nhau."
+    },
+    {
+      "id": "dp.dan_lo_tien",
+      "nghe": "luyen_bao",
+      "ten": "Th\xE1i Th\u01B0\u1EE3ng \u0111an l\xF4 c\u1ED5 ph\u1ED5",
+      "ra": "item.dan_lo_tien",
+      "chu": [
+        {
+          "id": "item.hu_linh_phach",
+          "so": 1
+        },
+        {
+          "id": "item.thien_ngoai_van_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 50,
+      "mo_ta": "V\u1EABn thi\u1EBFt l\xE0m v\u1ECF, H\u01B0 Linh Ph\xE1ch nh\u1ED1t v\xE0o l\xF2ng l\xF2 thay cho l\u1EEDa. Ph\xE1ch t\u1EC9nh d\u1EADy l\xFAc l\xF2 ch\u01B0a k\xEDn l\xE0 n\xF3 tr\u1ED1n m\u1EA5t."
+    },
+    {
+      "id": "dp.phu_but_tien",
+      "nghe": "luyen_bao",
+      "ten": "L\xF4i M\u1ED9c Ph\xF9 B\xFAt c\u1ED5 ph\u1ED5",
+      "ra": "item.phu_but_tien",
+      "chu": [
+        {
+          "id": "item.bang_vuong_linh_vu",
+          "so": 1
+        },
+        {
+          "id": "item.hu_linh_phach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "L\xF4ng b\u1EB1ng v\u01B0\u01A1ng l\xE0m ng\xF2i, H\u01B0 Linh Ph\xE1ch luy\u1EC7n v\xE0o c\xE1n g\u1ED7 s\xE9t \u0111\xE1nh cho b\xFAt c\xF3 linh. L\u1EEDa nh\u1ECF nung l\xE2u, l\u1EEDa g\u1EAFt th\xEC l\xF4ng ch\xE1y tr\u01B0\u1EDBc khi ph\xE1ch k\u1ECBp nh\u1EADp."
+    },
+    {
+      "id": "dp.khi_lo_pham",
+      "nghe": "luyen_bao",
+      "ten": "Th\u1EA1ch \u0111\u1EC9nh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.khi_lo_pham",
+      "chu": [
+        {
+          "id": "item.thiet_khoang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 4,
+      "mo_ta": "\u0110\u1EBDo \u0111\xE1 ong th\xE0nh l\xF2ng \u0111\u1EC9nh, nung m\u1ED9t c\u1EE5c s\u1EAFt l\xE0m \u0111ai b\xF3 quanh mi\u1EC7ng. L\u1EEDa v\u1EEBa ph\u1EA3i, qu\xE1 tay th\xEC \u0111\xE1 n\u1ED5."
+    },
+    {
+      "id": "dp.khi_lo_hoang",
+      "nghe": "luyen_bao",
+      "ten": "Thi\u1EBFt \u0111\u1EC9nh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.khi_lo_hoang",
+      "chu": [
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        },
+        {
+          "id": "item.thiet_khoang",
+          "so": 4
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 20,
+      "mo_ta": "B\u1ED1n c\u1EE5c s\u1EAFt n\u1EA5u th\xE0nh gang, m\u1ED9t kh\u1ED1i h\xE0n thi\u1EBFt l\xE0m l\xF2ng \u0111\u1EC9nh. \u0110\u1ED5 khu\xF4n m\u1ED9t l\u1EA7n cho li\u1EC1n kh\u1ED1i, ngu\u1ED9i d\u1EDF l\xE0 n\u1EE9t."
+    },
+    {
+      "id": "dp.khi_lo_huyen",
+      "nghe": "luyen_bao",
+      "ten": "X\xEDch Di\u1EC5m \u0111\u1EC9nh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.khi_lo_huyen",
+      "chu": [
+        {
+          "id": "item.han_thiet",
+          "so": 2
+        },
+        {
+          "id": "item.hoa_diep_dang",
+          "so": 2
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 60,
+      "mo_ta": "D\xE2y H\u1ECFa Di\u1EC7p \u0110\u1EB1ng \u0111\u1ED1t c\xF9ng h\xE0n thi\u1EBFt cho kim lo\u1EA1i ng\u1EA3 \u0111\u1ECF, m\u1ED9t v\u1ECB y\xEAu t\xE0i l\xE0m m\u1EAFt tr\u1EADn d\u1EABn h\u1ECFa. Kh\u1EAFc tr\u1EADn l\xFAc \u0111\u1EC9nh c\xF2n r\u1EF1c."
+    },
+    {
+      "id": "dp.khi_lo_dia",
+      "nghe": "luyen_bao",
+      "ten": "\u0110\u1ECBa M\u1EA1ch \u0111\u1EC9nh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.khi_lo_dia",
+      "chu": [
+        {
+          "id": "item.tu_kim",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 30,
+      "mo_ta": "T\u1EED kim pha \u0111\u1ED3ng \u0111en \u0111\xFAc th\xE2n, kh\u1EAFc \u0111\u1ECBa m\u1EA1ch \u0111\u1ED3 khi \u0111\u1EC9nh c\xF2n m\u1EC1m. L\u1EEDa nh\u1ECF gi\u1EEF l\xE2u, n\xE9t kh\u1EAFc m\u1EDBi \u0103n s\xE2u v\xE0o th\u1EDB kim."
+    },
+    {
+      "id": "dp.khi_lo_thien",
+      "nghe": "luyen_bao",
+      "ten": "C\u1EEDu Di\u1EC7u \u0111\u1EC9nh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.khi_lo_thien",
+      "chu": [
+        {
+          "id": "item.thien_ngoai_van_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 50,
+      "mo_ta": "V\u1EABn thi\u1EBFt \u0111\xFAc th\xE2n \u0111\u1EC9nh, ch\xEDn \u0111\u1ED1m s\xE1ng kh\u1EA3m theo \u0111\xFAng v\u1ECB sao. L\u1EEDa m\u1EA1nh m\u1ED9t h\u01A1i, kh\u1EA3m l\u1EC7ch m\u1ED9t v\xEC l\xE0 c\u1EA3 \u0111\u1EC9nh c\xE2m."
+    },
+    {
+      "id": "dp.khi_lo_tien",
+      "nghe": "luyen_bao",
+      "ten": "Th\xE1i S\u01A1 \u0111\u1EC9nh c\u1ED5 ph\u1ED5",
+      "ra": "item.khi_lo_tien",
+      "chu": [
+        {
+          "id": "item.yeu_dan_5",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "Ng\u0169 Giai Y\xEAu \u0110an luy\u1EC7n tan v\xE0o men \u0111\u1EC9nh l\xE0m h\u1ECFa ch\u1EE7ng, t\u1EEB \u0111\xF3 \u0111\u1EC9nh t\u1EF1 ch\xE1y b\u1EB1ng linh kh\xED. L\u1EEDa nh\u1ECF nung tr\u0103m ng\xE0y cho men h\xF3a ng\u1ECDc."
+    },
+    {
+      "id": "dp.dan_lo_dat",
+      "nghe": "luyen_bao",
+      "ten": "\u0110an l\xF4 \u0111\u1EA5t nung \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.dan_lo_dat",
+      "chu": [
+        {
+          "id": "item.thiet_khoang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 3,
+      "mo_ta": "N\u1EB7n l\xF2 b\u1EB1ng \u0111\u1EA5t s\xE9t, nung m\u1ED9t c\u1EE5c s\u1EAFt l\xE0m \u0111ai quanh mi\u1EC7ng. L\u1EEDa than nh\u1ECF, nung m\u1ED9t \u0111\xEAm l\xE0 xong."
+    },
+    {
+      "id": "dp.dan_lo_dong",
+      "nghe": "luyen_bao",
+      "ten": "\u0110\u1ED3ng \u0111an l\xF4 \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.dan_lo_dong",
+      "chu": [
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        },
+        {
+          "id": "item.thiet_khoang",
+          "so": 3
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 15,
+      "mo_ta": "\u0110\xFAc l\xF2 ba ch\xE2n, h\xE0n thi\u1EBFt l\xF3t l\xF2ng cho ch\u1ECBu \u0111\u01B0\u1EE3c l\u1EEDa Huy\u1EC1n ph\u1EA9m. Kh\u1EAFc v\xE2n m\xE2y tr\u01B0\u1EDBc khi \u0111\u1ED3ng ngu\u1ED9i h\u1EB3n."
+    },
+    {
+      "id": "dp.dan_lo_huyen",
+      "nghe": "luyen_bao",
+      "ten": "T\u1EED V\u0103n \u0111an l\xF4 \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.dan_lo_huyen",
+      "chu": [
+        {
+          "id": "item.han_thiet",
+          "so": 2
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 70,
+      "mo_ta": "H\xE0n thi\u1EBFt pha m\u1ED9t v\u1ECB y\xEAu t\xE0i cho kim ng\u1EA3 t\xEDm, kh\u1EAFc tr\u1EADn v\u0103n gi\u1EEF nhi\u1EC7t l\xEAn th\xE0nh l\xF2. L\u1EEDa nh\u1ECF, kh\u1EAFc ch\u1EADm, sai n\xE9t l\xE0 l\xF2 r\xF2 h\u01A1i."
+    },
+    {
+      "id": "dp.phu_but_pham",
+      "nghe": "luyen_bao",
+      "ten": "Tr\xFAc H\xE0o B\xFAt \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phu_but_pham",
+      "chu": [
+        {
+          "id": "item.thiet_khoang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 1,
+      "mo_ta": "R\xE8n m\u1ED9t kh\xE2u s\u1EAFt nh\u1ECF b\u1ECBt \u0111\u1EA7u c\xE1n tr\xFAc, k\u1EB9p l\xF4ng d\xEA l\xE0m ng\xF2i. Vi\u1EC7c c\u1EE7a bu\u1ED5i chi\u1EC1u."
+    },
+    {
+      "id": "dp.phu_but_hoang",
+      "nghe": "luyen_bao",
+      "ten": "Lang H\xE0o B\xFAt \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phu_but_hoang",
+      "chu": [
+        {
+          "id": "item.thu_tu",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 15,
+      "mo_ta": "L\xF4ng g\xE1y s\xF3i y\xEAu kh\xF3 ki\u1EBFm, r\xE2u chu\u1ED9t y\xEAu thay c\u0169ng \u0111\u01B0\u1EE3c. H\u01A1 l\u1EEDa nh\u1ECF cho th\u1EB3ng, b\xF3 ch\u1EB7t l\xE0m ng\xF2i, c\u1EE9ng m\xE0 \u0111\xE0n h\u1ED3i."
+    },
+    {
+      "id": "dp.phu_but_huyen",
+      "nghe": "luyen_bao",
+      "ten": "H\u1EA1c V\u0169 Ph\xF9 B\xFAt \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phu_but_huyen",
+      "chu": [
+        {
+          "id": "item.hac_vu",
+          "so": 1
+        },
+        {
+          "id": "item.hac_cot",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 70,
+      "mo_ta": "L\xF4ng c\xE1nh h\u1EA1c k\u1EBFt th\xE0nh ng\xF2i, x\u01B0\u01A1ng h\u1EA1c m\xE0i l\xE0m l\xF5i c\xE1n. L\u1EEDa nh\u1ECF hong cho l\xF4ng v\u1EDBi x\u01B0\u01A1ng quen h\u01A1i nhau."
+    },
+    {
+      "id": "dp.pha_giap_toan_giac",
+      "nghe": "luyen_bao",
+      "ten": "Ph\xE1 Gi\xE1p To\u1EA3n \u0111\u1ED3 ph\u1ED5 (kim gi\xE1c)",
+      "ra": "item.pha_giap_toan",
+      "chu": [
+        {
+          "id": "item.kim_giac",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 20,
+      "mo_ta": "\u0110\u1EA7u s\u1EEBng Kim Gi\xE1c T\xEA m\xE0i th\xE0nh m\u0169i khoan, h\xE0n thi\u1EBFt b\u1ECDc th\xE2n. L\u1EEDa v\u0169 nung s\u1EEBng cho t\u1EDBi khi s\u1EEBng ng\u1EA3 m\xE0u v\xE0ng \u0111\u1EADm."
+    },
+    {
+      "id": "dp.linh_lung_thap_nha",
+      "nghe": "luyen_bao",
+      "ten": "Linh Lung Tr\u1EA5n Nh\u1EA1c Th\xE1p \u0111\u1ED3 ph\u1ED5 (c\u1EF1 t\u01B0\u1EE3ng nha)",
+      "ra": "item.linh_lung_tran_nhac_thap",
+      "chu": [
+        {
+          "id": "item.cu_tuong_nha",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "Ph\u1ECFng th\xE1p ti\xEAn nh\xE2n, l\u1EA5y ng\xE0 voi H\u1ED3ng Hoang l\xE0m c\u1ED1t b\u1EA3y t\u1EA7ng. M\u1ED7i t\u1EA7ng kh\u1EAFc m\u1ED9t v\xF2ng tu\u1ED5i c\u1EE7a ng\xE0, kh\u1EAFc sai th\xEC th\xE1p nghi\xEAng."
+    },
+    {
+      "id": "dp.linh_lung_thap_quy",
+      "nghe": "luyen_bao",
+      "ten": "Linh Lung Tr\u1EA5n Nh\u1EA1c Th\xE1p \u0111\u1ED3 ph\u1ED5 (b\u1ED1i s\u01A1n quy gi\xE1p)",
+      "ra": "item.linh_lung_tran_nhac_thap",
+      "chu": [
+        {
+          "id": "item.boi_son_quy_giap",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "Mai r\xF9a c\xF5ng n\xFAi l\xE0 n\xFAi bi\u1EBFt \u0111i, \u0111em tr\u1EA5n v\xE0o \u0111\xE1y th\xE1p th\xEC th\xE1p n\u1EB7ng nh\u01B0 n\xFAi. L\u1EEDa v\u0103n ba ng\xE0y cho mai m\u1EC1m r\u1ED3i m\u1EDBi gh\xE9p."
+    },
+    {
+      "id": "dp.than_hanh_ngoa_bao",
+      "nghe": "luyen_bao",
+      "ten": "Th\u1EA7n H\xE0nh Ngoa \u0111\u1ED3 ph\u1ED5 (da b\xE1o)",
+      "ra": "item.than_hanh_ngoa",
+      "chu": [
+        {
+          "id": "item.bao_bi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 15,
+      "mo_ta": "Da b\xE1o \u0111en thay da h\u01B0\u01A1u, \u0111i \u0111\xEAm kh\xF4ng nghe ti\u1EBFng s\u1ED9t so\u1EA1t. Kh\u1EAFc tr\u1EADn v\u0103n l\xF3t \u0111\u1EBF b\u1EB1ng l\u1EEDa nh\u1ECF."
+    },
+    {
+      "id": "dp.phu_but_thien_bao",
+      "nghe": "luyen_bao",
+      "ten": "B\u1ED3 \u0110\u1EC1 Ph\xF9 B\xFAt \u0111\u1ED3 ph\u1ED5 (l\xF4i v\u0103n b\xE1o b\xEC)",
+      "ra": "item.phu_but_thien",
+      "chu": [
+        {
+          "id": "item.loi_van_bao_bi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 150,
+      "mo_ta": "C\u1EAFt s\u1EE3i l\xF4ng v\u1EB1n t\xEDm tr\xEAn da b\xE1o l\xE0m ng\xF2i, c\xE1n b\xFAt b\u1ECDc ph\u1EA7n da c\xF2n l\u1EA1i. Ng\xF2i t\u1EF1 t\xEA, v\u1EBD l\xF4i ph\xF9 kh\xF4ng c\u1EA7n g\u1ECDi s\xE9t."
+    },
+    {
+      "id": "dp.van_doc_phien",
+      "nghe": "luyen_bao",
+      "ten": "V\u1EA1n \u0110\u1ED9c Phi\xEAn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.van_doc_phien",
+      "chu": [
+        {
+          "id": "item.chuong_doc_tinh",
+          "so": 2
+        },
+        {
+          "id": "item.ngo_cong_doc_nang",
+          "so": 1
+        },
+        {
+          "id": "item.co_trung_mau",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 150,
+      "mo_ta": "Th\u1EA3 c\u1ED5 m\u1EB9 v\xE0o b\xECnh ch\u01B0\u1EDBng kh\xED cho n\xF3 \u0103n \u0111\u1ED9c, r\u1ED3i t\u1EA9m c\u1EA3 b\xECnh v\xE0o c\u1EDD. T\xFAi \u0111\u1ED9c r\u1EBFt l\xE0m m\u1EF1c th\xEAu, ng\u01B0\u1EDDi luy\u1EC7n ph\u1EA3i ng\u1EADm gi\u1EA3i \u0111\u1ED9c \u0111an."
+    },
+    {
+      "id": "dp.quy_giap_thuan_ngac",
+      "nghe": "luyen_bao",
+      "ten": "Quy Gi\xE1p Thu\u1EABn \u0111\u1ED3 ph\u1ED5 (v\u1EA3y c\xE1 s\u1EA5u)",
+      "ra": "item.quy_giap_thuan",
+      "chu": [
+        {
+          "id": "item.ngac_giap",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 2,
+      "mo_ta": "V\u1EA3y l\u01B0ng c\xE1 s\u1EA5u tr\u1EAFng thay mai r\xF9a, vi\u1EC1n \u0111\u1ED3ng, quai da tr\xE2u. Ng\xE2m n\u01B0\u1EDBc m\u1ED9t \u0111\xEAm tr\u01B0\u1EDBc khi nung cho v\u1EA3y kh\u1ECFi n\u1EE9t."
+    },
+    {
+      "id": "dp.khi_lo_dia_du",
+      "nghe": "luyen_bao",
+      "ten": "\u0110\u1ECBa M\u1EA1ch \u0111\u1EC9nh \u0111\u1ED3 ph\u1ED5 (k\xECnh du)",
+      "ra": "item.khi_lo_dia",
+      "chu": [
+        {
+          "id": "item.kinh_du",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 80,
+      "mo_ta": "\u0110\xFAc \u0111\u1EC9nh b\u1EB1ng h\xE0n thi\u1EBFt, l\xF2ng \u0111\u1EC9nh qu\xE9t d\u1EA7u K\xECnh Ng\u01B0 cho l\u1EEDa \u0111\u1EC1u v\xE0 kim kh\xF4ng b\xE1m th\xE0nh. L\u1EEDa v\u0103n, qu\xE9t ba l\u1EDBp d\u1EA7u."
+    },
+    {
+      "id": "dp.huyen_vu_thuan_ngac",
+      "nghe": "luyen_bao",
+      "ten": "Huy\u1EC1n V\u0169 Thu\u1EABn \u0111\u1ED3 ph\u1ED5 (huy\u1EC1n ng\u1EA1c gi\xE1p)",
+      "ra": "item.huyen_vu_thuan",
+      "chu": [
+        {
+          "id": "item.huyen_ngac_giap",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "Mai H\u1EAFc Th\u1EE7y Huy\u1EC1n Ng\u1EA1c thay mai quy long, \u0111en nh\u01B0 m\u1EF1c m\xE0 nh\u1EB9 h\u01A1n. Kh\u1EAFc tr\u1EADn v\u0103n th\u1EE7y h\u1EC7 d\u1ECDc v\xE2n mai."
+    },
+    {
+      "id": "dp.phu_but_hoang_tho",
+      "nghe": "luyen_bao",
+      "ten": "Ph\xF9 b\xFAt \u0111\u1ED3 ph\u1ED5 (l\xF4ng th\u1ECF ng\u1ECDc)",
+      "ra": "item.phu_but_hoang",
+      "chu": [
+        {
+          "id": "item.ngoc_tho_mao",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": "L\xF4ng th\u1ECF ng\u1ECDc b\xF3 l\xE0m \u0111\u1EA7u b\xFAt, \u0111\xEAm tr\u0103ng ng\xF2i t\u1EF1 s\xE1ng m\u1EDD. B\xF3 ch\u1EB7t, ng\xF2i m\u1EC1m m\xE0 kh\xF4ng x\u01A1."
+    },
+    {
+      "id": "dp.bich_ba_linh_tan",
+      "nghe": "luyen_bao",
+      "ten": "B\xEDch Ba Linh T\xE1n \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.bich_ba_linh_tan",
+      "chu": [
+        {
+          "id": "item.cam_ly_lan",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 30,
+      "mo_ta": "Hai m\u1EA3nh v\u1EA3y c\xE1 ch\xE9p g\u1EA5m gh\xE9p l\xE0m ch\xF3p \xF4, l\u1EE5a xanh c\u0103ng quanh. V\u1EA3y n\u0103m m\xE0u gi\u1EEF m\xE0n n\u01B0\u1EDBc quanh th\xE2n."
+    },
+    {
+      "id": "dp.luu_van_chu",
+      "nghe": "luyen_bao",
+      "ten": "L\u01B0u V\xE2n Chu \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.luu_van_chu",
+      "chu": [
+        {
+          "id": "item.thanh_dieu_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "L\xF4ng chim xanh c\u1EE7a ti\xEAn nh\xE2n c\u1EAFm \u1EDF m\u0169i thuy\u1EC1n, th\u1EA3 gi\xF3 l\xE0 thuy\u1EC1n t\u1EF1 bi\u1EBFt h\u01B0\u1EDBng. G\u1ED7 tr\u1EA7m \u0111\u1EBDo theo d\xE1ng m\xE2y tr\xF4i."
+    },
+    {
+      "id": "dp.tu_kim_phi_kiem_nha",
+      "nghe": "luyen_bao",
+      "ten": "T\u1EED Kim Phi Ki\u1EBFm \u0111\u1ED3 ph\u1ED5 (th\u1EF1c thi\u1EBFt nha)",
+      "ra": "item.tu_kim_phi_kiem",
+      "chu": [
+        {
+          "id": "item.thuc_thiet_nha",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 20,
+      "mo_ta": "R\u0103ng th\xFA g\u1EB7m s\u1EAFt m\xE0i l\u01B0\u1EE1i, h\xE0n thi\u1EBFt l\xE0m th\xE2n. M\xE0i \u0111\u1EBFn khi l\u01B0\u1EE1i c\u1EAFt \u0111\u01B0\u1EE3c s\u1EE3i t\xF3c th\u1EA3 tr\xEAn m\u1EB7t n\u01B0\u1EDBc."
+    },
+    {
+      "id": "dp.moc_dang_tac",
+      "nghe": "luyen_bao",
+      "ten": "M\u1ED9c \u0110\u1EB1ng T\xE1c \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.moc_dang_tac",
+      "chu": [
+        {
+          "id": "item.thanh_dang_can",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 3,
+      "mo_ta": "G\xE2n \u0110\u1EB1ng Y\xEAu b\u1EC7n ba s\u1EE3i th\xE0nh d\xE2y, ng\xE2m n\u01B0\u1EDBc thu\u1ED1c cho d\xE2y c\xF2n s\u1ED1ng. D\xE2y s\u1ED1ng th\xEC t\u1EF1 bi\u1EBFt qu\u1EA5n."
+    },
+    {
+      "id": "dp.bich_lan_doc_cham",
+      "nghe": "luyen_bao",
+      "ten": "B\xEDch L\xE2n \u0110\u1ED9c Ch\xE2m \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.bich_lan_doc_cham",
+      "chu": [
+        {
+          "id": "item.thuc_nhan_hoa_nhuy",
+          "so": 1
+        },
+        {
+          "id": "item.doc_khuan_bao",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 10,
+      "mo_ta": "R\xE8n ba c\xE2y kim h\xE0n thi\u1EBFt, ng\xE2m v\xE0o nh\u1EE5y hoa \u0103n th\u1ECBt v\u1EDBi b\xE0o t\u1EED n\u1EA5m \u0111\u1ED9c cho ng\u1EA5m \u0111\u1EC1u. Ng\u01B0\u1EDDi r\xE8n \u0111eo bao tay da."
+    },
+    {
+      "id": "dp.nhiep_hon_linh",
+      "nghe": "luyen_bao",
+      "ten": "Nhi\u1EBFp H\u1ED3n Linh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.nhiep_hon_linh",
+      "chu": [
+        {
+          "id": "item.hoe_am_moc",
+          "so": 2
+        },
+        {
+          "id": "item.oan_hon_ty",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 60,
+      "mo_ta": "G\u1ED7 h\xF2e gi\u1EEF h\u1ED3n l\xE0m qu\u1EA3 l\u1EAFc, s\u1EE3i kh\xF3i oan h\u1ED3n qu\u1EA5n quanh d\xE2y treo. L\u1EAFc m\u1ED9t ti\u1EBFng l\xE0 h\u1ED3n k\u1EBB nghe ch\u1EADm l\u1EA1i."
+    },
+    {
+      "id": "dp.thanh_moc_thuan",
+      "nghe": "luyen_bao",
+      "ten": "Thanh M\u1ED9c Thu\u1EABn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thanh_moc_thuan",
+      "chu": [
+        {
+          "id": "item.thien_nien_moc_tam",
+          "so": 1
+        },
+        {
+          "id": "item.thanh_dang_can",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "L\xF5i c\xE2y ngh\xECn n\u0103m g\u1ECDt th\xE0nh thu\u1EABn tr\xF2n, g\xE2n \u0110\u1EB1ng Y\xEAu b\u1EC7n l\xE0m quai. L\u1EEDa v\u0103n hong, g\u1ED7 c\xF2n s\u1ED1ng th\xEC thu\u1EABn t\u1EF1 li\u1EC1n v\u1EBFt ch\xE9m."
+    },
+    {
+      "id": "dp.phu_tang_than_moc",
+      "nghe": "luyen_bao",
+      "ten": "Ph\xF9 Tang Th\u1EA7n M\u1ED9c \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phu_tang_than_moc",
+      "chu": [
+        {
+          "id": "item.ngo_dong_chi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "C\xE0nh ng\xF4 \u0111\u1ED3ng n\u01A1i Ph\u01B0\u1EE3ng \u0111\u1EADu, h\u01A1 l\u1EEDa v\u0103n \u0111\u1EBFn khi \u1EA5m nh\u01B0 n\u1EAFng s\u1EDBm. Kh\xF4ng \u0111\u01B0\u1EE3c \u0111\u1EC3 ch\xE1y, ch\xE1y l\xE0 m\u1EA5t sinh kh\xED."
+    },
+    {
+      "id": "dp.hau_tho_thuan_tuy",
+      "nghe": "luyen_bao",
+      "ten": "H\u1EADu Th\u1ED5 Thu\u1EABn \u0111\u1ED3 ph\u1ED5 (th\u1EA1ch t\u1EE7y)",
+      "ra": "item.hau_tho_thuan",
+      "chu": [
+        {
+          "id": "item.thach_tuy_phan",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 5,
+      "mo_ta": "R\u1EAFc b\u1ED9t th\u1EA1ch t\u1EE7y v\xE0o \u0111\u1EA5t s\xE9t \u0111\xFAc khi\xEAn, nung xong c\u1EE9ng nh\u01B0 s\u1EAFt. L\u1EEDa v\u0103n, nung m\u1ED9t ng\xE0y."
+    },
+    {
+      "id": "dp.ban_son_an",
+      "nghe": "luyen_bao",
+      "ten": "B\xE0n S\u01A1n \u1EA4n \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.ban_son_an",
+      "chu": [
+        {
+          "id": "item.son_tinh_hach",
+          "so": 2
+        },
+        {
+          "id": "item.linh_van_thach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 50,
+      "mo_ta": "Hai l\xF5i S\u01A1n Tinh \xE9p l\xE0m th\xE2n \u1EA5n, m\u1EAFt tr\u1EADn b\u1EB1ng \u0111\xE1 linh v\u0103n \u0111\u1EB7t gi\u1EEFa m\u1EB7t \u1EA5n. \u1EA4n th\xE0nh th\xEC \u0111\u1EB7t xu\u1ED1ng \u0111\u1EA5t l\xE0 \u0111\u1EA5t l\xFAn."
+    },
+    {
+      "id": "dp.dan_lo_huyen_dong",
+      "nghe": "luyen_bao",
+      "ten": "T\u1EED V\u0103n \u0111an l\xF4 \u0111\u1ED3 ph\u1ED5 (c\u1ED5 \u0111\u1ED3ng tinh)",
+      "ra": "item.dan_lo_huyen",
+      "chu": [
+        {
+          "id": "item.co_dong_tinh",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 30,
+      "mo_ta": "Tr\u1ED9n \u0111\u1ED3ng g\u1EC9 c\u1EE7a \u0111\u1EC9nh th\xE0nh tinh v\xE0o h\xE0n thi\u1EBFt, l\xF2 gi\u1EEF l\u1EEDa \u0111\u1EC1u m\xE0 kh\u1ECFi kh\u1EAFc nhi\u1EC1u tr\u1EADn v\u0103n. G\xF5 th\u1EED nghe ng\xE2n nh\u01B0 chu\xF4ng nh\u1ECF l\xE0 \u0111\u01B0\u1EE3c."
+    },
+    {
+      "id": "dp.thua_anh_kiem",
+      "nghe": "luyen_bao",
+      "ten": "Th\u1EEBa \u1EA2nh Ki\u1EBFm \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thua_anh_kiem",
+      "chu": [
+        {
+          "id": "item.tan_kiem_y",
+          "so": 2
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 3
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 60,
+      "mo_ta": "Hai m\u1EA3nh ki\u1EBFm g\xE3y c\xF2n ki\u1EBFm \xFD, gh\xE9p v\xE0o th\xE2n h\xE0n thi\u1EBFt. Ki\u1EBFm \xFD kh\xF4ng ch\u1ECBu nhau th\xEC r\xE8n m\xE3i kh\xF4ng li\u1EC1n, ph\u1EA3i \u0111\u1EC3 ng\u01B0\u1EDDi r\xE8n ng\u1ED3i tr\u01B0\u1EDBc ki\u1EBFm m\u1ED9t \u0111\xEAm."
+    },
+    {
+      "id": "dp.hoi_am_thuan",
+      "nghe": "luyen_bao",
+      "ten": "H\u1ED3i \xC2m Thu\u1EABn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.hoi_am_thuan",
+      "chu": [
+        {
+          "id": "item.co_chung_dong",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 3
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "\u0110\xFAc m\u1EA3nh chu\xF4ng ch\xF9a v\xE0o gi\u1EEFa m\u1EB7t thu\u1EABn h\xE0n thi\u1EBFt. \u0110\xFAc xong b\xFAng tay th\u1EED, ng\xE2n h\u1EBFt m\u1ED9t n\xE9n h\u01B0\u01A1ng m\u1EDBi \u0111\u1EA1t."
+    },
+    {
+      "id": "dp.hau_tho_kim_cang_an",
+      "nghe": "luyen_bao",
+      "ten": "H\u1EADu Th\u1ED5 Kim Cang \u1EA4n \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.hau_tho_kim_cang_an",
+      "chu": [
+        {
+          "id": "item.sa_trung_tam",
+          "so": 2
+        },
+        {
+          "id": "item.sa_linh_tinh",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 20,
+      "mo_ta": "Tim sa tr\xF9ng l\xE0m l\xF5i \u1EA5n, c\xE1t linh \u0111\xFAc v\u1ECF ngo\xE0i. \u0110\u1EB7t \u1EA5n v\xE0o l\xF2, c\xE1t t\u1EF1 b\xF2 v\u1EC1 b\u1ECDc k\xEDn l\xF5i."
+    },
+    {
+      "id": "dp.dia_sat_dinh",
+      "nghe": "luyen_bao",
+      "ten": "\u0110\u1ECBa S\xE1t \u0110inh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.dia_sat_dinh",
+      "chu": [
+        {
+          "id": "item.bach_cot_phan",
+          "so": 1
+        },
+        {
+          "id": "item.thi_du",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 5,
+      "mo_ta": "R\xE8n b\u1EA3y \u0111inh h\xE0n thi\u1EBFt, t\xF4i trong d\u1EA7u thi r\u1ED3i l\u0103n qua b\u1ED9t x\u01B0\u01A1ng. L\u1EA5y \u0111\u1ED9c tr\u1ECB \u0111\u1ED9c, \u0111inh nh\u1EDB m\xF9i x\xE1c m\xE0 ghim."
+    },
+    {
+      "id": "dp.huyet_anh_dao",
+      "nghe": "luyen_bao",
+      "ten": "Huy\u1EBFt \u1EA2nh \u0110ao \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.huyet_anh_dao",
+      "chu": [
+        {
+          "id": "item.cuong_thi_nha",
+          "so": 1
+        },
+        {
+          "id": "item.thi_du",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 20,
+      "mo_ta": "R\u0103ng c\u01B0\u01A1ng thi m\xE0i l\u01B0\u1EE1i, thi du t\xF4i l\u1EEDa, h\xE0n thi\u1EBFt l\xE0m s\u1ED1ng. Thi \u0111\u1ED9c trong l\u01B0\u1EE1i l\xE0m v\u1EBFt ch\xE9m kh\xF4ng ch\u1ECBu kh\xE9p."
+    },
+    {
+      "id": "dp.khu_thi_linh",
+      "nghe": "luyen_bao",
+      "ten": "Khu Thi Linh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.khu_thi_linh",
+      "chu": [
+        {
+          "id": "item.thi_hach",
+          "so": 1
+        },
+        {
+          "id": "item.luyen_thi_phu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 50,
+      "mo_ta": "Treo thi h\u1EA1ch trong l\xF2ng chu\xF4ng \u0111\u1ED3ng, d\xE1n l\xE1 ph\xF9 luy\u1EC7n thi l\xEAn quai. L\u1EEDa v\u0103n, chu\xF4ng ngu\u1ED9i r\u1ED3i m\u1EDBi g\u1EAFn l\u01B0\u1EE1i."
+    },
+    {
+      "id": "dp.thien_dien_phap_y",
+      "nghe": "luyen_bao",
+      "ten": "Thi\xEAn Di\u1EC7n Ph\xE1p Y \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thien_dien_phap_y",
+      "chu": [
+        {
+          "id": "item.hoa_bi",
+          "so": 1
+        },
+        {
+          "id": "item.bien_buc_si",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 50,
+      "mo_ta": "T\u1EA5m h\u1ECDa b\xEC l\xE0m l\u1EDBp l\xF3t, c\xE1nh d\u01A1i m\xE0ng \u0111\u1ECF kh\xE2u l\u1EDBp ngo\xE0i. Kh\xE2u trong b\xF3ng t\u1ED1i, \u0111\u1EEBng nh\xECn v\xE0o m\u1EB7t v\u1EBD tr\xEAn da."
+    },
+    {
+      "id": "dp.ho_tam_noi_giap",
+      "nghe": "luyen_bao",
+      "ten": "H\u1ED9 T\xE2m N\u1ED9i Gi\xE1p \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.ho_tam_noi_giap",
+      "chu": [
+        {
+          "id": "item.thi_mao",
+          "so": 1
+        },
+        {
+          "id": "item.co_khoi_tan_giap",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "M\u1EA3nh gi\xE1p kh\xF4i l\u1ED7i c\u1ED5 c\u1EAFt l\xE0m t\u1EA5m h\u1ED9 t\xE2m, l\xF4ng Mao C\u01B0\u01A1ng d\u1EC7t quanh vi\u1EC1n. L\xF4ng c\u1EE9ng nh\u01B0 kim, ph\u1EA3i nung \u0111\u1ECF m\u1EDBi u\u1ED1n \u0111\u01B0\u1EE3c."
+    },
+    {
+      "id": "dp.huyen_thiet_ho_uyen",
+      "nghe": "luyen_bao",
+      "ten": "Huy\u1EC1n Thi\u1EBFt H\u1ED9 Uy\u1EC3n \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.huyen_thiet_ho_uyen",
+      "chu": [
+        {
+          "id": "item.moc_khoi_hach",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 5,
+      "mo_ta": "L\xF5i kh\xF4i l\u1ED7i g\u1ED7 kh\u1EA3m trong bao c\u1ED5 tay, nh\u01B0 kh\u1EDBp tay ng\u01B0\u1EDDi g\u1ED7: g\u1EA1t \u0111ao xong, l\xF5i b\u1EADt l\u1EA1i \u0111\u1EA9y c\xFA \u0111\u1EA5m theo \u0111\xE0."
+    },
+    {
+      "id": "dp.ly_hoa_hoan_dao",
+      "nghe": "luyen_bao",
+      "ten": "Ly H\u1ECFa Ho\xE0n \u0110ao \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.ly_hoa_hoan_dao",
+      "chu": [
+        {
+          "id": "item.dong_khoi_hach",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 20,
+      "mo_ta": "Th\xE1o ch\xEDn v\xF2ng xoay trong l\xF5i kh\xF4i l\u1ED7i \u0111\u1ED3ng, g\u1EAFn l\xEAn l\u01B0ng \u0111ao. V\xF2ng c\xF2n t\u1EF1 quay th\xEC m\u1ED7i nh\xE1t ch\xE9m ch\xEDn v\xF2ng c\xF9ng reo."
+    },
+    {
+      "id": "dp.oanh_thien_loi_chuy",
+      "nghe": "luyen_bao",
+      "ten": "Oanh Thi\xEAn L\xF4i Ch\xF9y \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.oanh_thien_loi_chuy",
+      "chu": [
+        {
+          "id": "item.co_khoi_hach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 100,
+      "mo_ta": "\u0110\u1EADp v\u1EE1 v\u1ECF C\u1ED5 Kh\xF4i H\u1EA1ch, chia tia s\xE9t b\u1ECB nh\u1ED1t l\xE0m \u0111\xF4i, \u0111\xFAc v\xE0o hai \u0111\u1EA7u ch\xF9y. L\u1EEDa v\u0169, \u0111\xFAc d\u01B0\u1EDBi tr\u1EDDi gi\xF4ng."
+    },
+    {
+      "id": "dp.phi_cuong_trao",
+      "nghe": "luyen_bao",
+      "ten": "Phi C\u01B0\u01A1ng Tr\u1EA3o \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phi_cuong_trao",
+      "chu": [
+        {
+          "id": "item.phi_cuong_tuy",
+          "so": 1
+        },
+        {
+          "id": "item.thi_khoi_hach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "L\u1EA5y l\xF5i thi kh\xF4i l\xE0m kh\u1EDBp, t\u1EE7y Phi C\u01B0\u01A1ng r\xF3t v\xE0o l\xE0m g\xE2n. Vu\u1ED1t r\xE8n xong c\xF2n t\u1EF1 co du\u1ED7i, \u0111\u1EB7t trong h\u1ED9p s\u1EAFt."
+    },
+    {
+      "id": "dp.huyet_ha_phien",
+      "nghe": "luyen_bao",
+      "ten": "Huy\u1EBFt H\xE0 Phi\xEAn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.huyet_ha_phien",
+      "chu": [
+        {
+          "id": "item.huyet_anh_tinh",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "Tan Huy\u1EBFt \u1EA2nh Tinh v\xE0o ch\u1EADu n\u01B0\u1EDBc thu\u1ED1c, nh\xFAng l\u1EE5a tr\u1EAFng b\u1EA3y l\u1EA7n. L\u1EE5a \u0111\u1ECF th\u1EABm m\xE0 kh\xF4ng kh\xF4 th\xEC c\u1EDD \u0111\xE3 th\xE0nh."
+    },
+    {
+      "id": "dp.van_quy_phien",
+      "nghe": "luyen_bao",
+      "ten": "V\u1EA1n Qu\u1EF7 Phi\xEAn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.van_quy_phien",
+      "chu": [
+        {
+          "id": "item.quy_vuong_an",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "C\u1EAFm c\xE1n c\u1EDD v\xE0o Qu\u1EF7 V\u01B0\u01A1ng \u1EA4n, th\u1EAFp \xE2m h\u1ECFa b\u1EA3y \u0111\xEAm cho t\xEAn ng\u01B0\u1EDDi ch\u1EBFt tr\xEAn \u1EA5n b\xF2 l\xEAn m\u1EB7t c\u1EDD."
+    },
+    {
+      "id": "dp.xich_huy_tien",
+      "nghe": "luyen_bao",
+      "ten": "X\xEDch H\u1EE7y Ti\xEAn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.xich_huy_tien",
+      "chu": [
+        {
+          "id": "item.huy_lan",
+          "so": 1
+        },
+        {
+          "id": "item.han_thiet",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 80,
+      "mo_ta": "V\u1EA3y H\u1EE7y gh\xE9p l\xEAn l\xF5i h\xE0n thi\u1EBFt nh\u01B0 v\u1EA3y r\u1EAFn th\u1EADt. L\u1EEDa v\u0169, v\u1EA3y n\xF3ng s\u1EB5n n\xEAn l\xF2 d\u1EC5 qu\xE1 l\u1EEDa."
+    },
+    {
+      "id": "dp.bi_hi_tran_bi",
+      "nghe": "luyen_bao",
+      "ten": "B\xED H\xED Tr\u1EA5n Bi \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.bi_hi_tran_bi",
+      "chu": [
+        {
+          "id": "item.bi_hi_giap",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "M\xE0i mai long t\u1EED th\xE0nh bia, kh\u1EAFc ng\u01B0\u1EE3c ch\u1EEF c\u0169 cho xu\xF4i l\u1EA1i. Ch\u1EEF xu\xF4i th\xEC bia m\u1EDBi ch\u1ECBu \u0111\u1EE9ng."
+    },
+    {
+      "id": "dp.phi_lan_tieu",
+      "nghe": "luyen_bao",
+      "ten": "Phi L\xE2n Ti\xEAu \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phi_lan_tieu",
+      "chu": [
+        {
+          "id": "item.trao_phong_lan",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 80,
+      "mo_ta": "Chia v\u1EA3y long t\u1EED l\xE0m b\u1EA3y, m\xE0i m\u1ECFng nh\u01B0 l\xE1. Th\u1EA3 th\u1EED t\u1EEB m\xE1i nh\xE0, m\u1EA3nh n\xE0o l\u01B0\u1EE3n \u0111\u1EE7 m\u1ED9t v\xF2ng m\u1EDBi gi\u1EEF."
+    },
+    {
+      "id": "dp.lieu_nguyen_phien",
+      "nghe": "luyen_bao",
+      "ten": "Li\u1EC7u Nguy\xEAn Phi\u1EBFn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.lieu_nguyen_phien",
+      "chu": [
+        {
+          "id": "item.tat_phuong_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 100,
+      "mo_ta": "K\u1EBFt l\xF4ng h\u1EA1c l\u1EEDa th\xE0nh qu\u1EA1t trong gian k\xEDn gi\xF3. C\xF3 gi\xF3 l\u1ECDt v\xE0o l\xE0 l\xF4ng b\xE9n l\u1EEDa, c\u1EA3 l\xF2 ch\xE1y theo."
+    },
+    {
+      "id": "dp.quy_loi_co",
+      "nghe": "luyen_bao",
+      "ten": "Qu\u1EF3 L\xF4i C\u1ED5 \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.quy_loi_co",
+      "chu": [
+        {
+          "id": "item.quy_nguu_bi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "C\u0103ng da tr\xE2u m\u1ED9t ch\xE2n l\xEAn tang tr\u1ED1ng \u0111\u1ED3ng, \u0111\xE1nh th\u1EED ba ti\u1EBFng d\u01B0\u1EDBi tr\u1EDDi gi\xF4ng. S\xE9t \u0111\xE1p l\u1EDDi th\xEC tr\u1ED1ng th\xE0nh."
+    },
+    {
+      "id": "dp.toan_nghe_lu",
+      "nghe": "luyen_bao",
+      "ten": "Toan Ngh\xEA L\u01B0 \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.toan_nghe_lu",
+      "chu": [
+        {
+          "id": "item.toan_nghe_tu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "Cu\u1ED9n r\xE2u long t\u1EED trong l\xF2ng l\u01B0 \u0111\u1ED3ng, l\u1EEDa v\u0103n hong ba ng\xE0y cho r\xE2u nh\u1EA3 m\xF9i tr\u1EA7m."
+    },
+    {
+      "id": "dp.phi_liem_phong_y",
+      "nghe": "luyen_bao",
+      "ten": "Phi Li\xEAm Phong Y \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phi_liem_phong_y",
+      "chu": [
+        {
+          "id": "item.phi_liem_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "D\u1EC7t l\xF4ng c\xE1nh th\u1EA7n gi\xF3 th\xE0nh \xE1o, khung d\u1EC7t ph\u1EA3i ch\u1EB7n \u0111\xE1. Bu\xF4ng tay l\xE0 s\u1EE3i bay m\u1EA5t."
+    },
+    {
+      "id": "dp.cuu_anh_ho",
+      "nghe": "luyen_bao",
+      "ten": "C\u1EEDu Anh H\u1ED3 \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.cuu_anh_ho",
+      "chu": [
+        {
+          "id": "item.cuu_anh_dam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "Chia m\u1EADt hung th\xFA l\xE0m \u0111\xF4i theo \u0111\u01B0\u1EDDng n\xF3ng l\u1EA1nh, m\u1ED7i n\u1EEDa m\u1ED9t ng\u0103n h\u1ED3 l\xF4. Hai ng\u0103n ph\u1EA3i ng\u0103n b\u1EB1ng ng\u1ECDc, sai m\u1ED9t khe l\xE0 n\u1ED5 l\xF2."
+    },
+    {
+      "id": "dp.cung_ky_dao",
+      "nghe": "luyen_bao",
+      "ten": "C\xF9ng K\u1EF3 \u0110ao \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.cung_ky_dao",
+      "chu": [
+        {
+          "id": "item.cung_ky_si",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "X\u01B0\u01A1ng c\xE1nh h\u1ED5 hung th\xFA l\xE0m s\u1ED1ng \u0111ao, r\xE8n b\u1EB1ng l\u1EEDa v\u0169. Ng\u01B0\u1EDDi r\xE8n c\xF3 t\u1ED9i th\xEC x\u01B0\u01A1ng \u1EA5m tay, r\xE8n d\u1EC5 h\u01A1n."
+    },
+    {
+      "id": "dp.thao_thiet_an",
+      "nghe": "luyen_bao",
+      "ten": "Thao Thi\u1EBFt \u1EA4n \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thao_thiet_an",
+      "chu": [
+        {
+          "id": "item.thao_thiet_van_cot",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "\u0110\xFAc \u0111\u1ED3ng quanh x\u01B0\u01A1ng h\xE0m Thao Thi\u1EBFt, gi\u1EEF nguy\xEAn v\xE2n c\u0169. \u0110\u1EEBng \u0111\u1EC3 \u0111an d\u01B0\u1EE3c trong gian luy\u1EC7n, x\u01B0\u01A1ng h\xFAt h\u1EBFt."
+    },
+    {
+      "id": "dp.ly_long_giap",
+      "nghe": "luyen_bao",
+      "ten": "Ly Long Gi\xE1p \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.ly_long_giap",
+      "chu": [
+        {
+          "id": "item.ly_long_lan",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "Ng\xE2m v\u1EA3y r\u1ED3ng trong ch\u1EADu n\u01B0\u1EDBc cho t\u1EDBi khi n\u01B0\u1EDBc th\xF4i xo\xE1y, r\u1ED3i m\u1EDBi k\u1EBFt gi\xE1p. V\u1EA3y c\xF2n xo\xE1y l\xE0 ch\u01B0a thu\u1EA7n."
+    },
+    {
+      "id": "dp.hoa_lan_truong",
+      "nghe": "luyen_bao",
+      "ten": "H\u1ECFa L\xE2n Tr\u01B0\u1EE3ng \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.hoa_lan_truong",
+      "chu": [
+        {
+          "id": "item.hoa_lan_giac",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "G\u1EAFn s\u1EEBng H\u1ECFa L\xE2n l\xEAn \u0111\u1EA7u tr\u01B0\u1EE3ng t\u1EED \u0111\xE0n. Ng\u01B0\u1EDDi luy\u1EC7n ph\u1EA3i kh\xF4ng mang s\xE1t \xFD, l\u1EEDa trong s\u1EEBng m\u1EDBi ch\u1ECBu n\u1EB1m y\xEAn."
+    },
+    {
+      "id": "dp.tinh_dau_thuan",
+      "nghe": "luyen_bao",
+      "ten": "Tinh \u0110\u1EA9u Thu\u1EABn \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.tinh_dau_thuan",
+      "chu": [
+        {
+          "id": "item.huyen_vu_van_giap",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "Gi\u1EEF nguy\xEAn v\xE2n sao tr\xEAn mai Huy\u1EC1n Quy, vi\u1EC1n \u0111\u1ED3ng \u0111en. Luy\u1EC7n d\u01B0\u1EDBi tr\u1EDDi sao, \u0111\xEAm c\xF3 m\xE2y th\xEC ngh\u1EC9."
+    },
+    {
+      "id": "dp.hoa_loan_vu_y",
+      "nghe": "luyen_bao",
+      "ten": "H\u1ECFa Loan V\u0169 Y \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.hoa_loan_vu_y",
+      "chu": [
+        {
+          "id": "item.hoa_loan_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "D\u1EC7t l\xF4ng \u0111u\xF4i H\u1ECFa Loan, l\u1EEDa v\u0103n hong su\u1ED1t. L\xF4ng ch\xE1y th\xEC \u0111\u1EE3i s\xE1ng h\xF4m sau m\u1ECDc l\u1EA1i r\u1ED3i d\u1EC7t ti\u1EBFp."
+    },
+    {
+      "id": "dp.thanh_loan_tram",
+      "nghe": "luyen_bao",
+      "ten": "Thanh Loan Tr\xE2m \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thanh_loan_tram",
+      "chu": [
+        {
+          "id": "item.thanh_loan_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 300,
+      "mo_ta": "C\xE0i l\xF4ng Thanh Loan v\xE0o tr\xE2m ng\u1ECDc, c\u1EAFm tr\xE2m v\xE0o ch\u1EADu c\xE2y ba ng\xE0y. C\xE2y ra l\u1ED9c th\xEC tr\xE2m \u0111\xE3 th\xE0nh."
+    },
+    {
+      "id": "dp.lang_nguyet_cau",
+      "nghe": "luyen_bao",
+      "ten": "Lang Nguy\u1EC7t C\xE2u \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.lang_nguyet_cau",
+      "chu": [
+        {
+          "id": "item.thien_lang_nguyet_phach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "Kh\u1EA3m m\u1EAFt Thi\xEAn Lang v\xE0o chu\xF4i c\xE2u b\u1EA1c, luy\u1EC7n trong \u0111\xEAm tr\u0103ng tr\xF2n. S\xF3i quanh \u0111\xF3 h\xFA th\xEC ph\u1EA3i d\u1EEBng tay ch\u1EDD ch\xFAng im."
+    },
+    {
+      "id": "dp.van_tuong_dien",
+      "nghe": "luyen_bao",
+      "ten": "V\u1EA1n T\u01B0\u1EDBng Di\u1EC7n \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.van_tuong_dien",
+      "chu": [
+        {
+          "id": "item.van_tuong_ho_dien",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "Ph\u1EE7 m\u1EB7t ng\u01B0\u1EDDi H\u1ED3 V\u01B0\u01A1ng l\xEAn khu\xF4n ng\u1ECDc, l\u1EEDa v\u0103n hong cho m\u1EB7t qu\xEAn ch\u1EE7 c\u0169. Ng\u01B0\u1EDDi luy\u1EC7n \u0111\u1EEBng soi g\u01B0\u01A1ng trong l\xFAc \u1EA5y."
+    },
+    {
+      "id": "dp.long_huyet_thuong",
+      "nghe": "luyen_bao",
+      "ten": "Long Huy\u1EBFt Th\u01B0\u01A1ng \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.long_huyet_thuong",
+      "chu": [
+        {
+          "id": "item.long_huyet_giao_cot",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "\u0110\u1ED1t s\u1ED1ng giao v\u01B0\u01A1ng n\u1ED1i l\xE0m c\xE1n th\u01B0\u01A1ng, r\xE8n trong n\u01B0\u1EDBc l\u1EA1nh. N\u01B0\u1EDBc quanh c\xE1n s\xF4i h\u1EBFt ba v\u1EA1c m\u1EDBi th\xE0nh."
+    },
+    {
+      "id": "dp.phu_dieu_si",
+      "nghe": "luyen_bao",
+      "ten": "Ph\xF9 Di\xEAu S\xED \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.phu_dieu_si",
+      "chu": [
+        {
+          "id": "item.phu_dieu_than_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "K\u1EBFt l\xF4ng c\xE1nh ch\u1EE7 B\u1EB1ng V\u01B0\u01A1ng th\xE0nh \u0111\xF4i c\xE1nh, luy\u1EC7n tr\xEAn \u0111\u1EC9nh n\xFAi c\xF3 gi\xF3 l\u1EDBn. L\xF4ng t\u1EF1 l\u01A1 l\u1EEDng, khung ph\u1EA3i ch\u1EB1ng d\xE2y."
+    },
+    {
+      "id": "dp.hung_tam_kinh",
+      "nghe": "luyen_bao",
+      "ten": "H\xF9ng T\xE2m K\xEDnh \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.hung_tam_kinh",
+      "chu": [
+        {
+          "id": "item.thiet_the_hung_tam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "\u0110\xFAc \u0111\u1ED3ng quanh qu\u1EA3 tim H\xF9ng V\u01B0\u01A1ng th\xE0nh g\u01B0\u01A1ng h\u1ED9 t\xE2m, gi\u1EEF nguy\xEAn v\u1EBFt th\u1EC7 \u1EA5n \u1EDF m\u1EB7t sau."
+    },
+    {
+      "id": "dp.bach_ho_dao",
+      "nghe": "luyen_bao",
+      "ten": "B\u1EA1ch H\u1ED5 \u0110ao \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.bach_ho_dao",
+      "chu": [
+        {
+          "id": "item.bach_ho_huyet_phach",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "Nung l\u01B0\u1EE1i \u0111ao \u0111\u1ECF r\u1ED3i t\xF4i qua tinh huy\u1EBFt B\u1EA1ch H\u1ED5 b\u1EA3y l\u1EA7n. L\u01B0\u1EE1i tr\u1EAFng nh\u01B0 s\u01B0\u01A1ng l\xE0 xong."
+    },
+    {
+      "id": "dp.tu_sa_doc_cham",
+      "nghe": "luyen_bao",
+      "ten": "T\u1EED Sa \u0110\u1ED9c Ch\xE2m \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.tu_sa_doc_cham",
+      "chu": [
+        {
+          "id": "item.tu_sa_doc_tuy",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 200,
+      "mo_ta": "Ng\xE2m ch\xEDn c\xE2y kim trong t\u1EE7y \u0111\u1ED9c H\u1EA1t V\u01B0\u01A1ng b\u1ED1n m\u01B0\u01A1i ch\xEDn ng\xE0y. B\xECnh ng\xE2m ph\u1EA3i l\xE0 ng\u1ECDc, \u0111\u1ED3 s\u1EE9 b\u1ECB \u0103n th\u1EE7ng."
+    },
+    {
+      "id": "dp.vien_tam_moc_ngu",
+      "nghe": "luyen_bao",
+      "ten": "Vi\xEAn T\xE2m M\u1ED9c Ng\u01B0 \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.vien_tam_moc_ngu",
+      "chu": [
+        {
+          "id": "item.thinh_phap_vien_tam",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "Kho\xE9t m\xF5 g\u1ED7, kh\u1EA3m vi\xEAn t\xE2m ng\u1ECDc v\xE0o l\xF2ng m\xF5. Luy\u1EC7n v\u1EEBa luy\u1EC7n v\u1EEBa t\u1EE5ng kinh, \u0111\u1EE9t ti\u1EBFng t\u1EE5ng l\xE0 ng\u1ECDc n\u1EE9t."
+    },
+    {
+      "id": "dp.kim_thue_bao_y",
+      "nghe": "luyen_bao",
+      "ten": "Kim Thu\u1EBF B\u1EA3o Y \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.kim_thue_bao_y",
+      "chu": [
+        {
+          "id": "item.kim_than_xa_thue",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "C\u1EAFt x\xE1c l\u1ED9t X\xE0 V\u01B0\u01A1ng may \xE1o, gi\u1EEF nguy\xEAn l\u1EDBp v\u1EA3y v\xE0ng. Luy\u1EC7n xong ph\u1EA3i \u0111em qua m\u1ED9t ng\xF4i mi\u1EBFu cho h\u01B0\u01A1ng kh\xF3i \xE1m v\xE0o."
+    },
+    {
+      "id": "dp.liet_ung_cung",
+      "nghe": "luyen_bao",
+      "ten": "Li\u1EC7t \u01AFng Cung \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.liet_ung_cung",
+      "chu": [
+        {
+          "id": "item.ung_ton_cuong_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 300,
+      "mo_ta": "L\xF4ng c\xE1nh \u01B0ng t\xF4n c\u1EAFt l\xE0m \u0111u\xF4i t\xEAn, s\u1EEBng th\xFA l\xE0m th\xE2n cung. M\xE9p l\xF4ng s\u1EAFc, c\u1EAFm \u0111u\xF4i t\xEAn ph\u1EA3i \u0111eo bao tay."
+    },
+    {
+      "id": "dp.thon_kim_dai",
+      "nghe": "luyen_bao",
+      "ten": "Th\xF4n Kim \u0110\u1EA1i \u0111\u1ED3 ph\u1ED5",
+      "ra": "item.thon_kim_dai",
+      "chu": [
+        {
+          "id": "item.thon_kim_thu_nang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "L\u1ED9n t\xFAi m\xE1 chu\u1ED9t gi\xE0, kh\xE2u mi\u1EC7ng b\u1EB1ng ch\u1EC9 v\xE0ng, kh\u1EAFc tr\u1EADn v\u0103n thu n\u1EA1p l\xEAn l\u1EDBp l\xF3t."
+    },
+    {
+      "id": "dp.cuu_pham_lien_dai_thiem",
+      "nghe": "luyen_bao",
+      "ten": "C\u1EEDu Ph\u1EA9m Li\xEAn \u0110\xE0i \u0111\u1ED3 ph\u1ED5 (thi\u1EC1m ch\xE2u)",
+      "ra": "item.cuu_pham_lien_dai",
+      "chu": [
+        {
+          "id": "item.thon_nguyet_thiem_chau",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "\u0110\u1EB7t thi\u1EC1m ch\xE2u gi\u1EEFa \u0111\xE0i sen ch\xEDn t\u1EA7ng c\xE1nh, b\xF3ng tr\u0103ng trong ch\xE2u t\u1EE5 linh kh\xED th\xE0nh s\u01B0\u01A1ng. L\u1EEDa v\u0103n, luy\u1EC7n ba \u0111\xEAm tr\u0103ng."
+    },
+    {
+      "id": "dp.tu_thu_tien_y_chu",
+      "nghe": "luyen_bao",
+      "ten": "T\u1EED Th\u1EE5 Ti\xEAn Y \u0111\u1ED3 ph\u1ED5 (v\u1EA1n ti chu nang)",
+      "ra": "item.tu_thu_tien_y",
+      "chu": [
+        {
+          "id": "item.van_ti_chu_nang",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "B\xF3p tuy\u1EBFn t\u01A1 nh\u1EC7n m\u1EB9 l\u1EA5y s\u1EE3i b\u1EA1c, d\u1EC7t li\u1EC1n kh\xF4ng n\u1ED1i. Th\u1EE3 d\u1EC7t ng\u1ED3i khung m\u1ED9t m\u1EA1ch \u0111\u1EBFn khi h\u1EBFt t\u01A1."
+    },
+    {
+      "id": "dp.dinh_hai_chau_ca",
+      "nghe": "luyen_bao",
+      "ten": "\u0110\u1ECBnh H\u1EA3i Ch\xE2u \u0111\u1ED3 ph\u1ED5 (h\u1EA3i ca ch\xE2u)",
+      "ra": "item.dinh_hai_chau",
+      "chu": [
+        {
+          "id": "item.hai_ca_chau",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 200,
+      "mo_ta": "L\u1EA5y ng\u1ECDc trai ng\u01B0 c\u01A1 l\xE0m h\u1EA1t c\xE1i, t\u1EE5 n\u01B0\u1EDBc bi\u1EC3n quanh th\xE0nh chu\u1ED7i ch\xE2u. Ng\u01B0\u1EDDi luy\u1EC7n b\u1ECBt tai, nghe ti\u1EBFng h\xE1t l\xE0 l\u1EA1c tay."
+    },
+    {
+      "id": "dp.quy_tuc_phu",
+      "nghe": "che_phu",
+      "ten": "Quy T\u1EE9c Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.quy_tuc_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 100,
+      "mo_ta": "Kh\xE9p tr\u1EADn v\u0103n trong gi\u1EA5y ng\u1ECDc \u0111\u1EC3 t\xECm l\u1EA1i tr\u1EADn \u0111\xE3 bi\u1EBFt c\xF9ng Th\u1ED5."
+    },
+    {
+      "id": "dp.na_di_phu",
+      "nghe": "che_phu",
+      "ten": "Na Di Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.na_di_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 30,
+      "mo_ta": "V\u1EBD v\xF2ng ph\xF9 li\u1EC1n n\xE9t, d\u1EDDi th\xE2n trong t\u1EA7m ba ngh\xECn d\u1EB7m."
+    },
+    {
+      "id": "dp.hoa_dan_phu",
+      "nghe": "che_phu",
+      "ten": "H\u1ECFa \u0110\u1EA1n Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.hoa_dan_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 2,
+      "mo_ta": "Ph\xF9 t\u1EADp tay c\u1EE7a ph\xF9 \u0111\u1ED3. V\xF2ng xo\xE1y ph\u1EA3i v\u1EBD m\u1ED9t h\u01A1i, d\u1EEBng b\xFAt gi\u1EEFa ch\u1EEBng th\xEC l\u1EEDa t\u1EAFt trong gi\u1EA5y."
+    },
+    {
+      "id": "dp.bua_tru_ta",
+      "nghe": "che_phu",
+      "ten": "B\xF9a tr\u1EEB t\xE0 ph\u01B0\u01A1ng",
+      "ra": "item.bua_tru_ta",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "moc"
+          ],
+          "so": 1
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 6,
+      "mo_ta": "M\u1EF1c chu sa h\xF2a n\u01B0\u1EDBc l\xE1 c\xE2y s\u1EAFc \u0111\u1EB7c. \xD4ng t\u1EEB d\u1EB7n v\u1EBD m\u1ED9t h\u01A1i kh\xF4ng \u0111\u1EE9t, n\xE9t \u0111\u1EE9t th\xEC d\u01B0\u01A1ng kh\xED r\xF2 ra."
+    },
+    {
+      "id": "dp.canh_kim_phu",
+      "nghe": "che_phu",
+      "ten": "Canh Kim Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.canh_kim_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.lang_nha",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "R\u0103ng s\xF3i nghi\u1EC1n m\u1ECBn tr\u1ED9n v\xE0o chu sa. N\xE9t ph\xF9 s\u1EAFc nh\u01B0 v\u1EBFt dao, ph\u1EA3i h\u1EA1 b\xFAt d\u1EE9t kho\xE1t."
+    },
+    {
+      "id": "dp.dan_loi_phu",
+      "nghe": "che_phu",
+      "ten": "D\u1EABn L\xF4i Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.dan_loi_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 8,
+      "mo_ta": "Ph\u1EA3i v\u1EBD l\xFAc tr\u1EDDi oi, m\u1EF1c y\xEAu huy\u1EBFt m\u1EDBi b\u1EAFt \u0111\u01B0\u1EE3c l\xF4i kh\xED. N\xE9t ng\u1EADp ng\u1EEBng th\xEC s\xE9t \u0111\xE1nh ng\u01B0\u1EE3c v\xE0o tay."
+    },
+    {
+      "id": "dp.dinh_than_phu",
+      "nghe": "che_phu",
+      "ten": "\u0110\u1ECBnh Th\xE2n Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.dinh_than_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.thiem_to",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 8,
+      "mo_ta": "M\u1ED9t gi\u1ECDt m\u1EE7 c\xF3c y\xEAu h\xF2a v\xE0o m\u1EF1c. Ph\u1EA3i v\u1EBD ch\u1EADm, n\xE9t cu\u1ED1i kh\xE9p v\xF2ng m\u1EDBi gi\u1EEF \u0111\u01B0\u1EE3c ng\u01B0\u1EDDi."
+    },
+    {
+      "id": "dp.kim_cuong_phu",
+      "nghe": "che_phu",
+      "ten": "Kim C\u01B0\u01A1ng Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.kim_cuong_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "tho"
+          ],
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 5,
+      "mo_ta": "Ph\xF9 h\u1ED9 th\xE2n ch\xE9p t\u1EEB kinh nh\xE0 ch\xF9a. N\xE9t d\xE0y, ch\u1EADm, \u0111\u1EC1u tay nh\u01B0 t\u1EE5ng kinh."
+    },
+    {
+      "id": "dp.than_hanh_phu",
+      "nghe": "che_phu",
+      "ten": "Th\u1EA7n H\xE0nh Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.than_hanh_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "moc"
+          ],
+          "so": 1
+        }
+      ],
+      "linh_thach": 5,
+      "mo_ta": "M\u1EF1c ng\xE2m m\u1ED9t v\u1ECB th\u1EA3o d\u01B0\u1EE3c h\u1EC7 m\u1ED9c cho nh\u1EB9 ch\xE2n. Kh\xF4ng k\xE9n n\xE9t b\xFAt, ph\xF9 \u0111\u1ED3 n\xE0o c\u0169ng v\u1EBD \u0111\u01B0\u1EE3c."
+    },
+    {
+      "id": "dp.truyen_am_phu",
+      "nghe": "che_phu",
+      "ten": "Truy\u1EC1n \xC2m Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.truyen_am_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "thuy"
+          ],
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 3,
+      "mo_ta": "N\u01B0\u1EDBc m\xE0i m\u1EF1c ph\u1EA3i l\xE0 n\u01B0\u1EDBc s\u01B0\u01A1ng c\u1EE7a m\u1ED9t v\u1ECB linh d\u01B0\u1EE3c h\u1EC7 th\u1EE7y, ti\u1EBFng n\xF3i m\u1EDBi th\u1EA5m v\xE0o gi\u1EA5y. G\u1EA5p h\u1EA1c cho ch\u1EADm."
+    },
+    {
+      "id": "dp.tam_lo_phu",
+      "nghe": "che_phu",
+      "ten": "T\u1EA7m L\u1ED9 Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.tam_lo_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 2
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "tho"
+          ],
+          "so": 1
+        }
+      ],
+      "linh_thach": 5,
+      "mo_ta": "R\u1EAFc b\u1ED9t r\u1EC5 c\xE2y h\u1EC7 th\u1ED5 l\xEAn gi\u1EA5y tr\u01B0\u1EDBc khi v\u1EBD, ph\xF9 m\u1EDBi nh\u1EADn ra \u0111\u1EA5t. Hai l\u1EDBp gi\u1EA5y d\xE1n ch\u1ED3ng cho bay \u0111\u01B0\u1EE3c xa."
+    },
+    {
+      "id": "dp.thanh_phong_phu",
+      "nghe": "che_phu",
+      "ten": "Thanh Phong Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.thanh_phong_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 2
+        },
+        {
+          "id": "item.hac_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "L\xF4ng h\u1EA1c \u0111\u1ED1t th\xE0nh tro h\xF2a v\xE0o m\u1EF1c. N\xE9t ph\u1EA3i nh\u1EB9 nh\u01B0 l\xF4ng, n\u1EB7ng tay m\u1ED9t ch\xFAt l\xE0 gi\xF3 kh\xF4ng ra."
+    },
+    {
+      "id": "dp.thien_ti_phu",
+      "nghe": "che_phu",
+      "ten": "Thi\xEAn Ti Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.thien_ti_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 2
+        },
+        {
+          "id": "item.chu_ty",
+          "so": 2
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": "Se t\u01A1 nh\u1EC7n y\xEAu v\xE0o t\u1EEBng n\xE9t, ch\xEDn v\xF2ng l\u01B0\u1EDBi kh\xF4ng v\xF2ng n\xE0o \u0111\u01B0\u1EE3c \u0111\u1EE9t. Ai n\xF3ng v\u1ED9i th\xEC t\u01A1 r\u1ED1i th\xE0nh c\u1EE5c."
+    },
+    {
+      "id": "dp.huyen_quy_phu",
+      "nghe": "che_phu",
+      "ten": "Huy\u1EC1n Quy Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.huyen_quy_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 2
+        },
+        {
+          "id": "item.quy_giap",
+          "so": 1
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "linh_thach": 10,
+      "mo_ta": "Mai r\xF9a nghi\u1EC1n l\xE0m n\u1EC1n, n\xE9t ph\xF9 v\u1EBD theo v\xE2n mai. Ch\u1EADm th\xEC s\u1ED1ng, nhanh th\xEC v\u1EE1."
+    },
+    {
+      "id": "dp.dia_don_phu",
+      "nghe": "che_phu",
+      "ten": "\u0110\u1ECBa \u0110\u1ED9n Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.dia_don_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 2
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 2
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "tho"
+          ],
+          "so": 2
+        }
+      ],
+      "linh_thach": 25,
+      "mo_ta": "M\u1EF1c h\xF2a \u0111\u1EA5t l\u1EA5y t\u1EEB \u0111\xE1y gi\u1EBFng s\xE2u c\xF9ng hai v\u1ECB linh d\u01B0\u1EE3c h\u1EC7 th\u1ED5. Ph\xF9 gi\u1EEF m\u1EA1ng, t\xE1n tu n\xE0o c\xF3 \u0111\u01A1n n\xE0y c\u0169ng gi\u1EA5u k\u1EF9."
+    },
+    {
+      "id": "dp.huyen_bang_phu",
+      "nghe": "che_phu",
+      "ten": "Huy\u1EC1n B\u0103ng Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.huyen_bang_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.bang_vu",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "bang",
+            "thuy"
+          ],
+          "pham": 3,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "mo_ta": "L\xF4ng chim b\u1EB1ng l\xE0m ng\xF2i ph\u1EE5, m\u1EF1c pha nh\u1EF1a linh d\u01B0\u1EE3c h\xE0n th\u1EE7y. Ph\u1EA3i v\u1EBD trong gian l\u1EA1nh, m\u1EF1c \u1EA5m l\xE0 b\u0103ng kh\xF4ng k\u1EBFt."
+    },
+    {
+      "id": "dp.tu_tieu_loi_phu",
+      "nghe": "che_phu",
+      "ten": "T\u1EED Ti\xEAu L\xF4i Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.tu_tieu_loi_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 3
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 3
+        }
+      ],
+      "phu": [
+        {
+          "loai": "linh_duoc",
+          "he": [
+            "loi"
+          ],
+          "pham": 3,
+          "so": 2
+        }
+      ],
+      "hoa": "vu",
+      "linh_thach": 80,
+      "mo_ta": "V\u1EBD trong \u0111\xEAm gi\xF4ng, m\u1ED9t h\u01A1i t\u1EEB \u0111\u1EA7u t\u1EDBi cu\u1ED1i, \u0111\u1EE3i s\xE9t \u0111\xE1nh xu\u1ED1ng m\u1EDBi h\u1EA1 n\xE9t ch\xF3t. Ch\u1EADm m\u1ED9t nh\u1ECBp l\xE0 l\xF4i kh\xED tan."
+    },
+    {
+      "id": "dp.kim_thiem_phu",
+      "nghe": "che_phu",
+      "ten": "Kim Thi\u1EC1m Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.kim_thiem_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 2
+        },
+        {
+          "id": "item.kim_thiem_bao_chau",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "B\u1EA3o ch\xE2u c\xF3c y\xEAu m\xE0i th\xE0nh b\u1ED9t h\xF2a v\xE0o m\u1EF1c. V\u1EBD ch\u1EADm, n\xE9t cu\u1ED1i th\u1EAFt l\u1EA1i nh\u01B0 mi\u1EC7ng c\xF3c kh\xE9p."
+    },
+    {
+      "id": "dp.cuu_tieu_phong_phu",
+      "nghe": "che_phu",
+      "ten": "C\u1EEDu Ti\xEAu Phong Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.cuu_tieu_phong_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 3
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 3
+        },
+        {
+          "id": "item.tien_hac_tho_cot",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "X\u01B0\u01A1ng h\u1EA1c ti\xEAn l\xE0m c\xE1n ng\xF2i ph\u1EE5, gi\xF3 trong x\u01B0\u01A1ng th\u1ED5i theo n\xE9t. V\u1EBD m\u1ED9t h\u01A1i t\u1EEB d\u01B0\u1EDBi l\xEAn nh\u01B0 h\u1EA1c c\u1EA5t c\xE1nh."
+    },
+    {
+      "id": "dp.pha_quan_phu",
+      "nghe": "che_phu",
+      "ten": "Ph\xE1 Qu\xE2n Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.pha_quan_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 2
+        },
+        {
+          "id": "item.huyet_nguyet_lang_nha",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "Ph\xF9 c\u1EE7a th\u1EE3 ph\xF9 quan \u1EA3i L\u01B0\u01A1ng Qu\u1ED1c, nghi\u1EC1n nanh s\xF3i tr\u0103ng m\xE1u v\xE0o chu sa. N\xE9t ph\xF9 s\u1EAFc nh\u01B0 v\u1EBFt ch\xE9m, h\u1EA1 b\xFAt kh\xF4ng \u0111\u01B0\u1EE3c ngo\xE1i l\u1EA1i."
+    },
+    {
+      "id": "dp.bat_dong_phu",
+      "nghe": "che_phu",
+      "ten": "B\u1EA5t \u0110\u1ED9ng Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.bat_dong_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 2
+        },
+        {
+          "id": "item.kim_boi_hung_bi",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "Da l\u01B0ng g\u1EA5u y\xEAu c\u1EAFt th\xE0nh t\u1EA5m m\u1ECFng l\xE0m n\u1EC1n ph\xF9 thay gi\u1EA5y. N\xE9t d\xE0y v\xE0 ch\u1EADm, nh\u01B0 ng\u01B0\u1EDDi \u0111\u1EAFp \u0111\xEA."
+    },
+    {
+      "id": "dp.kim_lan_doc_phu",
+      "nghe": "che_phu",
+      "ten": "Kim L\xE2n \u0110\u1ED9c Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.kim_lan_doc_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 3
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 3
+        },
+        {
+          "id": "item.kim_lan_mang_dom",
+          "so": 1
+        }
+      ],
+      "phu": [
+        {
+          "loai": "yeu_tai",
+          "pham": 5,
+          "so": 1
+        }
+      ],
+      "hoa": "van",
+      "linh_thach": 50,
+      "mo_ta": "M\u1EADt m\xE3ng x\xE0 pha m\u1EF1c, th\xEAm m\u1ED9t v\u1ECB y\xEAu t\xE0i c\u1EA5p cao cho \u0111\u1ED9c kh\u1ECFi c\u1EAFn ng\u01B0\u1EE3c. Ng\u01B0\u1EDDi v\u1EBD ng\u1EADm gi\u1EA3i \u0111\u1ED9c \u0111an, m\u1ED7i n\xE9t th\u1EDF m\u1ED9t h\u01A1i."
+    },
+    {
+      "id": "dp.canh_kim_phu_nha",
+      "nghe": "che_phu",
+      "ten": "Canh Kim Ph\xF9 ph\u01B0\u01A1ng (nanh l\u1EE3n)",
+      "ra": "item.canh_kim_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.tru_nha",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "Nanh l\u1EE3n r\u1EEBng nghi\u1EC1n b\u1ED9t tr\u1ED9n v\xE0o chu sa, n\xE9t ph\xF9 c\u1EE9ng nh\u01B0 m\u0169i gi\xE1o. V\u1EBD m\u1ED9t h\u01A1i, \u0111\u1EEBng nh\u1EA5c b\xFAt gi\u1EEFa ch\u1EEBng."
+    },
+    {
+      "id": "dp.dinh_than_phu_diep",
+      "nghe": "che_phu",
+      "ten": "\u0110\u1ECBnh Th\xE2n Ph\xF9 ph\u01B0\u01A1ng (\u0111i\u1EC7p ph\u1EA5n)",
+      "ra": "item.dinh_than_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.diep_phan",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "Ph\u1EA5n c\xE1nh b\u01B0\u1EDBm r\u1EAFc l\xEAn m\u1EF1c c\xF2n \u01B0\u1EDBt, n\xE9t ph\xF9 \xF3ng \xE1nh nh\u01B0 b\u1EE5i tr\u0103ng. Ng\u01B0\u1EDDi v\u1EBD ph\u1EA3i b\u1ECBt m\u0169i."
+    },
+    {
+      "id": "dp.na_di_phu_sa",
+      "nghe": "che_phu",
+      "ten": "Na Di Ph\xF9 ph\u01B0\u01A1ng (sa linh)",
+      "ra": "item.na_di_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.sa_linh_tinh",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "C\xE1t linh lu\xF4n b\xF2 v\u1EC1 m\u1ED9t \u0111\u1ED1ng, tr\u1ED9n v\xE0o m\u1EF1c th\xEC ph\xF9 c\u0169ng bi\u1EBFt \u0111\u01B0\u1EDDng v\u1EC1 ch\u1ED7 c\u0169. R\u1EAFc c\xE1t l\xEAn gi\u1EA5y tr\u01B0\u1EDBc khi v\u1EBD."
+    },
+    {
+      "id": "dp.dia_don_phu_vu",
+      "nghe": "che_phu",
+      "ten": "\u0110\u1ECBa \u0110\u1ED9n Ph\xF9 ph\u01B0\u01A1ng (v\u1EE5 tinh)",
+      "ra": "item.dia_don_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 2
+        },
+        {
+          "id": "item.vu_tinh",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "M\u1EDF n\u1EAFp l\u1ECD s\u01B0\u01A1ng trong gian k\xEDn, \u0111\u1EC3 s\u01B0\u01A1ng th\u1EA5m v\xE0o gi\u1EA5y r\u1ED3i m\u1EDBi v\u1EBD. Ph\xF9 \u0111\u1ED9n k\xE8m m\u1ED9t l\xE0n s\u01B0\u01A1ng, k\u1EBB \u0111\u1ECBch kh\xF4ng th\u1EA5y ng\u01B0\u1EDDi ch\xECm xu\u1ED1ng \u0111\xE2u."
+    },
+    {
+      "id": "dp.huyen_bang_phu_chau",
+      "nghe": "che_phu",
+      "ten": "Huy\u1EC1n B\u0103ng Ph\xF9 ph\u01B0\u01A1ng (b\u0103ng ph\xE1ch ch\xE2u)",
+      "ra": "item.huyen_bang_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.bang_phach_chau",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "Hai h\u1EA1t b\u0103ng ph\xE1ch ch\xE2u m\xE0i trong nghi\xEAn \u0111\xE1 l\u1EA1nh, m\u1EF1c \u0111\u1EB7c nh\u01B0 s\u01B0\u01A1ng \u0111\xF4ng. V\u1EBD xong ph\u1EA3i \u0111\u1EC3 ph\xF9 trong h\u1ED9p \u0111\xE1."
+    },
+    {
+      "id": "dp.thuong_lang_phu",
+      "nghe": "che_phu",
+      "ten": "Th\u01B0\u01A1ng L\xE3ng Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.thuong_lang_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.thuy_linh_chau",
+          "so": 2
+        },
+        {
+          "id": "item.thuy_hau_mao",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "Th\u1EE7y linh ch\xE2u m\xE0i l\xE0m m\u1EF1c, l\xF4ng kh\u1EC9 n\u01B0\u1EDBc b\u1EC7n l\xE0m ng\xF2i cho n\xE9t ph\xF9 tr\u01A1n nh\u01B0 n\u01B0\u1EDBc ch\u1EA3y. V\u1EBD b\xEAn b\u1EDD s\xF4ng th\xEC d\u1EC5 th\xE0nh."
+    },
+    {
+      "id": "dp.liet_diem_phu",
+      "nghe": "che_phu",
+      "ten": "Li\u1EC7t Di\u1EC5m Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.liet_diem_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.hoa_tinh_chau",
+          "so": 2
+        },
+        {
+          "id": "item.hoa_ke_vu",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "H\u1ECFa tinh ch\xE2u t\xE1n b\u1ED9t tr\u1ED9n chu sa, l\xF4ng \u0111u\xF4i g\xE0 l\u1EEDa l\xE0m ng\xF2i. Ng\xF2i b\xE9n l\u1EEDa th\xEC ph\u1EA3i v\u1EBD nhanh tr\u01B0\u1EDBc khi ch\xE1y h\u1EBFt."
+    },
+    {
+      "id": "dp.toan_phong_phu",
+      "nghe": "che_phu",
+      "ten": "To\xE0n Phong Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.toan_phong_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.phong_linh_chau",
+          "so": 2
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "Phong linh ch\xE2u nghi\u1EC1n trong l\u1ECD k\xEDn, m\u1EDF ra l\xE0 b\u1ED9t bay. \u0110\xF3ng c\u1EEDa gian v\u1EBD, v\u1EBD n\xE9t xo\xE1y t\u1EEB ngo\xE0i v\xE0o trong."
+    },
+    {
+      "id": "dp.thien_loi_phu",
+      "nghe": "che_phu",
+      "ten": "Thi\xEAn L\xF4i Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.thien_loi_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 3
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.loi_linh_chau",
+          "so": 2
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 3
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "linh_thach": 50,
+      "mo_ta": "Hai h\u1EA1t l\xF4i linh ch\xE2u t\xE1n trong c\u1ED1i \u0111\xE1, tay ng\u01B0\u1EDDi t\xE1n ph\u1EA3i b\u1ECDc v\u1EA3i. V\u1EBD d\u01B0\u1EDBi tr\u1EDDi gi\xF4ng, n\xE9t ch\xF3t h\u1EA1 \u0111\xFAng l\xFAc s\u1EA5m n\u1ED5."
+    },
+    {
+      "id": "dp.toa_hon_phu",
+      "nghe": "che_phu",
+      "ten": "T\u1ECFa H\u1ED3n Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.toa_hon_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.am_phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.am_thuy_chau",
+          "so": 1
+        },
+        {
+          "id": "item.oan_hon_ty",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "Gi\u1EA5y h\xECnh nh\xE2n c\u0169 l\xE0m gi\u1EA5y ph\xF9, n\u01B0\u1EDBc ch\xE2u \xE2m th\u1EE7y l\xE0m m\u1EF1c, s\u1EE3i kh\xF3i oan h\u1ED3n qu\u1EA5n v\xE0o n\xE9t ch\xF3t. V\u1EBD l\xFAc n\u1EEDa \u0111\xEAm, \u0111\u1EEBng quay \u0111\u1EA7u."
+    },
+    {
+      "id": "dp.am_binh_phu",
+      "nghe": "che_phu",
+      "ten": "\xC2m Binh Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.am_binh_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 2
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.am_binh_lenh",
+          "so": 1
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 2
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "\u0110\u1EB7t th\u1EBB l\u1EC7nh \xE2m binh gi\u1EEFa gi\u1EA5y, v\u1EBD ph\xF9 v\xF2ng quanh r\u1ED3i \xE9p th\u1EBB v\xE0o. Ng\xF2i b\xFAt d\u1EEBng l\xE0 nghe ti\u1EBFng gi\xE1p s\u1EAFt."
+    },
+    {
+      "id": "dp.tam_bao_phu",
+      "nghe": "che_phu",
+      "ten": "T\u1EA7m B\u1EA3o Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.tam_bao_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 1
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 1
+        },
+        {
+          "id": "item.tam_bao_dieu_ti",
+          "so": 1
+        }
+      ],
+      "phu": [],
+      "hoa": "van",
+      "mo_ta": "M\u0169i ch\u1ED3n t\u1EA7m b\u1EA3o ph\u01A1i kh\xF4 nghi\u1EC1n v\xE0o m\u1EF1c, ng\xF2i b\xFAt t\u1EF1 k\xE9o v\u1EC1 ph\xEDa c\xF3 kim th\u1EA1ch. C\u1EE9 \u0111\u1EC3 tay theo ng\xF2i m\xE0 v\u1EBD."
+    },
+    {
+      "id": "dp.tran_quy_phu",
+      "nghe": "che_phu",
+      "ten": "Tr\u1EA5n Qu\u1EF7 Ph\xF9 ph\u01B0\u01A1ng",
+      "ra": "item.tran_quy_phu",
+      "chu": [
+        {
+          "id": "item.chu_sa",
+          "so": 3
+        },
+        {
+          "id": "item.phu_chi",
+          "so": 3
+        },
+        {
+          "id": "item.cuu_u_am_hoa",
+          "so": 1
+        },
+        {
+          "id": "item.yeu_huyet_mac",
+          "so": 3
+        }
+      ],
+      "phu": [],
+      "hoa": "vu",
+      "mo_ta": "Nh\u1ED1t \xE2m h\u1ECFa v\xE0o \u0111\xE8n \u0111\u1ED3ng, v\u1EBD d\u01B0\u1EDBi \xE1nh l\u1EEDa xanh. M\u1EF1c ph\u1EA3i h\u01A1 qua l\u1EEDa \u1EA5y, n\xE9t ph\xF9 m\u1EDBi c\u1EAFn \u0111\u01B0\u1EE3c h\u1ED3n."
+    }
+  ];
+  function getAllRecipes() {
+    try {
+      const liveDp = gWin.game?.env?.content?.donPhuong;
+      if (liveDp && typeof liveDp.values === "function") {
+        const list = [];
+        for (const r of liveDp.values()) {
+          list.push({
+            id: r.id,
+            nghe: r.nghe,
+            ten: r.ten,
+            ra: r.ra,
+            ra_cuc: r.ra_cuc,
+            chu: r.chu || [],
+            phu: r.phu || [],
+            hoa: r.hoa,
+            linh_thach: r.linh_thach,
+            mo_ta: r.mo_ta
+          });
+        }
+        if (list.length > 0) return list;
+      }
+    } catch (e) {
+    }
+    return FALLBACK_RECIPES;
+  }
+  function getRecipeById(id) {
+    const all = getAllRecipes();
+    return all.find((r) => r.id === id);
+  }
+  function findMatchingItemForPhu(p) {
+    if (p.id) return p.id;
+    const items = getAllAvailableItems();
+    const match = items.find((it) => {
+      if (p.loai && it.cat !== p.loai) return false;
+      if (p.pham !== void 0 && it.quality !== p.pham) return false;
+      return true;
+    });
+    return match ? match.id : null;
+  }
+  function giveIngredientsForRecipe(recipeId, multiplier = 10) {
+    const recipe = getRecipeById(recipeId);
+    if (!recipe) {
+      notify("\u26A0\uFE0F Kh\xF4ng t\xECm th\u1EA5y c\xF4ng th\u1EE9c n\xE0y!");
+      return false;
+    }
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) {
+      notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return false;
+    }
+    const nv = copyObj(state.run.nhanVat);
+    const tuiDo = copyObj(nv.tuiDo || {});
+    const addedList = [];
+    for (const c of recipe.chu || []) {
+      if (c.id) {
+        const needed = (c.so || 1) * multiplier;
+        tuiDo[c.id] = (tuiDo[c.id] || 0) + needed;
+        const info = getItemInfo(c.id);
+        addedList.push(`${info.name} x${needed}`);
+      }
+    }
+    for (const p of recipe.phu || []) {
+      const itemId = findMatchingItemForPhu(p);
+      if (itemId) {
+        const needed = (p.so || 1) * multiplier;
+        tuiDo[itemId] = (tuiDo[itemId] || 0) + needed;
+        const info = getItemInfo(itemId);
+        addedList.push(`${info.name} x${needed}`);
+      }
+    }
+    nv.tuiDo = tuiDo;
+    nv.oTuiThem = Math.max(nv.oTuiThem || 0, Object.keys(tuiDo).length + 50);
+    nv.xepTui = buildSyncedXepTui(nv.xepTui, tuiDo);
+    const nextRun = copyObj(state.run);
+    nextRun.nhanVat = nv;
+    setGameState({ run: nextRun });
+    persistGameSave(nextRun);
+    notify(`\u{1F4E6} \u0110\xE3 th\xEAm nguy\xEAn li\u1EC7u ch\u1EBF t\xE1c x${multiplier}: ${addedList.slice(0, 2).join(", ")}...`);
+    return true;
+  }
+  function giveCraftedProduct(recipeId, count = 5) {
+    const recipe = getRecipeById(recipeId);
+    if (!recipe) {
+      notify("\u26A0\uFE0F Kh\xF4ng t\xECm th\u1EA5y c\xF4ng th\u1EE9c n\xE0y!");
+      return false;
+    }
+    const state = getGameState();
+    if (!state || !state.run || !state.run.nhanVat) {
+      notify("\u26A0\uFE0F H\xE3y b\u01B0\u1EDBc v\xE0o trong ki\u1EBFp tu ti\xEAn tr\u01B0\u1EDBc!");
+      return false;
+    }
+    const nv = copyObj(state.run.nhanVat);
+    const tuiDo = copyObj(nv.tuiDo || {});
+    const targetId = recipe.ra;
+    tuiDo[targetId] = (tuiDo[targetId] || 0) + count;
+    nv.tuiDo = tuiDo;
+    nv.oTuiThem = Math.max(nv.oTuiThem || 0, Object.keys(tuiDo).length + 50);
+    nv.xepTui = buildSyncedXepTui(nv.xepTui, tuiDo);
+    const nextRun = copyObj(state.run);
+    nextRun.nhanVat = nv;
+    setGameState({ run: nextRun });
+    persistGameSave(nextRun);
+    const info = getItemInfo(targetId);
+    notify(`\u2728 \u0110\xE3 nh\u1EADn th\xE0nh ph\u1EA9m: ${info.name} x${count}!`);
+    return true;
   }
 
   // src/modules/automation.ts
@@ -1746,8 +6786,43 @@
           <label class="vktt-chk-label" style="color:#ffff70;"><input type="checkbox" name="vktt-lc-he" value="loi" ${nv.linhCan?.he?.includes("loi") ? "checked" : ""}> \u26A1L\xF4i</label>
         </div>
         <div style="display:flex;gap:6px;margin-top:6px;">
-          <button id="vktt-btn-gan-lc" class="vktt-btn vktt-btn-green vktt-btn-sm" style="flex:1;">\u{1F331} G\xE1n Linh C\u0103n & M\xE0u M\u1EA1ch</button>
+          <button id="vktt-btn-gan-lc" class="vktt-btn vktt-btn-green vktt-btn-sm" style="flex:1;">\u{1F331} G\xE1n Linh C\u0103n \u0110\xE3 T\xEDch</button>
           <button id="vktt-btn-go-lc" class="vktt-btn vktt-btn-ghost vktt-btn-sm">G\u1EE1 (V\xF4)</button>
+        </div>
+
+        <!-- M\u1EAAU LINH C\u0102N C\xD3 S\u1EB4N (PRESETS) -->
+        <div style="margin-top:8px;padding-top:6px;border-top:1px dashed rgba(229,184,105,0.25);">
+          <label class="vktt-label">\u{1F4CB} M\u1EABu Linh C\u0103n C\xF3 S\u1EB5n (Song Linh, Bi\u1EBFn D\u1ECB, Ng\u0169 H\xE0nh...):</label>
+          <div class="vktt-row">
+            <select id="vktt-sel-lc-preset" class="vktt-select" style="flex:1;">
+              <option value="">-- Ch\u1ECDn M\u1EABu Linh C\u0103n --</option>
+              <optgroup label="\u{1F31F} To\xE0n H\u1EC7 & Ng\u0169 H\xE0nh">
+                <option value="bat_hoang">\u{1F31F} B\xE1t Hoang Ti\xEAn C\u0103n (To\xE0n B\u1ED9 8 H\u1EC7)</option>
+                <option value="ngu_hanh">\u262F\uFE0F Ng\u0169 H\xE0nh Linh C\u0103n (Kim M\u1ED9c Th\u1EE7y H\u1ECFa Th\u1ED5)</option>
+              </optgroup>
+              <optgroup label="\u26A1 Bi\u1EBFn D\u1ECB Linh C\u0103n">
+                <option value="loi">\u26A1 Thi\xEAn L\xF4i Linh C\u0103n</option>
+                <option value="bang">\u2744\uFE0F Thi\xEAn B\u0103ng Linh C\u0103n</option>
+                <option value="phong">\u{1F32A}\uFE0F Thi\xEAn Phong Linh C\u0103n</option>
+                <option value="tam_di">\u26A1\u2744\uFE0F\u{1F32A}\uFE0F Tam D\u1ECB Linh C\u0103n (L\xF4i + B\u0103ng + Phong)</option>
+              </optgroup>
+              <optgroup label="\u{1F451} Thi\xEAn Linh C\u0103n (Thu\u1EA7n H\u1EC7)">
+                <option value="kim">\u2694\uFE0F Thi\xEAn Kim Linh C\u0103n</option>
+                <option value="moc">\u{1F33F} Thi\xEAn M\u1ED9c Linh C\u0103n</option>
+                <option value="thuy">\u{1F30A} Thi\xEAn Th\u1EE7y Linh C\u0103n</option>
+                <option value="hoa">\u{1F525} Thi\xEAn H\u1ECFa Linh C\u0103n</option>
+                <option value="tho">\u26F0\uFE0F Thi\xEAn Th\u1ED5 Linh C\u0103n</option>
+              </optgroup>
+              <optgroup label="\u{1F91D} Song Linh C\u0103n (T\u01B0\u01A1ng Sinh T\u1ED1i \u01AFu)">
+                <option value="kim_thuy">\u2694\uFE0F\u{1F30A} Kim Th\u1EE7y Song Linh (Kim sinh Th\u1EE7y)</option>
+                <option value="thuy_moc">\u{1F30A}\u{1F33F} Th\u1EE7y M\u1ED9c Song Linh (Th\u1EE7y sinh M\u1ED9c)</option>
+                <option value="moc_hoa">\u{1F33F}\u{1F525} M\u1ED9c H\u1ECFa Song Linh (M\u1ED9c sinh H\u1ECFa)</option>
+                <option value="hoa_tho">\u{1F525}\u26F0\uFE0F H\u1ECFa Th\u1ED5 Song Linh (H\u1ECFa sinh Th\u1ED5)</option>
+                <option value="tho_kim">\u26F0\uFE0F\u2694\uFE0F Th\u1ED5 Kim Song Linh (Th\u1ED5 sinh Kim)</option>
+              </optgroup>
+            </select>
+            <button id="vktt-btn-apply-lc-preset" class="vktt-btn vktt-btn-cyan vktt-btn-sm">G\xE1n M\u1EABu</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1954,6 +7029,37 @@
         renderTabContent("tab-nhan-vat");
       };
     }
+    const LC_PRESETS = {
+      bat_hoang: { name: "B\xE1t Hoang Ti\xEAn C\u0103n (8 H\u1EC7)", elements: ["kim", "moc", "thuy", "hoa", "tho", "bang", "phong", "loi"] },
+      ngu_hanh: { name: "Ng\u0169 H\xE0nh Linh C\u0103n", elements: ["kim", "moc", "thuy", "hoa", "tho"] },
+      loi: { name: "Thi\xEAn L\xF4i Linh C\u0103n", elements: ["loi"] },
+      bang: { name: "Thi\xEAn B\u0103ng Linh C\u0103n", elements: ["bang"] },
+      phong: { name: "Thi\xEAn Phong Linh C\u0103n", elements: ["phong"] },
+      tam_di: { name: "Tam D\u1ECB Linh C\u0103n", elements: ["loi", "bang", "phong"] },
+      kim: { name: "Thi\xEAn Kim Linh C\u0103n", elements: ["kim"] },
+      moc: { name: "Thi\xEAn M\u1ED9c Linh C\u0103n", elements: ["moc"] },
+      thuy: { name: "Thi\xEAn Th\u1EE7y Linh C\u0103n", elements: ["thuy"] },
+      hoa: { name: "Thi\xEAn H\u1ECFa Linh C\u0103n", elements: ["hoa"] },
+      tho: { name: "Thi\xEAn Th\u1ED5 Linh C\u0103n", elements: ["tho"] },
+      kim_thuy: { name: "Kim Th\u1EE7y Song Linh", elements: ["kim", "thuy"] },
+      thuy_moc: { name: "Th\u1EE7y M\u1ED9c Song Linh", elements: ["thuy", "moc"] },
+      moc_hoa: { name: "M\u1ED9c H\u1ECFa Song Linh", elements: ["moc", "hoa"] },
+      hoa_tho: { name: "H\u1ECFa Th\u1ED5 Song Linh", elements: ["hoa", "tho"] },
+      tho_kim: { name: "Th\u1ED5 Kim Song Linh", elements: ["tho", "kim"] }
+    };
+    const btnApplyLcPreset = document.getElementById("vktt-btn-apply-lc-preset");
+    if (btnApplyLcPreset) {
+      btnApplyLcPreset.onclick = () => {
+        const sel = document.getElementById("vktt-sel-lc-preset")?.value;
+        if (!sel || !LC_PRESETS[sel]) {
+          return notify("\u26A0\uFE0F Vui l\xF2ng ch\u1ECDn m\u1ED9t m\u1EABu linh c\u0103n t\u1EEB danh s\xE1ch!");
+        }
+        const preset = LC_PRESETS[sel];
+        setLinhCan(preset.elements);
+        notify(`\u{1F331} \u0110\xE3 g\xE1n th\xE0nh c\xF4ng: ${preset.name}!`);
+        renderTabContent("tab-nhan-vat");
+      };
+    }
     const statBtns = document.querySelectorAll(".vktt-btn-set-stat");
     statBtns.forEach((btn) => {
       btn.onclick = () => {
@@ -2057,10 +7163,111 @@
       };
     }
   }
+  var catalogCatFilter = "all";
+  var catalogQualityFilter = 0;
+  var catalogSearchQuery = "";
+  var catalogOffset = 0;
+  var CATALOG_LIMIT = 30;
+  function renderCatalogCards(append = false) {
+    const listEl = document.getElementById("vktt-catalog-list");
+    const moreBtn = document.getElementById("vktt-btn-catalog-more");
+    const badgeEl = document.getElementById("vktt-catalog-total-badge");
+    if (!listEl) return;
+    const { items, total } = filterItems(
+      catalogCatFilter,
+      catalogQualityFilter,
+      catalogSearchQuery,
+      catalogOffset,
+      CATALOG_LIMIT
+    );
+    if (badgeEl) {
+      badgeEl.innerText = `(${total.toLocaleString()} m\xF3n)`;
+    }
+    if (!append) {
+      listEl.innerHTML = "";
+    }
+    if (items.length === 0 && !append) {
+      listEl.innerHTML = '<div style="padding:14px;text-align:center;color:#64748b;font-size:12px;">Kh\xF4ng t\xECm th\u1EA5y v\u1EADt ph\u1EA9m n\xE0o ph\xF9 h\u1EE3p.</div>';
+      if (moreBtn) moreBtn.style.display = "none";
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    items.forEach((item) => {
+      const color = QUALITY_COLORS[item.quality] || "#94a3b8";
+      const catName = CATEGORY_NAMES[item.cat] || item.cat;
+      const elStr = item.he && item.he.length ? `[${item.he.join("/")}]` : "";
+      const card = document.createElement("div");
+      card.className = "vktt-catalog-item";
+      card.innerHTML = `
+      <div class="vktt-item-main">
+        <div class="vktt-item-name" style="color:${color};">
+          <span class="vktt-quality-tag" style="background:${color};color:#000;">P.${item.quality}</span>
+          <span>${item.name}</span>
+        </div>
+        <div class="vktt-item-meta">
+          <span>${catName}</span>
+          ${elStr ? `<span style="color:#38bdf8;">${elStr}</span>` : ""}
+          ${item.desc ? `<span style="color:#64748b;max-width:140px;overflow:hidden;text-overflow:ellipsis;" title="${item.desc}">${item.desc}</span>` : ""}
+        </div>
+      </div>
+      <div class="vktt-item-actions">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-ghost vktt-btn-fast-add" data-id="${item.id}" data-count="1">+1</button>
+        <button class="vktt-btn vktt-btn-sm vktt-btn-cyan vktt-btn-fast-add" data-id="${item.id}" data-count="10">+10</button>
+        <button class="vktt-btn vktt-btn-sm vktt-btn-purple vktt-btn-fast-add" data-id="${item.id}" data-count="99">+99</button>
+      </div>
+    `;
+      card.querySelectorAll(".vktt-btn-fast-add").forEach((btn) => {
+        btn.onclick = () => {
+          const id = btn.getAttribute("data-id") || "";
+          const count = parseInt(btn.getAttribute("data-count") || "1", 10);
+          addItem(id, count);
+        };
+      });
+      fragment.appendChild(card);
+    });
+    listEl.appendChild(fragment);
+    if (moreBtn) {
+      const remaining = total - (catalogOffset + items.length);
+      if (remaining > 0) {
+        moreBtn.style.display = "block";
+        moreBtn.innerText = `Xem th\xEAm (${remaining.toLocaleString()} m\xF3n c\xF2n l\u1EA1i)...`;
+      } else {
+        moreBtn.style.display = "none";
+      }
+    }
+  }
   function getTabKhoDoHtml() {
     return `
+    <!-- KH\u1ED0I 1: B\u1ED0 TR\xCD KINH M\u1EA0CH & TRANG B\u1ECA T\u1ED0I \u01AFU -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">\u26A1 G\xF3i C\u1EF1c Ph\u1EA9m To\xE0n N\u0103ng</div>
+      <div class="vktt-card-hdr">\u26A1 T\u1EF1 \u0110\u1ED9ng B\u1ED1 Tr\xED Kinh M\u1EA1ch & Trang B\u1ECB</div>
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
+        Thu\u1EADt to\xE1n 2D x\u1EBFp k\xEDn m\u1EA3nh t\u1EEB t\xFAi l\xEAn ng\u01B0\u1EDDi (kh\xF4ng ch\u1EA1m \u0110an \u0110i\u1EC1n), t\u1EF1 \u0111\u1ED9ng ch\u1EC9nh m\xE0u \xF4 kinh m\u1EA1ch t\u01B0\u01A1ng th\xEDch 100% h\u1EC7 v\u1EADt ph\u1EA9m (0 \u0111i\u1EC3m ngh\u1ECBch, buff t\u1ED1i \u0111a), \u0111\u1EA3 th\xF4ng to\xE0n b\u1ED9 \xF4 v\xE0 trang b\u1ECB 6 m\xF3n \u0111\u1ED3 t\u1ED1t nh\u1EA5t.
+      </p>
+      <button id="vktt-btn-auto-opt-bag" class="vktt-btn vktt-btn-green vktt-btn-block" style="margin-bottom:8px;">
+        \u26A1 B\u1ED0 TR\xCD M\u1EA2NH T\u1EEA T\xDAI L\xCAN NG\u01AF\u1EDCI T\u1ED0I \u01AFU NH\u1EA4T
+      </button>
+
+      <div style="padding-top:6px;border-top:1px dashed rgba(229,184,105,0.25);">
+        <label class="vktt-label">\u{1F3AF} Ho\u1EB7c T\u1EF1 \u0110\u1ED9ng G\xE1n & B\u1ED1 Tr\xED Theo H\u1EC7 T\xF9y Ch\u1ECDn:</label>
+        <div class="vktt-row">
+          <select id="vktt-sel-opt-build" class="vktt-select" style="flex:1;">
+            <option value="toan_nang">\u{1F31F} To\xE0n N\u0103ng Th\u1EA7n C\u1EA5p (Top 10 Ph\u1EA9m 8 To\xE0n Game)</option>
+            <option value="kim">\u2694\uFE0F Ki\u1EBFm T\xF4ng / Kim Tu (Full Kim/L\xF4i Ph\u1EA9m 7-8)</option>
+            <option value="hoa">\u{1F525} H\u1ECFa Tu / Vi\xEAm \u0110\u1EBF (Full H\u1ECFa Ph\u1EA9m 7-8)</option>
+            <option value="thuy">\u2744\uFE0F Th\u1EE7y / B\u0103ng Tu (Full Th\u1EE7y/B\u0103ng Ph\u1EA9m 7-8)</option>
+            <option value="moc">\u{1F33F} M\u1ED9c Tu / Tr\u01B0\u1EDDng Sinh (Full M\u1ED9c/Phong Ph\u1EA9m 7-8)</option>
+            <option value="tho">\u26F0\uFE0F Th\u1ED5 Tu / B\u1EA5t Di\u1EC7t (Full Th\u1ED5 Ph\u1EA9m 7-8)</option>
+            <option value="loi_phong">\u26A1 L\xF4i / Phong Tu (Full Bi\u1EBFn D\u1ECB Ph\u1EA9m 7)</option>
+          </select>
+          <button id="vktt-btn-apply-opt-build" class="vktt-btn vktt-btn-cyan vktt-btn-sm">G\xE1n Build</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KH\u1ED0I 2: G\xD3I C\u1EF0C PH\u1EA8M TO\xC0N N\u0102NG & TH\xCAM NHANH -->
+    <div class="vktt-card">
+      <div class="vktt-card-hdr">\u{1F381} G\xF3i C\u1EF1c Ph\u1EA9m & Nh\u1EADn Nhanh</div>
       <button id="vktt-btn-godpack" class="vktt-btn vktt-btn-block" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
         \u{1F451} K\xCDCH HO\u1EA0T G\xD3I TH\u1EA6N \u0110\u1EA0O (Ph\u1EA9m 8-9 + 99 Th\u1EA7n \u0110an)
       </button>
@@ -2070,38 +7277,79 @@
       </div>
     </div>
 
+    <!-- KH\u1ED0I 3: DANH M\u1EE4C TO\xC0N B\u1ED8 V\u1EACT PH\u1EA8M GAME H\u1ED6 TR\u1EE2 -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">\u{1F50D} Th\xEAm V\u1EADt Ph\u1EA9m B\u1EA5t K\u1EF3</div>
-      <div class="vktt-field">
-        <label class="vktt-label">T\xECm theo t\xEAn ho\u1EB7c ID</label>
-        <input type="text" id="vktt-search-item" class="vktt-inp" placeholder="G\xF5 t\xEAn v\u1EADt ph\u1EA9m (Vd: b\xE0n \u0111\xE0o, ki\u1EBFm, ph\xF9...)" style="width:100%;" />
-        <div id="vktt-item-results" class="vktt-dropdown-list" style="display:none;"></div>
+      <div class="vktt-card-hdr">
+        <span>\u{1F4CB} Danh M\u1EE5c To\xE0n B\u1ED9 V\u1EADt Ph\u1EA9m Game</span>
+        <span id="vktt-catalog-total-badge" style="font-size:10.5px;color:#e5b869;">(\u0110ang t\u1EA3i...)</span>
       </div>
-      <div class="vktt-field" style="margin-top:6px;">
-        <label class="vktt-label">ID V\u1EADt Ph\u1EA9m \u0110\xE3 Ch\u1ECDn</label>
-        <input type="text" id="vktt-selected-item-id" class="vktt-inp" placeholder="item.xxxx..." style="width:100%;" />
+      <div class="vktt-filter-bar">
+        <select id="vktt-cat-filter" class="vktt-select" style="flex:1;">
+          <option value="all">T\u1EA5t C\u1EA3 Lo\u1EA1i</option>
+          <option value="cong_phap">C\xF4ng Ph\xE1p</option>
+          <option value="dan_duoc">\u0110an D\u01B0\u1EE3c</option>
+          <option value="phap_khi">Ph\xE1p Kh\xED</option>
+          <option value="linh_duoc">Linh D\u01B0\u1EE3c</option>
+          <option value="yeu_tai">Y\xEAu T\xE0i</option>
+          <option value="nguyen_lieu">Nguy\xEAn Li\u1EC7u / Qu\u1EB7ng</option>
+          <option value="phu_luc">Ph\xF9 L\u1EE5c</option>
+          <option value="di_hoa">D\u1ECB H\u1ECFa</option>
+          <option value="dung_cu">D\u1EE5ng C\u1EE5 Luy\u1EC7n Ch\u1EBF</option>
+          <option value="phuong_tien">Ph\u01B0\u01A1ng Ti\u1EC7n</option>
+          <option value="tru_vat">Tr\u1EEF V\u1EADt</option>
+          <option value="don_phuong">\u0110\u01A1n Ph\u01B0\u01A1ng / \u0110\u1ED3 Ph\u1ED5</option>
+          <option value="di_bao">D\u1ECB B\u1EA3o</option>
+          <option value="lenh_bai">L\u1EC7nh B\xE0i</option>
+          <option value="dac_san">\u0110\u1EB7c S\u1EA3n</option>
+        </select>
+        <select id="vktt-quality-filter" class="vktt-select" style="width:110px;flex:none;">
+          <option value="0">T\u1EA5t C\u1EA3 Ph\u1EA9m</option>
+          <option value="8">\u{1F31F} Ph\u1EA9m 8</option>
+          <option value="7">\u{1F451} Ph\u1EA9m 7</option>
+          <option value="6">\u2728 Ph\u1EA9m 6</option>
+          <option value="5">\u{1F48E} Ph\u1EA9m 5</option>
+          <option value="4">\u{1F33F} Ph\u1EA9m 4</option>
+          <option value="3">\u{1F539} Ph\u1EA9m 3</option>
+          <option value="2">\u{1F538} Ph\u1EA9m 2</option>
+          <option value="1">\u26AA Ph\u1EA9m 1</option>
+        </select>
       </div>
-      <div style="display:flex;gap:6px;align-items:center;margin-top:6px;">
-        <span class="vktt-lbl" style="width:65px;">S\u1ED1 L\u01B0\u1EE3ng:</span>
-        <input type="number" id="vktt-item-count" class="vktt-inp" value="10" style="width:70px;flex:none;" />
-        <button id="vktt-btn-add-item" class="vktt-btn vktt-btn-cyan vktt-btn-sm" style="flex:1;">Th\xEAm V\xE0o T\xFAi</button>
+      <div style="margin-bottom:6px;">
+        <input type="text" id="vktt-catalog-search" class="vktt-inp" placeholder="\u{1F50D} T\xECm theo t\xEAn ho\u1EB7c ID (g\xF5 kh\xF4ng d\u1EA5u)..." style="width:100%;" />
       </div>
+      <div id="vktt-catalog-list" class="vktt-catalog-list">
+        <!-- Rendered items with +1, +10, +99 -->
+      </div>
+      <button id="vktt-btn-catalog-more" class="vktt-btn vktt-btn-ghost vktt-btn-block" style="margin-top:6px;display:none;">
+        Xem th\xEAm v\u1EADt ph\u1EA9m...
+      </button>
     </div>
 
+    <!-- KH\u1ED0I 4: TH\xCAM NHANH THEO ID T\u1EF0 DO -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">\u{1F6E1}\uFE0F 6 \xD4 Trang B\u1ECB Chuy\xEAn D\u1EE5ng</div>
-      <div class="vktt-grid-2">
-        <button id="vktt-btn-eq-ring" class="vktt-btn vktt-btn-ghost">\u{1F48D} Nh\u1EABn C\xE0n Kh\xF4n</button>
-        <button id="vktt-btn-eq-fire" class="vktt-btn vktt-btn-ghost">\u{1F525} C\u1EEDu U Ho\xE0ng H\u1ECFa</button>
-        <button id="vktt-btn-eq-wing" class="vktt-btn vktt-btn-ghost">\u{1FABD} Ph\xF9 Di\xEAu S\xED</button>
-        <button id="vktt-btn-eq-danlo" class="vktt-btn vktt-btn-ghost">\u2697\uFE0F \u0110an L\xF4 Ti\xEAn</button>
-        <button id="vktt-btn-eq-pen" class="vktt-btn vktt-btn-ghost">\u{1F58C}\uFE0F Ph\xF9 B\xFAt Ti\xEAn</button>
-        <button id="vktt-btn-eq-khi" class="vktt-btn vktt-btn-ghost">\u{1F528} Kh\xED L\xF4 Ti\xEAn</button>
+      <div class="vktt-card-hdr">\u{1F50D} Nh\u1EADp ID T\u1EF1 Do</div>
+      <div class="vktt-row">
+        <input type="text" id="vktt-custom-item-id" class="vktt-inp" placeholder="item.xxxx..." style="flex:1;" />
+        <input type="number" id="vktt-custom-item-count" class="vktt-inp" value="10" style="width:65px;flex:none;" />
+        <button id="vktt-btn-add-custom-item" class="vktt-btn vktt-btn-sm vktt-btn-cyan">Th\xEAm</button>
       </div>
     </div>
   `;
   }
   function bindTabKhoDoEvents() {
+    const btnAutoOpt = document.getElementById("vktt-btn-auto-opt-bag");
+    if (btnAutoOpt) {
+      btnAutoOpt.onclick = () => {
+        autoOptimizeFromBag();
+      };
+    }
+    const btnApplyBuild = document.getElementById("vktt-btn-apply-opt-build");
+    if (btnApplyBuild) {
+      btnApplyBuild.onclick = () => {
+        const buildKey = document.getElementById("vktt-sel-opt-build")?.value || "toan_nang";
+        applyElementalBuild(buildKey);
+      };
+    }
     const btnGodPack = document.getElementById("vktt-btn-godpack");
     if (btnGodPack) btnGodPack.onclick = applyGodPack;
     const btnAllItems = document.getElementById("vktt-btn-all-items");
@@ -2137,117 +7385,227 @@
         notify("\u{1F522} \u0110\xE3 \u0111\u1EB7t s\u1ED1 l\u01B0\u1EE3ng m\u1ECDi v\u1EADt ph\u1EA9m trong t\xFAi = 99!");
       };
     }
-    const searchInp = document.getElementById("vktt-search-item");
-    const resultsDiv = document.getElementById("vktt-item-results");
-    const selectedIdInp = document.getElementById("vktt-selected-item-id");
-    if (searchInp && resultsDiv && selectedIdInp) {
-      let searchDebounce = null;
-      searchInp.oninput = () => {
-        clearTimeout(searchDebounce);
-        searchDebounce = setTimeout(() => {
-          const q = searchInp.value.trim();
-          if (!q) {
-            resultsDiv.style.display = "none";
-            return;
-          }
-          const matches = searchItems(q, 25);
-          if (matches.length === 0) {
-            resultsDiv.innerHTML = '<div style="padding:10px;color:#94a3b8;font-size:12px;">Kh\xF4ng t\xECm th\u1EA5y v\u1EADt ph\u1EA9m n\xE0o.</div>';
-            resultsDiv.style.display = "block";
-            return;
-          }
-          resultsDiv.innerHTML = matches.map((item) => {
-            const color = QUALITY_COLORS[item.quality] || "#a1a1aa";
-            return `
-            <div class="vktt-dropdown-item" data-id="${item.id}" data-name="${item.name}">
-              <div>
-                <span style="color:${color};font-weight:700;">${item.name}</span>
-                <span style="color:#64748b;font-size:10px;margin-left:6px;">(${item.cat})</span>
-              </div>
-              <span class="vktt-quality-tag" style="background:${color};color:#000;">P.${item.quality}</span>
-            </div>
-          `;
-          }).join("");
-          resultsDiv.style.display = "block";
-          resultsDiv.querySelectorAll(".vktt-dropdown-item").forEach((el) => {
-            el.addEventListener("click", () => {
-              const id = el.getAttribute("data-id") || "";
-              const name = el.getAttribute("data-name") || "";
-              selectedIdInp.value = id;
-              searchInp.value = name;
-              resultsDiv.style.display = "none";
-            });
-          });
-        }, 150);
+    catalogOffset = 0;
+    renderCatalogCards(false);
+    const catFilterSel = document.getElementById("vktt-cat-filter");
+    if (catFilterSel) {
+      catFilterSel.value = catalogCatFilter;
+      catFilterSel.onchange = () => {
+        catalogCatFilter = catFilterSel.value;
+        catalogOffset = 0;
+        renderCatalogCards(false);
       };
     }
-    const btnAdd = document.getElementById("vktt-btn-add-item");
-    if (btnAdd && selectedIdInp) {
-      btnAdd.onclick = () => {
-        const id = selectedIdInp.value.trim();
-        const count = parseInt(document.getElementById("vktt-item-count")?.value || "10", 10);
+    const qualityFilterSel = document.getElementById("vktt-quality-filter");
+    if (qualityFilterSel) {
+      qualityFilterSel.value = String(catalogQualityFilter);
+      qualityFilterSel.onchange = () => {
+        catalogQualityFilter = parseInt(qualityFilterSel.value, 10) || 0;
+        catalogOffset = 0;
+        renderCatalogCards(false);
+      };
+    }
+    const catalogSearchInp = document.getElementById("vktt-catalog-search");
+    if (catalogSearchInp) {
+      catalogSearchInp.value = catalogSearchQuery;
+      let deb = null;
+      catalogSearchInp.oninput = () => {
+        clearTimeout(deb);
+        deb = setTimeout(() => {
+          catalogSearchQuery = catalogSearchInp.value.trim();
+          catalogOffset = 0;
+          renderCatalogCards(false);
+        }, 180);
+      };
+    }
+    const catalogMoreBtn = document.getElementById("vktt-btn-catalog-more");
+    if (catalogMoreBtn) {
+      catalogMoreBtn.onclick = () => {
+        catalogOffset += CATALOG_LIMIT;
+        renderCatalogCards(true);
+      };
+    }
+    const btnCustomAdd = document.getElementById("vktt-btn-add-custom-item");
+    if (btnCustomAdd) {
+      btnCustomAdd.onclick = () => {
+        const idInp = document.getElementById("vktt-custom-item-id");
+        const cntInp = document.getElementById("vktt-custom-item-count");
+        const id = idInp?.value?.trim() || "";
+        const count = parseInt(cntInp?.value || "10", 10);
+        if (!id) return notify("\u26A0\uFE0F Vui l\xF2ng nh\u1EADp ID v\u1EADt ph\u1EA9m!");
         addItem(id, count);
       };
     }
-    const eqBtns = [
-      ["vktt-btn-eq-ring", "tru_vat", "item.can_khon_gioi"],
-      ["vktt-btn-eq-fire", "di_hoa", "item.cuu_u_hoang_hoa"],
-      ["vktt-btn-eq-wing", "di_lai", "item.phu_dieu_si"],
-      ["vktt-btn-eq-danlo", "luyen_dan", "item.dan_lo_tien"],
-      ["vktt-btn-eq-pen", "che_phu", "item.phu_but_tien"],
-      ["vktt-btn-eq-khi", "luyen_bao", "item.khi_lo_tien"]
-    ];
-    eqBtns.forEach(([btnId, slot, itemId]) => {
-      const b = document.getElementById(btnId);
-      if (b) {
-        b.onclick = () => {
-          const state = getGameState();
-          if (!state?.run?.nhanVat) return notify("\u26A0\uFE0F Ch\u01B0a v\xE0o game!");
-          const nhanVat = copyObj(state.run.nhanVat);
-          const trangBi = copyObj(nhanVat.trangBi || {});
-          trangBi[slot] = itemId;
-          nhanVat.trangBi = trangBi;
-          updateNhanVat(nhanVat);
-          notify(`\u{1F6E1}\uFE0F \u0110\xE3 trang b\u1ECB b\u1EA3o v\u1EADt: ${itemId}!`);
-        };
-      }
+  }
+  var currentCraftType = "luyen_dan";
+  var recipeSearchQuery = "";
+  function renderRecipeList() {
+    const container = document.getElementById("vktt-recipe-list");
+    if (!container) return;
+    const state = getGameState();
+    const tuiDo = state?.run?.nhanVat?.tuiDo || {};
+    const allRecipes = getAllRecipes();
+    let filtered = allRecipes.filter((r) => r.nghe === currentCraftType);
+    if (recipeSearchQuery && recipeSearchQuery.trim()) {
+      const qNorm = recipeSearchQuery.trim().toLowerCase();
+      filtered = filtered.filter((r) => {
+        const outInfo = getItemInfo(r.ra);
+        const nameMatch = r.ten.toLowerCase().includes(qNorm);
+        const outMatch = outInfo.name.toLowerCase().includes(qNorm);
+        const idMatch = r.id.toLowerCase().includes(qNorm) || r.ra.toLowerCase().includes(qNorm);
+        return nameMatch || outMatch || idMatch;
+      });
+    }
+    if (filtered.length === 0) {
+      container.innerHTML = '<div style="padding:14px;text-align:center;color:#64748b;font-size:12px;">Kh\xF4ng t\xECm th\u1EA5y c\xF4ng th\u1EE9c n\xE0o.</div>';
+      return;
+    }
+    container.innerHTML = filtered.map((recipe) => {
+      const outItem = getItemInfo(recipe.ra);
+      const color = QUALITY_COLORS[outItem.quality] || "#94a3b8";
+      const chuTags = (recipe.chu || []).map((c) => {
+        const cInfo = getItemInfo(c.id);
+        const stock = tuiDo[c.id] || 0;
+        const hasEnough = stock >= c.so;
+        return `<span class="vktt-ing-tag ${hasEnough ? "has" : "lack"}">
+        ${cInfo.name} x${c.so} (${stock}/${c.so})
+      </span>`;
+      }).join("");
+      const phuTags = (recipe.phu || []).map((p) => {
+        const typeStr = CATEGORY_NAMES[p.loai || ""] || p.loai || "V\u1EADt ph\u1EA9m";
+        const elStr = p.he && p.he.length ? `[${p.he.join("/")}]` : "";
+        const phamStr = p.pham ? `P.${p.pham}` : "";
+        return `<span class="vktt-ing-tag" style="border-color:#38bdf8;color:#7dd3fc;">
+        Ph\u1EE5: ${typeStr} ${elStr} ${phamStr} x${p.so || 1}
+      </span>`;
+      }).join("");
+      const hoaStr = recipe.hoa === "van" ? "V\u0103n H\u1ECFa" : recipe.hoa === "vu" ? "V\u0169 H\u1ECFa" : "";
+      const ltStr = recipe.linh_thach ? `\u{1F48E} ${recipe.linh_thach} LT` : "";
+      return `
+      <div class="vktt-recipe-card">
+        <div class="vktt-recipe-hdr">
+          <span style="color:${color};font-size:12.5px;">
+            <span class="vktt-quality-tag" style="background:${color};color:#000;">P.${outItem.quality}</span>
+            <b>${outItem.name}</b> <small style="color:#94a3b8;font-weight:400;">(${recipe.ten})</small>
+          </span>
+          <span style="font-size:10.5px;color:#cbd5e1;">${[hoaStr, ltStr].filter(Boolean).join(" \xB7 ")}</span>
+        </div>
+        ${recipe.mo_ta ? `<div style="font-size:10.5px;color:#94a3b8;font-style:italic;">${recipe.mo_ta}</div>` : ""}
+        <div class="vktt-recipe-ing-list">
+          ${chuTags}
+          ${phuTags}
+        </div>
+        <div class="vktt-recipe-actions">
+          <button class="vktt-btn vktt-btn-sm vktt-btn-cyan vktt-btn-give-ing" data-recipe-id="${recipe.id}" style="flex:1;">
+            \u{1F4E6} Nh\u1EADn \u0110\u1EE7 Nguy\xEAn Li\u1EC7u (x10)
+          </button>
+          <button class="vktt-btn vktt-btn-sm vktt-btn-ghost vktt-btn-craft-product" data-recipe-id="${recipe.id}" style="flex:1;">
+            \u2728 Nh\u1EADn Th\xE0nh Ph\u1EA9m (x5)
+          </button>
+        </div>
+      </div>
+    `;
+    }).join("");
+    container.querySelectorAll(".vktt-btn-give-ing").forEach((btn) => {
+      btn.onclick = () => {
+        const rId = btn.getAttribute("data-recipe-id");
+        if (rId) {
+          giveIngredientsForRecipe(rId, 10);
+          renderRecipeList();
+        }
+      };
+    });
+    container.querySelectorAll(".vktt-btn-craft-product").forEach((btn) => {
+      btn.onclick = () => {
+        const rId = btn.getAttribute("data-recipe-id");
+        if (rId) {
+          giveCraftedProduct(rId, 5);
+          renderRecipeList();
+        }
+      };
     });
   }
   function getTabKinhMachHtml() {
     return `
+    <!-- KH\u1ED0I 1: \u0110\xC3 TH\xD4NG KINH M\u1EA0CH & NGH\u1EC0 -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">\u{1F300} \u0110\xE3 Th\xF4ng Kinh M\u1EA1ch</div>
-      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
-        M\u1EDF to\xE0n b\u1ED9 kinh m\u1EA1ch, \u0111\u1ED3ng b\u1ED9 m\xE0u theo h\u1EC7 Linh C\u0103n v\xE0 b\u1EA3o to\xE0n c\xE1c m\u1EA3nh gh\xE9p hi\u1EC7n c\xF3 m\xE0 kh\xF4ng g\xE2y crash game.
-      </p>
-      <button id="vktt-btn-meridian" class="vktt-btn vktt-btn-block" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);">
-        \u{1F300} \u0110\xC3 TH\xD4NG TO\xC0N B\u1ED8 KINH M\u1EA0CH (100% AN TO\xC0N)
+      <div class="vktt-card-hdr">\u{1F300} \u0110\xE3 Th\xF4ng Kinh M\u1EA1ch & \u0110\u1ED9t Ph\xE1 Ngh\u1EC1</div>
+      <div style="display:flex;gap:6px;margin-bottom:6px;">
+        <button id="vktt-btn-meridian" class="vktt-btn vktt-btn-block" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);flex:1;">
+          \u{1F300} \u0110\xC3 TH\xD4NG KINH M\u1EA0CH (100% AN TO\xC0N)
+        </button>
+        <button id="vktt-btn-km-auto-opt" class="vktt-btn vktt-btn-cyan" style="flex:1;">
+          \u26A1 B\u1ED0 TR\xCD T\xDAI L\xCAN NG\u01AF\u1EDCI
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <button id="vktt-btn-all-profs" class="vktt-btn vktt-btn-ghost">\u2692\uFE0F T\xF4ng S\u01B0 3 Ngh\u1EC1</button>
+        <button id="vktt-btn-all-recipes" class="vktt-btn vktt-btn-ghost">\u{1F525} H\u1ECDc 216 \u0110\u01A1n Ph\u01B0\u01A1ng</button>
+      </div>
+      <button id="vktt-btn-all-skills" class="vktt-btn vktt-btn-block" style="margin-top:6px;">
+        \u26A1 H\u1ECDc To\xE0n B\u1ED9 87 K\u1EF9 Ph\xE1p & C\xF4ng Ph\xE1p C\u1EF1c Ph\u1EA9m
       </button>
     </div>
 
+    <!-- KH\u1ED0I 2: S\u1ED4 TAY CH\u1EBE T\xC1C (LUY\u1EC6N \u0110AN, LUY\u1EC6N KH\xCD, CH\u1EBE PH\xD9) -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">\u{1F4DC} L\u0129nh Ng\u1ED9 To\xE0n Di\u1EC7n</div>
-      <button id="vktt-btn-all-profs" class="vktt-btn vktt-btn-cyan vktt-btn-block" style="margin-bottom:6px;">
-        \u2692\uFE0F L\xEAn T\xF4ng S\u01B0 3 Ngh\u1EC1 (\u0110an, Ph\xF9, B\u1EA3o)
-      </button>
-      <button id="vktt-btn-all-recipes" class="vktt-btn vktt-btn-purple vktt-btn-block" style="margin-bottom:6px;">
-        \u{1F525} L\u0129nh Ng\u1ED9 To\xE0n B\u1ED9 101 \u0110an Ph\u01B0\u01A1ng & \u0110\u1ED3 Ph\u1ED5
-      </button>
-      <button id="vktt-btn-all-skills" class="vktt-btn vktt-btn-block">
-        \u26A1 H\u1ECDc To\xE0n B\u1ED9 87 K\u1EF9 Ph\xE1p & C\xF4ng Ph\xE1p C\u1EF1c Ph\u1EA9m
-      </button>
+      <div class="vktt-card-hdr">
+        <span>\u{1F4D6} S\u1ED5 Tay Ch\u1EBF T\xE1c (Luy\u1EC7n \u0110an, Luy\u1EC7n Kh\xED, Ch\u1EBF Ph\xF9)</span>
+      </div>
+      <!-- 3 SUB-TABS -->
+      <div class="vktt-subtabs" id="vktt-craft-subtabs">
+        <button class="vktt-subtab-btn ${currentCraftType === "luyen_dan" ? "active" : ""}" data-craft="luyen_dan">\u{1F33F} Luy\u1EC7n \u0110an (69)</button>
+        <button class="vktt-subtab-btn ${currentCraftType === "luyen_bao" ? "active" : ""}" data-craft="luyen_bao">\u2694\uFE0F Luy\u1EC7n B\u1EA3o / Kh\xED (112)</button>
+        <button class="vktt-subtab-btn ${currentCraftType === "che_phu" ? "active" : ""}" data-craft="che_phu">\u{1F4DC} Ch\u1EBF Ph\xF9 (35)</button>
+      </div>
+
+      <div style="margin-bottom:6px;">
+        <input type="text" id="vktt-recipe-search" class="vktt-inp" placeholder="\u{1F50D} T\xECm c\xF4ng th\u1EE9c ho\u1EB7c th\xE0nh ph\u1EA9m..." style="width:100%;" />
+      </div>
+
+      <div id="vktt-recipe-list" class="vktt-recipe-list">
+        <!-- Recipe cards dynamically populated -->
+      </div>
     </div>
   `;
   }
   function bindTabKinhMachEvents() {
     const btnM = document.getElementById("vktt-btn-meridian");
     if (btnM) btnM.onclick = unlockAllMeridians;
+    const btnOpt = document.getElementById("vktt-btn-km-auto-opt");
+    if (btnOpt) {
+      btnOpt.onclick = () => {
+        autoOptimizeFromBag();
+      };
+    }
     const btnP = document.getElementById("vktt-btn-all-profs");
     if (btnP) btnP.onclick = unlockAllProfessions;
     const btnR = document.getElementById("vktt-btn-all-recipes");
     if (btnR) btnR.onclick = unlockAllRecipes;
     const btnS = document.getElementById("vktt-btn-all-skills");
     if (btnS) btnS.onclick = unlockAllSkills;
+    const subtabBtns = document.querySelectorAll("#vktt-craft-subtabs .vktt-subtab-btn");
+    subtabBtns.forEach((btn) => {
+      btn.onclick = () => {
+        subtabBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCraftType = btn.getAttribute("data-craft") || "luyen_dan";
+        renderRecipeList();
+      };
+    });
+    const recipeSearchInp = document.getElementById("vktt-recipe-search");
+    if (recipeSearchInp) {
+      recipeSearchInp.value = recipeSearchQuery;
+      let rDeb = null;
+      recipeSearchInp.oninput = () => {
+        clearTimeout(rDeb);
+        rDeb = setTimeout(() => {
+          recipeSearchQuery = recipeSearchInp.value.trim();
+          renderRecipeList();
+        }, 180);
+      };
+    }
+    renderRecipeList();
   }
   function getTabTuDongHtml() {
     const speed = getGameSpeed();

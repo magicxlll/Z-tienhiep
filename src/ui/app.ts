@@ -19,8 +19,10 @@ import {
   updateMetaLuanHoi,
   unlockAllAchievementsAndFerrymen 
 } from '../core/mutator';
-import { searchItems } from '../data/items';
+import { searchItems, getAllAvailableItems, filterItems, CATEGORY_NAMES, getItemInfo, ItemInfo } from '../data/items';
 import { QUALITY_COLORS, THE_CHAT_DB, PRESET_ITEMS } from '../data/presets';
+import { autoOptimizeFromBag, applyElementalBuild, ELEMENT_BUILDS } from '../modules/optimizer';
+import { getAllRecipes, giveIngredientsForRecipe, giveCraftedProduct, RecipeInfo } from '../data/recipes';
 import { 
   setGameSpeed, 
   getGameSpeed, 
@@ -359,8 +361,43 @@ function getTabNhanVatHtml(): string {
           <label class="vktt-chk-label" style="color:#ffff70;"><input type="checkbox" name="vktt-lc-he" value="loi" ${nv.linhCan?.he?.includes('loi') ? 'checked' : ''}> ⚡Lôi</label>
         </div>
         <div style="display:flex;gap:6px;margin-top:6px;">
-          <button id="vktt-btn-gan-lc" class="vktt-btn vktt-btn-green vktt-btn-sm" style="flex:1;">🌱 Gán Linh Căn & Màu Mạch</button>
+          <button id="vktt-btn-gan-lc" class="vktt-btn vktt-btn-green vktt-btn-sm" style="flex:1;">🌱 Gán Linh Căn Đã Tích</button>
           <button id="vktt-btn-go-lc" class="vktt-btn vktt-btn-ghost vktt-btn-sm">Gỡ (Vô)</button>
+        </div>
+
+        <!-- MẪU LINH CĂN CÓ SẴN (PRESETS) -->
+        <div style="margin-top:8px;padding-top:6px;border-top:1px dashed rgba(229,184,105,0.25);">
+          <label class="vktt-label">📋 Mẫu Linh Căn Có Sẵn (Song Linh, Biến Dị, Ngũ Hành...):</label>
+          <div class="vktt-row">
+            <select id="vktt-sel-lc-preset" class="vktt-select" style="flex:1;">
+              <option value="">-- Chọn Mẫu Linh Căn --</option>
+              <optgroup label="🌟 Toàn Hệ & Ngũ Hành">
+                <option value="bat_hoang">🌟 Bát Hoang Tiên Căn (Toàn Bộ 8 Hệ)</option>
+                <option value="ngu_hanh">☯️ Ngũ Hành Linh Căn (Kim Mộc Thủy Hỏa Thổ)</option>
+              </optgroup>
+              <optgroup label="⚡ Biến Dị Linh Căn">
+                <option value="loi">⚡ Thiên Lôi Linh Căn</option>
+                <option value="bang">❄️ Thiên Băng Linh Căn</option>
+                <option value="phong">🌪️ Thiên Phong Linh Căn</option>
+                <option value="tam_di">⚡❄️🌪️ Tam Dị Linh Căn (Lôi + Băng + Phong)</option>
+              </optgroup>
+              <optgroup label="👑 Thiên Linh Căn (Thuần Hệ)">
+                <option value="kim">⚔️ Thiên Kim Linh Căn</option>
+                <option value="moc">🌿 Thiên Mộc Linh Căn</option>
+                <option value="thuy">🌊 Thiên Thủy Linh Căn</option>
+                <option value="hoa">🔥 Thiên Hỏa Linh Căn</option>
+                <option value="tho">⛰️ Thiên Thổ Linh Căn</option>
+              </optgroup>
+              <optgroup label="🤝 Song Linh Căn (Tương Sinh Tối Ưu)">
+                <option value="kim_thuy">⚔️🌊 Kim Thủy Song Linh (Kim sinh Thủy)</option>
+                <option value="thuy_moc">🌊🌿 Thủy Mộc Song Linh (Thủy sinh Mộc)</option>
+                <option value="moc_hoa">🌿🔥 Mộc Hỏa Song Linh (Mộc sinh Hỏa)</option>
+                <option value="hoa_tho">🔥⛰️ Hỏa Thổ Song Linh (Hỏa sinh Thổ)</option>
+                <option value="tho_kim">⛰️⚔️ Thổ Kim Song Linh (Thổ sinh Kim)</option>
+              </optgroup>
+            </select>
+            <button id="vktt-btn-apply-lc-preset" class="vktt-btn vktt-btn-cyan vktt-btn-sm">Gán Mẫu</button>
+          </div>
         </div>
       </div>
     </div>
@@ -581,6 +618,39 @@ function bindTabNhanVatEvents(): void {
     };
   }
 
+  const LC_PRESETS: Record<string, { name: string; elements: string[] }> = {
+    bat_hoang: { name: 'Bát Hoang Tiên Căn (8 Hệ)', elements: ['kim', 'moc', 'thuy', 'hoa', 'tho', 'bang', 'phong', 'loi'] },
+    ngu_hanh: { name: 'Ngũ Hành Linh Căn', elements: ['kim', 'moc', 'thuy', 'hoa', 'tho'] },
+    loi: { name: 'Thiên Lôi Linh Căn', elements: ['loi'] },
+    bang: { name: 'Thiên Băng Linh Căn', elements: ['bang'] },
+    phong: { name: 'Thiên Phong Linh Căn', elements: ['phong'] },
+    tam_di: { name: 'Tam Dị Linh Căn', elements: ['loi', 'bang', 'phong'] },
+    kim: { name: 'Thiên Kim Linh Căn', elements: ['kim'] },
+    moc: { name: 'Thiên Mộc Linh Căn', elements: ['moc'] },
+    thuy: { name: 'Thiên Thủy Linh Căn', elements: ['thuy'] },
+    hoa: { name: 'Thiên Hỏa Linh Căn', elements: ['hoa'] },
+    tho: { name: 'Thiên Thổ Linh Căn', elements: ['tho'] },
+    kim_thuy: { name: 'Kim Thủy Song Linh', elements: ['kim', 'thuy'] },
+    thuy_moc: { name: 'Thủy Mộc Song Linh', elements: ['thuy', 'moc'] },
+    moc_hoa: { name: 'Mộc Hỏa Song Linh', elements: ['moc', 'hoa'] },
+    hoa_tho: { name: 'Hỏa Thổ Song Linh', elements: ['hoa', 'tho'] },
+    tho_kim: { name: 'Thổ Kim Song Linh', elements: ['tho', 'kim'] }
+  };
+
+  const btnApplyLcPreset = document.getElementById('vktt-btn-apply-lc-preset');
+  if (btnApplyLcPreset) {
+    btnApplyLcPreset.onclick = () => {
+      const sel = (document.getElementById('vktt-sel-lc-preset') as HTMLSelectElement)?.value;
+      if (!sel || !LC_PRESETS[sel]) {
+        return notify('⚠️ Vui lòng chọn một mẫu linh căn từ danh sách!');
+      }
+      const preset = LC_PRESETS[sel];
+      setLinhCan(preset.elements);
+      notify(`🌱 Đã gán thành công: ${preset.name}!`);
+      renderTabContent('tab-nhan-vat');
+    };
+  }
+
   // 4. Thất Đại Chỉ Số
   const statBtns = document.querySelectorAll<HTMLButtonElement>('.vktt-btn-set-stat');
   statBtns.forEach(btn => {
@@ -698,10 +768,125 @@ function bindTabNhanVatEvents(): void {
 }
 
 /* ================= TAB 2: KHO ĐỒ ================= */
+
+// Catalog state
+let catalogCatFilter = 'all';
+let catalogQualityFilter = 0;
+let catalogSearchQuery = '';
+let catalogOffset = 0;
+const CATALOG_LIMIT = 30;
+
+function renderCatalogCards(append: boolean = false): void {
+  const listEl = document.getElementById('vktt-catalog-list');
+  const moreBtn = document.getElementById('vktt-btn-catalog-more');
+  const badgeEl = document.getElementById('vktt-catalog-total-badge');
+  if (!listEl) return;
+
+  const { items, total } = filterItems(
+    catalogCatFilter,
+    catalogQualityFilter,
+    catalogSearchQuery,
+    catalogOffset,
+    CATALOG_LIMIT
+  );
+
+  if (badgeEl) {
+    badgeEl.innerText = `(${total.toLocaleString()} món)`;
+  }
+
+  if (!append) {
+    listEl.innerHTML = '';
+  }
+
+  if (items.length === 0 && !append) {
+    listEl.innerHTML = '<div style="padding:14px;text-align:center;color:#64748b;font-size:12px;">Không tìm thấy vật phẩm nào phù hợp.</div>';
+    if (moreBtn) moreBtn.style.display = 'none';
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  items.forEach(item => {
+    const color = QUALITY_COLORS[item.quality] || '#94a3b8';
+    const catName = CATEGORY_NAMES[item.cat] || item.cat;
+    const elStr = item.he && item.he.length ? `[${item.he.join('/')}]` : '';
+
+    const card = document.createElement('div');
+    card.className = 'vktt-catalog-item';
+    card.innerHTML = `
+      <div class="vktt-item-main">
+        <div class="vktt-item-name" style="color:${color};">
+          <span class="vktt-quality-tag" style="background:${color};color:#000;">P.${item.quality}</span>
+          <span>${item.name}</span>
+        </div>
+        <div class="vktt-item-meta">
+          <span>${catName}</span>
+          ${elStr ? `<span style="color:#38bdf8;">${elStr}</span>` : ''}
+          ${item.desc ? `<span style="color:#64748b;max-width:140px;overflow:hidden;text-overflow:ellipsis;" title="${item.desc}">${item.desc}</span>` : ''}
+        </div>
+      </div>
+      <div class="vktt-item-actions">
+        <button class="vktt-btn vktt-btn-sm vktt-btn-ghost vktt-btn-fast-add" data-id="${item.id}" data-count="1">+1</button>
+        <button class="vktt-btn vktt-btn-sm vktt-btn-cyan vktt-btn-fast-add" data-id="${item.id}" data-count="10">+10</button>
+        <button class="vktt-btn vktt-btn-sm vktt-btn-purple vktt-btn-fast-add" data-id="${item.id}" data-count="99">+99</button>
+      </div>
+    `;
+
+    card.querySelectorAll<HTMLButtonElement>('.vktt-btn-fast-add').forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.getAttribute('data-id') || '';
+        const count = parseInt(btn.getAttribute('data-count') || '1', 10);
+        addItem(id, count);
+      };
+    });
+
+    fragment.appendChild(card);
+  });
+
+  listEl.appendChild(fragment);
+
+  if (moreBtn) {
+    const remaining = total - (catalogOffset + items.length);
+    if (remaining > 0) {
+      moreBtn.style.display = 'block';
+      moreBtn.innerText = `Xem thêm (${remaining.toLocaleString()} món còn lại)...`;
+    } else {
+      moreBtn.style.display = 'none';
+    }
+  }
+}
+
 function getTabKhoDoHtml(): string {
   return `
+    <!-- KHỐI 1: BỐ TRÍ KINH MẠCH & TRANG BỊ TỐI ƯU -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">⚡ Gói Cực Phẩm Toàn Năng</div>
+      <div class="vktt-card-hdr">⚡ Tự Động Bố Trí Kinh Mạch & Trang Bị</div>
+      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
+        Thuật toán 2D xếp kín mảnh từ túi lên người (không chạm Đan Điền), tự động chỉnh màu ô kinh mạch tương thích 100% hệ vật phẩm (0 điểm nghịch, buff tối đa), đả thông toàn bộ ô và trang bị 6 món đồ tốt nhất.
+      </p>
+      <button id="vktt-btn-auto-opt-bag" class="vktt-btn vktt-btn-green vktt-btn-block" style="margin-bottom:8px;">
+        ⚡ BỐ TRÍ MẢNH TỪ TÚI LÊN NGƯỜI TỐI ƯU NHẤT
+      </button>
+
+      <div style="padding-top:6px;border-top:1px dashed rgba(229,184,105,0.25);">
+        <label class="vktt-label">🎯 Hoặc Tự Động Gán & Bố Trí Theo Hệ Tùy Chọn:</label>
+        <div class="vktt-row">
+          <select id="vktt-sel-opt-build" class="vktt-select" style="flex:1;">
+            <option value="toan_nang">🌟 Toàn Năng Thần Cấp (Top 10 Phẩm 8 Toàn Game)</option>
+            <option value="kim">⚔️ Kiếm Tông / Kim Tu (Full Kim/Lôi Phẩm 7-8)</option>
+            <option value="hoa">🔥 Hỏa Tu / Viêm Đế (Full Hỏa Phẩm 7-8)</option>
+            <option value="thuy">❄️ Thủy / Băng Tu (Full Thủy/Băng Phẩm 7-8)</option>
+            <option value="moc">🌿 Mộc Tu / Trường Sinh (Full Mộc/Phong Phẩm 7-8)</option>
+            <option value="tho">⛰️ Thổ Tu / Bất Diệt (Full Thổ Phẩm 7-8)</option>
+            <option value="loi_phong">⚡ Lôi / Phong Tu (Full Biến Dị Phẩm 7)</option>
+          </select>
+          <button id="vktt-btn-apply-opt-build" class="vktt-btn vktt-btn-cyan vktt-btn-sm">Gán Build</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHỐI 2: GÓI CỰC PHẨM TOÀN NĂNG & THÊM NHANH -->
+    <div class="vktt-card">
+      <div class="vktt-card-hdr">🎁 Gói Cực Phẩm & Nhận Nhanh</div>
       <button id="vktt-btn-godpack" class="vktt-btn vktt-btn-block" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
         👑 KÍCH HOẠT GÓI THẦN ĐẠO (Phẩm 8-9 + 99 Thần Đan)
       </button>
@@ -711,39 +896,84 @@ function getTabKhoDoHtml(): string {
       </div>
     </div>
 
+    <!-- KHỐI 3: DANH MỤC TOÀN BỘ VẬT PHẨM GAME HỖ TRỢ -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">🔍 Thêm Vật Phẩm Bất Kỳ</div>
-      <div class="vktt-field">
-        <label class="vktt-label">Tìm theo tên hoặc ID</label>
-        <input type="text" id="vktt-search-item" class="vktt-inp" placeholder="Gõ tên vật phẩm (Vd: bàn đào, kiếm, phù...)" style="width:100%;" />
-        <div id="vktt-item-results" class="vktt-dropdown-list" style="display:none;"></div>
+      <div class="vktt-card-hdr">
+        <span>📋 Danh Mục Toàn Bộ Vật Phẩm Game</span>
+        <span id="vktt-catalog-total-badge" style="font-size:10.5px;color:#e5b869;">(Đang tải...)</span>
       </div>
-      <div class="vktt-field" style="margin-top:6px;">
-        <label class="vktt-label">ID Vật Phẩm Đã Chọn</label>
-        <input type="text" id="vktt-selected-item-id" class="vktt-inp" placeholder="item.xxxx..." style="width:100%;" />
+      <div class="vktt-filter-bar">
+        <select id="vktt-cat-filter" class="vktt-select" style="flex:1;">
+          <option value="all">Tất Cả Loại</option>
+          <option value="cong_phap">Công Pháp</option>
+          <option value="dan_duoc">Đan Dược</option>
+          <option value="phap_khi">Pháp Khí</option>
+          <option value="linh_duoc">Linh Dược</option>
+          <option value="yeu_tai">Yêu Tài</option>
+          <option value="nguyen_lieu">Nguyên Liệu / Quặng</option>
+          <option value="phu_luc">Phù Lục</option>
+          <option value="di_hoa">Dị Hỏa</option>
+          <option value="dung_cu">Dụng Cụ Luyện Chế</option>
+          <option value="phuong_tien">Phương Tiện</option>
+          <option value="tru_vat">Trữ Vật</option>
+          <option value="don_phuong">Đơn Phương / Đồ Phổ</option>
+          <option value="di_bao">Dị Bảo</option>
+          <option value="lenh_bai">Lệnh Bài</option>
+          <option value="dac_san">Đặc Sản</option>
+        </select>
+        <select id="vktt-quality-filter" class="vktt-select" style="width:110px;flex:none;">
+          <option value="0">Tất Cả Phẩm</option>
+          <option value="8">🌟 Phẩm 8</option>
+          <option value="7">👑 Phẩm 7</option>
+          <option value="6">✨ Phẩm 6</option>
+          <option value="5">💎 Phẩm 5</option>
+          <option value="4">🌿 Phẩm 4</option>
+          <option value="3">🔹 Phẩm 3</option>
+          <option value="2">🔸 Phẩm 2</option>
+          <option value="1">⚪ Phẩm 1</option>
+        </select>
       </div>
-      <div style="display:flex;gap:6px;align-items:center;margin-top:6px;">
-        <span class="vktt-lbl" style="width:65px;">Số Lượng:</span>
-        <input type="number" id="vktt-item-count" class="vktt-inp" value="10" style="width:70px;flex:none;" />
-        <button id="vktt-btn-add-item" class="vktt-btn vktt-btn-cyan vktt-btn-sm" style="flex:1;">Thêm Vào Túi</button>
+      <div style="margin-bottom:6px;">
+        <input type="text" id="vktt-catalog-search" class="vktt-inp" placeholder="🔍 Tìm theo tên hoặc ID (gõ không dấu)..." style="width:100%;" />
       </div>
+      <div id="vktt-catalog-list" class="vktt-catalog-list">
+        <!-- Rendered items with +1, +10, +99 -->
+      </div>
+      <button id="vktt-btn-catalog-more" class="vktt-btn vktt-btn-ghost vktt-btn-block" style="margin-top:6px;display:none;">
+        Xem thêm vật phẩm...
+      </button>
     </div>
 
+    <!-- KHỐI 4: THÊM NHANH THEO ID TỰ DO -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">🛡️ 6 Ô Trang Bị Chuyên Dụng</div>
-      <div class="vktt-grid-2">
-        <button id="vktt-btn-eq-ring" class="vktt-btn vktt-btn-ghost">💍 Nhẫn Càn Khôn</button>
-        <button id="vktt-btn-eq-fire" class="vktt-btn vktt-btn-ghost">🔥 Cửu U Hoàng Hỏa</button>
-        <button id="vktt-btn-eq-wing" class="vktt-btn vktt-btn-ghost">🪽 Phù Diêu Sí</button>
-        <button id="vktt-btn-eq-danlo" class="vktt-btn vktt-btn-ghost">⚗️ Đan Lô Tiên</button>
-        <button id="vktt-btn-eq-pen" class="vktt-btn vktt-btn-ghost">🖌️ Phù Bút Tiên</button>
-        <button id="vktt-btn-eq-khi" class="vktt-btn vktt-btn-ghost">🔨 Khí Lô Tiên</button>
+      <div class="vktt-card-hdr">🔍 Nhập ID Tự Do</div>
+      <div class="vktt-row">
+        <input type="text" id="vktt-custom-item-id" class="vktt-inp" placeholder="item.xxxx..." style="flex:1;" />
+        <input type="number" id="vktt-custom-item-count" class="vktt-inp" value="10" style="width:65px;flex:none;" />
+        <button id="vktt-btn-add-custom-item" class="vktt-btn vktt-btn-sm vktt-btn-cyan">Thêm</button>
       </div>
     </div>
   `;
 }
 
 function bindTabKhoDoEvents(): void {
+  // 1. Optimizer buttons
+  const btnAutoOpt = document.getElementById('vktt-btn-auto-opt-bag');
+  if (btnAutoOpt) {
+    btnAutoOpt.onclick = () => {
+      autoOptimizeFromBag();
+    };
+  }
+
+  const btnApplyBuild = document.getElementById('vktt-btn-apply-opt-build');
+  if (btnApplyBuild) {
+    btnApplyBuild.onclick = () => {
+      const buildKey = (document.getElementById('vktt-sel-opt-build') as HTMLSelectElement)?.value || 'toan_nang';
+      applyElementalBuild(buildKey);
+    };
+  }
+
+  // 2. Godpack & Presets
   const btnGodPack = document.getElementById('vktt-btn-godpack');
   if (btnGodPack) btnGodPack.onclick = applyGodPack;
 
@@ -783,115 +1013,214 @@ function bindTabKhoDoEvents(): void {
     };
   }
 
-  const searchInp = document.getElementById('vktt-search-item') as HTMLInputElement;
-  const resultsDiv = document.getElementById('vktt-item-results');
-  const selectedIdInp = document.getElementById('vktt-selected-item-id') as HTMLInputElement;
+  // 3. Catalog controls & rendering
+  catalogOffset = 0;
+  renderCatalogCards(false);
 
-  if (searchInp && resultsDiv && selectedIdInp) {
-    let searchDebounce: any = null;
-    searchInp.oninput = () => {
-      clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(() => {
-        const q = searchInp.value.trim();
-        if (!q) {
-          resultsDiv.style.display = 'none';
-          return;
-        }
-        const matches = searchItems(q, 25);
-        if (matches.length === 0) {
-          resultsDiv.innerHTML = '<div style="padding:10px;color:#94a3b8;font-size:12px;">Không tìm thấy vật phẩm nào.</div>';
-          resultsDiv.style.display = 'block';
-          return;
-        }
-
-        resultsDiv.innerHTML = matches.map(item => {
-          const color = QUALITY_COLORS[item.quality] || '#a1a1aa';
-          return `
-            <div class="vktt-dropdown-item" data-id="${item.id}" data-name="${item.name}">
-              <div>
-                <span style="color:${color};font-weight:700;">${item.name}</span>
-                <span style="color:#64748b;font-size:10px;margin-left:6px;">(${item.cat})</span>
-              </div>
-              <span class="vktt-quality-tag" style="background:${color};color:#000;">P.${item.quality}</span>
-            </div>
-          `;
-        }).join('');
-
-        resultsDiv.style.display = 'block';
-
-        resultsDiv.querySelectorAll('.vktt-dropdown-item').forEach(el => {
-          el.addEventListener('click', () => {
-            const id = el.getAttribute('data-id') || '';
-            const name = el.getAttribute('data-name') || '';
-            selectedIdInp.value = id;
-            searchInp.value = name;
-            resultsDiv.style.display = 'none';
-          });
-        });
-      }, 150);
+  const catFilterSel = document.getElementById('vktt-cat-filter') as HTMLSelectElement;
+  if (catFilterSel) {
+    catFilterSel.value = catalogCatFilter;
+    catFilterSel.onchange = () => {
+      catalogCatFilter = catFilterSel.value;
+      catalogOffset = 0;
+      renderCatalogCards(false);
     };
   }
 
-  const btnAdd = document.getElementById('vktt-btn-add-item');
-  if (btnAdd && selectedIdInp) {
-    btnAdd.onclick = () => {
-      const id = selectedIdInp.value.trim();
-      const count = parseInt((document.getElementById('vktt-item-count') as HTMLInputElement)?.value || '10', 10);
+  const qualityFilterSel = document.getElementById('vktt-quality-filter') as HTMLSelectElement;
+  if (qualityFilterSel) {
+    qualityFilterSel.value = String(catalogQualityFilter);
+    qualityFilterSel.onchange = () => {
+      catalogQualityFilter = parseInt(qualityFilterSel.value, 10) || 0;
+      catalogOffset = 0;
+      renderCatalogCards(false);
+    };
+  }
+
+  const catalogSearchInp = document.getElementById('vktt-catalog-search') as HTMLInputElement;
+  if (catalogSearchInp) {
+    catalogSearchInp.value = catalogSearchQuery;
+    let deb: any = null;
+    catalogSearchInp.oninput = () => {
+      clearTimeout(deb);
+      deb = setTimeout(() => {
+        catalogSearchQuery = catalogSearchInp.value.trim();
+        catalogOffset = 0;
+        renderCatalogCards(false);
+      }, 180);
+    };
+  }
+
+  const catalogMoreBtn = document.getElementById('vktt-btn-catalog-more');
+  if (catalogMoreBtn) {
+    catalogMoreBtn.onclick = () => {
+      catalogOffset += CATALOG_LIMIT;
+      renderCatalogCards(true);
+    };
+  }
+
+  // 4. Custom item add
+  const btnCustomAdd = document.getElementById('vktt-btn-add-custom-item');
+  if (btnCustomAdd) {
+    btnCustomAdd.onclick = () => {
+      const idInp = document.getElementById('vktt-custom-item-id') as HTMLInputElement;
+      const cntInp = document.getElementById('vktt-custom-item-count') as HTMLInputElement;
+      const id = idInp?.value?.trim() || '';
+      const count = parseInt(cntInp?.value || '10', 10);
+      if (!id) return notify('⚠️ Vui lòng nhập ID vật phẩm!');
       addItem(id, count);
     };
   }
+}
 
-  // Equipment helpers
-  const eqBtns: [string, string, string][] = [
-    ['vktt-btn-eq-ring', 'tru_vat', 'item.can_khon_gioi'],
-    ['vktt-btn-eq-fire', 'di_hoa', 'item.cuu_u_hoang_hoa'],
-    ['vktt-btn-eq-wing', 'di_lai', 'item.phu_dieu_si'],
-    ['vktt-btn-eq-danlo', 'luyen_dan', 'item.dan_lo_tien'],
-    ['vktt-btn-eq-pen', 'che_phu', 'item.phu_but_tien'],
-    ['vktt-btn-eq-khi', 'luyen_bao', 'item.khi_lo_tien']
-  ];
+/* ================= TAB 3: KINH MẠCH & CHẾ TÁC ================= */
 
-  eqBtns.forEach(([btnId, slot, itemId]) => {
-    const b = document.getElementById(btnId);
-    if (b) {
-      b.onclick = () => {
-        const state = getGameState();
-        if (!state?.run?.nhanVat) return notify('⚠️ Chưa vào game!');
-        const nhanVat = copyObj(state.run.nhanVat);
-        const trangBi = copyObj(nhanVat.trangBi || {});
-        trangBi[slot] = itemId;
-        nhanVat.trangBi = trangBi;
-        updateNhanVat(nhanVat);
-        notify(`🛡️ Đã trang bị bảo vật: ${itemId}!`);
-      };
-    }
+// Recipe state
+let currentCraftType = 'luyen_dan';
+let recipeSearchQuery = '';
+
+function renderRecipeList(): void {
+  const container = document.getElementById('vktt-recipe-list');
+  if (!container) return;
+
+  const state = getGameState();
+  const tuiDo = state?.run?.nhanVat?.tuiDo || {};
+  const allRecipes = getAllRecipes();
+
+  let filtered = allRecipes.filter(r => r.nghe === currentCraftType);
+
+  if (recipeSearchQuery && recipeSearchQuery.trim()) {
+    const qNorm = recipeSearchQuery.trim().toLowerCase();
+    filtered = filtered.filter(r => {
+      const outInfo = getItemInfo(r.ra);
+      const nameMatch = r.ten.toLowerCase().includes(qNorm);
+      const outMatch = outInfo.name.toLowerCase().includes(qNorm);
+      const idMatch = r.id.toLowerCase().includes(qNorm) || r.ra.toLowerCase().includes(qNorm);
+      return nameMatch || outMatch || idMatch;
+    });
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="padding:14px;text-align:center;color:#64748b;font-size:12px;">Không tìm thấy công thức nào.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(recipe => {
+    const outItem = getItemInfo(recipe.ra);
+    const color = QUALITY_COLORS[outItem.quality] || '#94a3b8';
+
+    // Primary materials (chu)
+    const chuTags = (recipe.chu || []).map(c => {
+      const cInfo = getItemInfo(c.id);
+      const stock = tuiDo[c.id] || 0;
+      const hasEnough = stock >= c.so;
+      return `<span class="vktt-ing-tag ${hasEnough ? 'has' : 'lack'}">
+        ${cInfo.name} x${c.so} (${stock}/${c.so})
+      </span>`;
+    }).join('');
+
+    // Secondary materials (phu)
+    const phuTags = (recipe.phu || []).map(p => {
+      const typeStr = CATEGORY_NAMES[p.loai || ''] || p.loai || 'Vật phẩm';
+      const elStr = p.he && p.he.length ? `[${p.he.join('/')}]` : '';
+      const phamStr = p.pham ? `P.${p.pham}` : '';
+      return `<span class="vktt-ing-tag" style="border-color:#38bdf8;color:#7dd3fc;">
+        Phụ: ${typeStr} ${elStr} ${phamStr} x${p.so || 1}
+      </span>`;
+    }).join('');
+
+    const hoaStr = recipe.hoa === 'van' ? 'Văn Hỏa' : recipe.hoa === 'vu' ? 'Vũ Hỏa' : '';
+    const ltStr = recipe.linh_thach ? `💎 ${recipe.linh_thach} LT` : '';
+
+    return `
+      <div class="vktt-recipe-card">
+        <div class="vktt-recipe-hdr">
+          <span style="color:${color};font-size:12.5px;">
+            <span class="vktt-quality-tag" style="background:${color};color:#000;">P.${outItem.quality}</span>
+            <b>${outItem.name}</b> <small style="color:#94a3b8;font-weight:400;">(${recipe.ten})</small>
+          </span>
+          <span style="font-size:10.5px;color:#cbd5e1;">${[hoaStr, ltStr].filter(Boolean).join(' · ')}</span>
+        </div>
+        ${recipe.mo_ta ? `<div style="font-size:10.5px;color:#94a3b8;font-style:italic;">${recipe.mo_ta}</div>` : ''}
+        <div class="vktt-recipe-ing-list">
+          ${chuTags}
+          ${phuTags}
+        </div>
+        <div class="vktt-recipe-actions">
+          <button class="vktt-btn vktt-btn-sm vktt-btn-cyan vktt-btn-give-ing" data-recipe-id="${recipe.id}" style="flex:1;">
+            📦 Nhận Đủ Nguyên Liệu (x10)
+          </button>
+          <button class="vktt-btn vktt-btn-sm vktt-btn-ghost vktt-btn-craft-product" data-recipe-id="${recipe.id}" style="flex:1;">
+            ✨ Nhận Thành Phẩm (x5)
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Bind recipe action buttons
+  container.querySelectorAll<HTMLButtonElement>('.vktt-btn-give-ing').forEach(btn => {
+    btn.onclick = () => {
+      const rId = btn.getAttribute('data-recipe-id');
+      if (rId) {
+        giveIngredientsForRecipe(rId, 10);
+        renderRecipeList(); // Refresh stock counts immediately
+      }
+    };
+  });
+
+  container.querySelectorAll<HTMLButtonElement>('.vktt-btn-craft-product').forEach(btn => {
+    btn.onclick = () => {
+      const rId = btn.getAttribute('data-recipe-id');
+      if (rId) {
+        giveCraftedProduct(rId, 5);
+        renderRecipeList();
+      }
+    };
   });
 }
 
-/* ================= TAB 3: KINH MẠCH & NGHỀ ================= */
 function getTabKinhMachHtml(): string {
   return `
+    <!-- KHỐI 1: ĐÃ THÔNG KINH MẠCH & NGHỀ -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">🌀 Đã Thông Kinh Mạch</div>
-      <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
-        Mở toàn bộ kinh mạch, đồng bộ màu theo hệ Linh Căn và bảo toàn các mảnh ghép hiện có mà không gây crash game.
-      </p>
-      <button id="vktt-btn-meridian" class="vktt-btn vktt-btn-block" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);">
-        🌀 ĐÃ THÔNG TOÀN BỘ KINH MẠCH (100% AN TOÀN)
+      <div class="vktt-card-hdr">🌀 Đã Thông Kinh Mạch & Đột Phá Nghề</div>
+      <div style="display:flex;gap:6px;margin-bottom:6px;">
+        <button id="vktt-btn-meridian" class="vktt-btn vktt-btn-block" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);flex:1;">
+          🌀 ĐÃ THÔNG KINH MẠCH (100% AN TOÀN)
+        </button>
+        <button id="vktt-btn-km-auto-opt" class="vktt-btn vktt-btn-cyan" style="flex:1;">
+          ⚡ BỐ TRÍ TÚI LÊN NGƯỜI
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <button id="vktt-btn-all-profs" class="vktt-btn vktt-btn-ghost">⚒️ Tông Sư 3 Nghề</button>
+        <button id="vktt-btn-all-recipes" class="vktt-btn vktt-btn-ghost">🔥 Học 216 Đơn Phương</button>
+      </div>
+      <button id="vktt-btn-all-skills" class="vktt-btn vktt-btn-block" style="margin-top:6px;">
+        ⚡ Học Toàn Bộ 87 Kỹ Pháp & Công Pháp Cực Phẩm
       </button>
     </div>
 
+    <!-- KHỐI 2: SỔ TAY CHẾ TÁC (LUYỆN ĐAN, LUYỆN KHÍ, CHẾ PHÙ) -->
     <div class="vktt-card">
-      <div class="vktt-card-hdr">📜 Lĩnh Ngộ Toàn Diện</div>
-      <button id="vktt-btn-all-profs" class="vktt-btn vktt-btn-cyan vktt-btn-block" style="margin-bottom:6px;">
-        ⚒️ Lên Tông Sư 3 Nghề (Đan, Phù, Bảo)
-      </button>
-      <button id="vktt-btn-all-recipes" class="vktt-btn vktt-btn-purple vktt-btn-block" style="margin-bottom:6px;">
-        🔥 Lĩnh Ngộ Toàn Bộ 101 Đan Phương & Đồ Phổ
-      </button>
-      <button id="vktt-btn-all-skills" class="vktt-btn vktt-btn-block">
-        ⚡ Học Toàn Bộ 87 Kỹ Pháp & Công Pháp Cực Phẩm
-      </button>
+      <div class="vktt-card-hdr">
+        <span>📖 Sổ Tay Chế Tác (Luyện Đan, Luyện Khí, Chế Phù)</span>
+      </div>
+      <!-- 3 SUB-TABS -->
+      <div class="vktt-subtabs" id="vktt-craft-subtabs">
+        <button class="vktt-subtab-btn ${currentCraftType === 'luyen_dan' ? 'active' : ''}" data-craft="luyen_dan">🌿 Luyện Đan (69)</button>
+        <button class="vktt-subtab-btn ${currentCraftType === 'luyen_bao' ? 'active' : ''}" data-craft="luyen_bao">⚔️ Luyện Bảo / Khí (112)</button>
+        <button class="vktt-subtab-btn ${currentCraftType === 'che_phu' ? 'active' : ''}" data-craft="che_phu">📜 Chế Phù (35)</button>
+      </div>
+
+      <div style="margin-bottom:6px;">
+        <input type="text" id="vktt-recipe-search" class="vktt-inp" placeholder="🔍 Tìm công thức hoặc thành phẩm..." style="width:100%;" />
+      </div>
+
+      <div id="vktt-recipe-list" class="vktt-recipe-list">
+        <!-- Recipe cards dynamically populated -->
+      </div>
     </div>
   `;
 }
@@ -899,6 +1228,13 @@ function getTabKinhMachHtml(): string {
 function bindTabKinhMachEvents(): void {
   const btnM = document.getElementById('vktt-btn-meridian');
   if (btnM) btnM.onclick = unlockAllMeridians;
+
+  const btnOpt = document.getElementById('vktt-btn-km-auto-opt');
+  if (btnOpt) {
+    btnOpt.onclick = () => {
+      autoOptimizeFromBag();
+    };
+  }
 
   const btnP = document.getElementById('vktt-btn-all-profs');
   if (btnP) btnP.onclick = unlockAllProfessions;
@@ -908,6 +1244,32 @@ function bindTabKinhMachEvents(): void {
 
   const btnS = document.getElementById('vktt-btn-all-skills');
   if (btnS) btnS.onclick = unlockAllSkills;
+
+  // Recipe subtabs
+  const subtabBtns = document.querySelectorAll<HTMLButtonElement>('#vktt-craft-subtabs .vktt-subtab-btn');
+  subtabBtns.forEach(btn => {
+    btn.onclick = () => {
+      subtabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCraftType = btn.getAttribute('data-craft') || 'luyen_dan';
+      renderRecipeList();
+    };
+  });
+
+  const recipeSearchInp = document.getElementById('vktt-recipe-search') as HTMLInputElement;
+  if (recipeSearchInp) {
+    recipeSearchInp.value = recipeSearchQuery;
+    let rDeb: any = null;
+    recipeSearchInp.oninput = () => {
+      clearTimeout(rDeb);
+      rDeb = setTimeout(() => {
+        recipeSearchQuery = recipeSearchInp.value.trim();
+        renderRecipeList();
+      }, 180);
+    };
+  }
+
+  renderRecipeList();
 }
 
 /* ================= TAB 4: TỰ ĐỘNG HÓA ================= */
