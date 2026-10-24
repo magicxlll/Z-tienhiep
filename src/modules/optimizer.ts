@@ -119,6 +119,27 @@ export function getMeridianLayout(physiqueId: string): MeridianLayout {
   return parseKhuon(fbStr);
 }
 
+// 4-DIRECTION ADJACENT NEIGHBORS
+export function qg(t: MeridianLayout, n: number): number[] {
+  const e = n % t.rong;
+  const i = Math.floor(n / t.rong);
+  const o: number[] = [];
+  if (e > 0) o.push(n - 1);
+  if (e < t.rong - 1) o.push(n + 1);
+  if (i > 0) o.push(n - t.rong);
+  if (i < t.cao - 1) o.push(n + t.rong);
+  return o.filter(a => t.vung[a] >= 0);
+}
+
+// TƯƠNG SINH - TƯƠNG KHẮC CYCLE RULES
+const EX: Record<string, string> = { loi: 'moc', phong: 'moc', bang: 'thuy' };
+const LX: Record<string, string> = { moc: 'hoa', hoa: 'tho', tho: 'kim', kim: 'thuy', thuy: 'moc' };
+const DX: Record<string, string> = { kim: 'moc', moc: 'tho', tho: 'thuy', thuy: 'hoa', hoa: 'kim' };
+
+export const xi = (t: string): string => EX[t] || t;
+export const isSinh = (t: string, n: string): boolean => t !== 'vo_sac' && n !== 'vo_sac' && LX[xi(t)] === xi(n);
+export const isKhac = (t: string, n: string): boolean => t !== 'vo_sac' && n !== 'vo_sac' && DX[xi(t)] === xi(n);
+
 export function getOffsets(hinh: string[], rot: number): [number, number][] {
   let pts: [number, number][] = [];
   hinh.forEach((row, y) => {
@@ -138,6 +159,8 @@ export function getOffsets(hinh: string[], rot: number): [number, number][] {
 
 export interface PlacedShard {
   item: string;
+  name?: string;
+  loai?: string;
   x: number;
   y: number;
   xoay: number;
@@ -145,86 +168,225 @@ export interface PlacedShard {
   element: string;
 }
 
+/**
+ * Smart packing algorithm:
+ * 1. Prioritizes Cong Phap first to build unbroken vascular conduits out from Dan Dien.
+ * 2. Ensures EVERY placed shard touches Dan Dien or touches a connected Cong Phap (100% thong, zero hatch cheo).
+ * 3. STRICT ZERO CONFLICT: Reject any position where any adjacent cell triggers isKhac (zero red borders).
+ * 4. MAXIMUM RESONANCE: Score bonus (+150) for adjacent cells triggering isSinh (green borders).
+ */
 export function packShards(
   layout: MeridianLayout,
   candidates: ItemInfo[],
-  maxCount: number = 12
+  maxCount: number = 10
 ): PlacedShard[] {
-  const placed: PlacedShard[] = [];
-  const occupied = new Set<number>();
-  if (layout.danDien >= 0) {
-    occupied.add(layout.danDien);
+  // Separate Cong Phap (conduits) and Phap Khi
+  const congPhaps = candidates.filter(c => c.cat === 'cong_phap').sort((a, b) => (b.quality || 0) - (a.quality || 0));
+  const phapKhis = candidates.filter(c => c.cat !== 'cong_phap').sort((a, b) => (b.quality || 0) - (a.quality || 0));
+
+  // Interleave to establish vascular network from Dan Dien
+  const orderedCandidates: ItemInfo[] = [];
+  orderedCandidates.push(...congPhaps.slice(0, 3));
+  let cpIdx = 3, pkIdx = 0;
+  while (cpIdx < congPhaps.length || pkIdx < phapKhis.length) {
+    if (pkIdx < phapKhis.length) orderedCandidates.push(phapKhis[pkIdx++]);
+    if (cpIdx < congPhaps.length) orderedCandidates.push(congPhaps[cpIdx++]);
   }
 
-  // Sort candidates by quality descending, then isShaped
-  const sorted = [...candidates].sort((a, b) => {
-    if (b.quality !== a.quality) return b.quality - a.quality;
-    return (b.hinh?.length || 0) - (a.hinh?.length || 0);
-  });
+  const placed: PlacedShard[] = [];
+  const cellOccupant = layout.vung.map(() => -1);
+  cellOccupant[layout.danDien] = -999; // Dan Dien reserved
 
-  for (const item of sorted) {
+  // Energy connection sources: Dan Dien + all cells of placed connected Cong Phap
+  const connectionSources = new Set<number>([layout.danDien]);
+
+  for (const item of orderedCandidates) {
+    if (placed.length >= maxCount) break;
     if (!item.hinh || !item.hinh.length) continue;
     if (placed.some(p => p.item === item.id)) continue;
 
-    let bestPos: { x: number; y: number; rot: number; cells: number[] } | null = null;
+    const isCP = item.cat === 'cong_phap';
+    const itemEl = item.he && item.he.length && item.he[0] !== 'vo_sac' ? item.he[0] : 'vo_sac';
 
-    // Try all 4 rotations
-    for (let rot = 0; rot < 4 && !bestPos; rot++) {
+    let bestPlacement: PlacedShard | null = null;
+    let bestScore = -999999;
+
+    for (let rot = 0; rot < 4; rot++) {
       const offsets = getOffsets(item.hinh, rot);
       const w = Math.max(...offsets.map(p => p[0])) + 1;
       const h = Math.max(...offsets.map(p => p[1])) + 1;
 
       for (let y = 0; y <= layout.cao - h; y++) {
         for (let x = 0; x <= layout.rong - w; x++) {
-          let valid = true;
-          const cellIndices: number[] = [];
+          const cells: number[] = [];
+          let fits = true;
+          let touchesConnection = false;
+          let hasConflict = false;
+          let sinhScore = 0;
 
           for (const [ox, oy] of offsets) {
             const cx = x + ox;
             const cy = y + oy;
-            const idx = cy * layout.rong + cx;
-
+            const cIdx = cy * layout.rong + cx;
             if (
               cx < 0 || cy < 0 ||
               cx >= layout.rong || cy >= layout.cao ||
-              layout.vung[idx] < 0 ||
-              occupied.has(idx)
+              layout.vung[cIdx] < 0 ||
+              cellOccupant[cIdx] !== -1
             ) {
-              valid = false;
+              fits = false;
               break;
             }
-            cellIndices.push(idx);
+            cells.push(cIdx);
           }
 
-          if (valid) {
-            bestPos = { x, y, rot, cells: cellIndices };
-            break;
+          if (!fits) continue;
+
+          // Check connectivity and neighbors
+          for (const cIdx of cells) {
+            const neighbors = qg(layout, cIdx);
+            for (const nIdx of neighbors) {
+              if (connectionSources.has(nIdx)) {
+                touchesConnection = true;
+              }
+              const nbrShardIdx = cellOccupant[nIdx];
+              if (nbrShardIdx >= 0) {
+                const nbrShard = placed[nbrShardIdx];
+                const nbrEl = nbrShard.element;
+
+                // STRICT: ZERO TƯƠNG KHẮC (NO RED BORDERS)
+                if (isKhac(itemEl, nbrEl) || isKhac(nbrEl, itemEl)) {
+                  hasConflict = true;
+                  break;
+                }
+
+                // TƯƠNG SINH BONUS (GREEN BORDERS)
+                if (isSinh(itemEl, nbrEl) || isSinh(nbrEl, itemEl)) {
+                  sinhScore += 150;
+                } else if (itemEl === nbrEl && itemEl !== 'vo_sac') {
+                  sinhScore += 40; // Same element resonance
+                }
+              }
+            }
+            if (hasConflict) break;
+          }
+
+          // Shard MUST connect to Dan Dien / Cong Phap network, and MUST NOT cause conflict
+          if (!touchesConnection || hasConflict) continue;
+
+          // Clustered closeness to Dan Dien
+          const ddX = layout.danDien % layout.rong;
+          const ddY = Math.floor(layout.danDien / layout.rong);
+          const avgX = cells.reduce((s, c) => s + (c % layout.rong), 0) / cells.length;
+          const avgY = cells.reduce((s, c) => s + Math.floor(c / layout.rong), 0) / cells.length;
+          const distScore = -Math.hypot(avgX - ddX, avgY - ddY) * 10;
+
+          const totalScore = sinhScore + distScore + (item.quality || 1) * 20;
+          if (totalScore > bestScore) {
+            bestScore = totalScore;
+            bestPlacement = {
+              item: item.id,
+              name: item.name,
+              loai: item.cat,
+              x,
+              y,
+              xoay: rot,
+              cells,
+              element: itemEl
+            };
           }
         }
-        if (bestPos) break;
       }
     }
 
-    if (bestPos) {
-      const primaryEl = (item.he && item.he.length && item.he[0] !== 'vo_sac')
-        ? item.he[0]
-        : 'kim';
-
-      placed.push({
-        item: item.id,
-        x: bestPos.x,
-        y: bestPos.y,
-        xoay: bestPos.rot,
-        cells: bestPos.cells,
-        element: primaryEl
-      });
-
-      bestPos.cells.forEach(idx => occupied.add(idx));
-      if (placed.length >= maxCount) break;
+    if (bestPlacement) {
+      const shardIdx = placed.length;
+      placed.push(bestPlacement);
+      for (const c of bestPlacement.cells) {
+        cellOccupant[c] = shardIdx;
+        if (isCP) {
+          connectionSources.add(c);
+        }
+      }
     }
   }
 
   return placed;
+}
+
+// EVALUATION HELPER: Mirror of game engine Hk function
+export function evaluatePlacedShards(
+  layout: MeridianLayout,
+  placed: PlacedShard[]
+): { total: number; thong: number; green: number; red: number } {
+  const r = placed.map(p => {
+    const it = getItemInfo(p.item);
+    return {
+      item: it,
+      o: p.cells,
+      he: p.element || it.he?.[0] || 'vo_sac',
+      heO: p.cells.map(() => p.element || it.he?.[0] || 'vo_sac'),
+      thong: false
+    };
+  });
+
+  const h = layout.vung.map(() => -1);
+  r.forEach((shard, sIdx) => shard.o.forEach(c => h[c] = sIdx));
+  const l = r.map(() => new Set<number>());
+  const d = r.map(() => false);
+  const g = r.map(() => new Map<number, [string, string][]>());
+
+  r.forEach((C, S) => {
+    C.o.forEach((cellIdx, eIdx) => {
+      for (const neighbor of qg(layout, cellIdx)) {
+        if (neighbor === layout.danDien) {
+          d[S] = true;
+        } else if (h[neighbor] >= 0 && h[neighbor] !== S) {
+          l[S].add(h[neighbor]);
+          const pairs = g[S].get(h[neighbor]) ?? [];
+          pairs.push([C.heO[eIdx], r[h[neighbor]].heO[r[h[neighbor]].o.indexOf(neighbor)]]);
+          g[S].set(h[neighbor], pairs);
+        }
+      }
+    });
+  });
+
+  const isCP = (C: number) => r[C]?.item.cat === 'cong_phap';
+  const queue = r.map((C, S) => S).filter(C => d[C] && isCP(C));
+  for (const C of queue) r[C].thong = true;
+  while (queue.length > 0) {
+    const C = queue.shift()!;
+    for (const nbr of l[C]) {
+      if (!r[nbr].thong && isCP(nbr)) {
+        r[nbr].thong = true;
+        queue.push(nbr);
+      }
+    }
+  }
+
+  r.forEach((C, S) => {
+    if (C && C.item.cat !== 'cong_phap') {
+      C.thong = d[S] || [...l[S]].some(P => isCP(P) && r[P].thong);
+    }
+  });
+
+  let greenBorders = 0;
+  let redBorders = 0;
+  r.forEach((C, S) => {
+    if (C.thong) {
+      for (const nbr of l[S]) {
+        if (nbr > S && r[nbr].thong) {
+          const pairs = g[S].get(nbr) || [];
+          const hasSinh = pairs.some(([e1, e2]) => isSinh(e1, e2) || isSinh(e2, e1));
+          const hasKhac = pairs.some(([e1, e2]) => isKhac(e1, e2) || isKhac(e2, e1));
+          if (hasKhac) redBorders++;
+          if (hasSinh) greenBorders++;
+        }
+      }
+    }
+  });
+
+  return { total: r.length, thong: r.filter(s => s.thong).length, green: greenBorders, red: redBorders };
 }
 
 // 6 DIVINE EQUIPMENT ITEMS
@@ -237,7 +399,7 @@ export const TOP_EQUIPMENT = {
   di_lai: 'item.thai_hu_chu'          // Phẩm 8, Thái Hư Chu
 };
 
-// PRESET BUILDS BY ELEMENT
+// PRESET BUILDS BY ELEMENT: BALANCED CP (CONDUITS) & PK (ARTIFACTS)
 export const ELEMENT_BUILDS: Record<string, {
   name: string;
   elements: string[];
@@ -246,104 +408,128 @@ export const ELEMENT_BUILDS: Record<string, {
 }> = {
   kim: {
     name: '⚔️ Kiếm Tông / Kim Tu',
-    elements: ['kim', 'loi'],
+    elements: ['kim', 'thuy', 'tho'],
     linhCanPham: 'thien',
     items: [
       'item.yeu_hoang_huyet_kinh',
-      'item.bat_chiet_kiem',
-      'item.doan_thien_chien_ky',
-      'item.toai_thien_kiem',
       'item.huyet_ma_thien_dao',
       'item.canh_kim_chan_kinh',
-      'item.thien_loi_chinh_phap',
-      'item.tu_tieu_loi_dien',
+      'item.truong_sinh_chan_kinh',
+      'item.khon_nguyen_than_kinh',
       'item.bat_diet_kim_than',
-      'item.tru_tien_kiem'
+      'item.huyen_vu_chan_kinh',
+      'item.bat_chiet_kiem',
+      'item.thai_co_long_lan',
+      'item.doan_thien_chien_ky',
+      'item.nghich_lan_thuan',
+      'item.toai_thien_kiem',
+      'item.tru_tien_kiem',
+      'item.dai_phan_thien_chung'
     ]
   },
   hoa: {
     name: '🔥 Hỏa Tu / Viêm Đế',
-    elements: ['hoa', 'moc'],
+    elements: ['hoa', 'moc', 'tho'],
     linhCanPham: 'thien',
     items: [
       'item.yeu_hoang_huyet_kinh',
-      'item.doan_thien_chien_ky',
       'item.dai_nhat_phat_an',
+      'item.truong_sinh_chan_kinh',
       'item.phan_thien_chan_hoa',
       'item.chuc_dung_hoa_dien',
+      'item.khon_nguyen_than_kinh',
+      'item.kien_moc_thien_kinh',
+      'item.thai_co_long_lan',
+      'item.doan_thien_chien_ky',
       'item.hon_thien_lang',
+      'item.hau_tho_than_bi',
+      'item.hat_vi_tien',
       'item.cuu_vi_huyen_dang',
-      'item.hoa_lan_truong',
-      'item.hoa_loan_vu_y',
-      'item.van_tuong_dien'
+      'item.hoa_lan_truong'
     ]
   },
   thuy: {
     name: '❄️ Thủy / Băng Tu',
-    elements: ['thuy', 'bang'],
+    elements: ['thuy', 'bang', 'kim'],
     linhCanPham: 'thien',
     items: [
-      'item.thai_co_long_lan',
-      'item.nghich_lan_thuan',
+      'item.yeu_hoang_huyet_kinh',
+      'item.huyet_ma_thien_dao',
+      'item.canh_kim_chan_kinh',
       'item.truong_sinh_chan_kinh',
       'item.thai_am_han_kinh',
+      'item.bat_diet_kim_than',
       'item.huyen_vu_chan_kinh',
-      'item.ngoc_tinh_binh',
-      'item.tran_hai_than_chuy',
-      'item.hoa_long_truong',
-      'item.thien_bang_cung',
-      'item.ly_long_giap'
+      'item.bat_chiet_kiem',
+      'item.thai_co_long_lan',
+      'item.doan_thien_chien_ky',
+      'item.nghich_lan_thuan',
+      'item.toai_thien_kiem',
+      'item.tru_tien_kiem',
+      'item.dai_phan_thien_chung'
     ]
   },
   moc: {
     name: '🌿 Mộc Tu / Trường Sinh',
-    elements: ['moc', 'phong'],
+    elements: ['moc', 'phong', 'thuy'],
     linhCanPham: 'thien',
     items: [
       'item.truong_sinh_chan_kinh',
       'item.cuu_thien_cuong_phong',
       'item.con_bang_chan_quyet',
       'item.kien_moc_thien_kinh',
-      'item.van_hon_phien',
-      'item.hat_vi_tien',
-      'item.thanh_loan_tram',
-      'item.tu_sa_doc_cham',
+      'item.huyen_vu_chan_kinh',
       'item.thanh_de_truong_xuan_kinh',
-      'item.van_thi_doc_vu'
+      'item.van_thi_doc_vu',
+      'item.thai_co_long_lan',
+      'item.nghich_lan_thuan',
+      'item.van_hon_phien',
+      'item.ngoc_tinh_binh',
+      'item.tran_hai_than_chuy',
+      'item.hoa_long_truong',
+      'item.hat_vi_tien'
     ]
   },
   tho: {
     name: '⛰️ Thổ Tu / Bất Diệt',
-    elements: ['tho', 'kim'],
+    elements: ['tho', 'hoa', 'kim'],
     linhCanPham: 'thien',
     items: [
       'item.yeu_hoang_huyet_kinh',
-      'item.thai_co_long_lan',
+      'item.huyet_ma_thien_dao',
+      'item.dai_nhat_phat_an',
+      'item.canh_kim_chan_kinh',
+      'item.phan_thien_chan_hoa',
+      'item.chuc_dung_hoa_dien',
       'item.khon_nguyen_than_kinh',
-      'item.hau_tho_than_bi',
-      'item.hung_tam_kinh',
-      'item.vien_tam_moc_ngu',
-      'item.huyen_hoang_tao_hoa_kinh',
-      'item.huyen_hoang_chuong',
-      'item.huyen_nham_chan_kinh',
-      'item.thai_son_ap_dinh'
+      'item.bat_chiet_kiem',
+      'item.thai_co_long_lan',
+      'item.doan_thien_chien_ky',
+      'item.toai_thien_kiem',
+      'item.tru_tien_kiem',
+      'item.dai_phan_thien_chung',
+      'item.hon_thien_lang'
     ]
   },
   loi_phong: {
     name: '⚡ Lôi / Phong Tu (Cuồng Bạo)',
-    elements: ['loi', 'phong'],
+    elements: ['loi', 'phong', 'thuy'],
     linhCanPham: 'bien_di',
     items: [
+      'item.truong_sinh_chan_kinh',
       'item.thien_loi_chinh_phap',
       'item.cuu_thien_cuong_phong',
       'item.tu_tieu_loi_dien',
       'item.con_bang_chan_quyet',
+      'item.huyen_vu_chan_kinh',
+      'item.cuu_tieu_ngu_loi_quyet',
+      'item.thai_co_long_lan',
+      'item.nghich_lan_thuan',
       'item.van_hon_phien',
       'item.tu_tieu_than_kiem',
-      'item.cuu_tieu_ngu_loi_quyet',
-      'item.thien_cuong_loi_quyet',
-      'item.thanh_minh_phong_kinh',
-      'item.oanh_thien_loi_chuy'
+      'item.ngoc_tinh_binh',
+      'item.tran_hai_than_chuy',
+      'item.hoa_long_truong'
     ]
   },
   toan_nang: {
@@ -354,6 +540,10 @@ export const ELEMENT_BUILDS: Record<string, {
       'item.luan_hoi_chan_kinh',
       'item.yeu_hoang_huyet_kinh',
       'item.phong_thien_an',
+      'item.ngu_to_hop_dao_quyet',
+      'item.thien_ma_chan_kinh',
+      'item.huyet_ma_thien_dao',
+      'item.nhu_lai_tang_kinh',
       'item.bat_chiet_kiem',
       'item.tam_sinh_thach',
       'item.thai_co_long_lan',
@@ -397,10 +587,10 @@ export function autoOptimizeFromBag(): boolean {
     return false;
   }
 
-  // 2. Pack shards onto grid
-  const placed = packShards(layout, candidateItems, 12);
+  // 2. Pack shards onto grid with strict connectivity & zero conflict
+  const placed = packShards(layout, candidateItems, 10);
   if (placed.length === 0) {
-    notify('⚠️ Không tìm được vị trí hợp lệ để đặt các mảnh hiện có!');
+    notify('⚠️ Không tìm được vị trí hợp lệ kết nối với Đan Điền cho các mảnh hiện có!');
     return false;
   }
 
@@ -411,7 +601,7 @@ export function autoOptimizeFromBag(): boolean {
   // Initialize colors and states
   const mau: string[] = oldKm.mau && oldKm.mau.length === totalCells
     ? [...oldKm.mau]
-    : new Array(totalCells).fill('kim');
+    : new Array(totalCells).fill('vo_sac');
 
   const trangThai: string[] = new Array(totalCells).fill('an');
   for (let i = 0; i < totalCells; i++) {
@@ -479,7 +669,8 @@ export function autoOptimizeFromBag(): boolean {
   setGameState({ run: nextRun });
   persistGameSave(nextRun);
 
-  notify(`⚡ Bố trí thành công ${placed.length} mảnh tối ưu & trang bị 6 món đồ từ túi!`);
+  const ev = evaluatePlacedShards(layout, placed);
+  notify(`⚡ Bố trí ${ev.thong}/${ev.total} mảnh thông mạch (${ev.green} viền tương sinh, ${ev.red} viền khắc) & trang bị 6 món đồ từ túi!`);
   return true;
 }
 
@@ -520,9 +711,9 @@ export function applyElementalBuild(buildKey: string): boolean {
   }
   nv.trangBi = currentTrangBi;
 
-  // 3. Pack shards onto grid
+  // 3. Pack shards onto grid with vascular network & zero conflict
   const candidateItems = build.items.map(id => getItemInfo(id)).filter(it => it.isShaped);
-  const placed = packShards(layout, candidateItems, 12);
+  const placed = packShards(layout, candidateItems, 10);
 
   // 4. Update meridian colors and states
   const totalCells = layout.rong * layout.cao;
@@ -572,6 +763,7 @@ export function applyElementalBuild(buildKey: string): boolean {
   setGameState({ run: nextRun });
   persistGameSave(nextRun);
 
-  notify(`🚀 Đã áp dụng ${build.name}: Bố trí ${placed.length} mảnh cực phẩm, trang bị 6 thần khí!`);
+  const ev = evaluatePlacedShards(layout, placed);
+  notify(`🚀 Đã áp dụng ${build.name}: ${ev.thong}/${ev.total} mảnh thông mạch (${ev.green} viền tương sinh, 0 viền khắc)!`);
   return true;
 }

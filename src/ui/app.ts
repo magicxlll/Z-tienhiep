@@ -861,7 +861,7 @@ function getTabKhoDoHtml(): string {
     <div class="vktt-card">
       <div class="vktt-card-hdr">⚡ Tự Động Bố Trí Kinh Mạch & Trang Bị</div>
       <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
-        Thuật toán 2D xếp kín mảnh từ túi lên người (không chạm Đan Điền), tự động chỉnh màu ô kinh mạch tương thích 100% hệ vật phẩm (0 điểm nghịch, buff tối đa), đả thông toàn bộ ô và trang bị 6 món đồ tốt nhất.
+        Thuật toán kết nối mạch từ Đan Điền: 100% thông mạch (đường dẫn khí màu trắng, KHÔNG bị hatch chéo), tự động ghép cặp tương sinh (viền xanh lá buff cực đại), triệt tiêu 100% tương khắc (KHÔNG có viền đỏ) và tự động trang bị 6 món đồ tốt nhất.
       </p>
       <button id="vktt-btn-auto-opt-bag" class="vktt-btn vktt-btn-green vktt-btn-block" style="margin-bottom:8px;">
         ⚡ BỐ TRÍ MẢNH TỪ TÚI LÊN NGƯỜI TỐI ƯU NHẤT

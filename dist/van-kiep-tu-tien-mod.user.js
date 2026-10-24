@@ -1545,6 +1545,22 @@ f d 2 b 2 3 5
     const fbStr = FALLBACK_KHUON[physiqueId] || FALLBACK_KHUON["the_chat.pham_the"];
     return parseKhuon(fbStr);
   }
+  function qg(t, n) {
+    const e = n % t.rong;
+    const i = Math.floor(n / t.rong);
+    const o = [];
+    if (e > 0) o.push(n - 1);
+    if (e < t.rong - 1) o.push(n + 1);
+    if (i > 0) o.push(n - t.rong);
+    if (i < t.cao - 1) o.push(n + t.rong);
+    return o.filter((a) => t.vung[a] >= 0);
+  }
+  var EX = { loi: "moc", phong: "moc", bang: "thuy" };
+  var LX = { moc: "hoa", hoa: "tho", tho: "kim", kim: "thuy", thuy: "moc" };
+  var DX = { kim: "moc", moc: "tho", tho: "thuy", thuy: "hoa", hoa: "kim" };
+  var xi = (t) => EX[t] || t;
+  var isSinh = (t, n) => t !== "vo_sac" && n !== "vo_sac" && LX[xi(t)] === xi(n);
+  var isKhac = (t, n) => t !== "vo_sac" && n !== "vo_sac" && DX[xi(t)] === xi(n);
   function getOffsets(hinh, rot) {
     let pts = [];
     hinh.forEach((row, y) => {
@@ -1559,61 +1575,172 @@ f d 2 b 2 3 5
     const minY = Math.min(...pts.map((p) => p[1]));
     return pts.map(([x, y]) => [x - minX, y - minY]);
   }
-  function packShards(layout, candidates, maxCount = 12) {
-    const placed = [];
-    const occupied = /* @__PURE__ */ new Set();
-    if (layout.danDien >= 0) {
-      occupied.add(layout.danDien);
+  function packShards(layout, candidates, maxCount = 10) {
+    const congPhaps = candidates.filter((c) => c.cat === "cong_phap").sort((a, b) => (b.quality || 0) - (a.quality || 0));
+    const phapKhis = candidates.filter((c) => c.cat !== "cong_phap").sort((a, b) => (b.quality || 0) - (a.quality || 0));
+    const orderedCandidates = [];
+    orderedCandidates.push(...congPhaps.slice(0, 3));
+    let cpIdx = 3, pkIdx = 0;
+    while (cpIdx < congPhaps.length || pkIdx < phapKhis.length) {
+      if (pkIdx < phapKhis.length) orderedCandidates.push(phapKhis[pkIdx++]);
+      if (cpIdx < congPhaps.length) orderedCandidates.push(congPhaps[cpIdx++]);
     }
-    const sorted = [...candidates].sort((a, b) => {
-      if (b.quality !== a.quality) return b.quality - a.quality;
-      return (b.hinh?.length || 0) - (a.hinh?.length || 0);
-    });
-    for (const item of sorted) {
+    const placed = [];
+    const cellOccupant = layout.vung.map(() => -1);
+    cellOccupant[layout.danDien] = -999;
+    const connectionSources = /* @__PURE__ */ new Set([layout.danDien]);
+    for (const item of orderedCandidates) {
+      if (placed.length >= maxCount) break;
       if (!item.hinh || !item.hinh.length) continue;
       if (placed.some((p) => p.item === item.id)) continue;
-      let bestPos = null;
-      for (let rot = 0; rot < 4 && !bestPos; rot++) {
+      const isCP = item.cat === "cong_phap";
+      const itemEl = item.he && item.he.length && item.he[0] !== "vo_sac" ? item.he[0] : "vo_sac";
+      let bestPlacement = null;
+      let bestScore = -999999;
+      for (let rot = 0; rot < 4; rot++) {
         const offsets = getOffsets(item.hinh, rot);
         const w = Math.max(...offsets.map((p) => p[0])) + 1;
         const h = Math.max(...offsets.map((p) => p[1])) + 1;
         for (let y = 0; y <= layout.cao - h; y++) {
           for (let x = 0; x <= layout.rong - w; x++) {
-            let valid = true;
-            const cellIndices = [];
+            const cells = [];
+            let fits = true;
+            let touchesConnection = false;
+            let hasConflict = false;
+            let sinhScore = 0;
             for (const [ox, oy] of offsets) {
               const cx = x + ox;
               const cy = y + oy;
-              const idx = cy * layout.rong + cx;
-              if (cx < 0 || cy < 0 || cx >= layout.rong || cy >= layout.cao || layout.vung[idx] < 0 || occupied.has(idx)) {
-                valid = false;
+              const cIdx = cy * layout.rong + cx;
+              if (cx < 0 || cy < 0 || cx >= layout.rong || cy >= layout.cao || layout.vung[cIdx] < 0 || cellOccupant[cIdx] !== -1) {
+                fits = false;
                 break;
               }
-              cellIndices.push(idx);
+              cells.push(cIdx);
             }
-            if (valid) {
-              bestPos = { x, y, rot, cells: cellIndices };
-              break;
+            if (!fits) continue;
+            for (const cIdx of cells) {
+              const neighbors = qg(layout, cIdx);
+              for (const nIdx of neighbors) {
+                if (connectionSources.has(nIdx)) {
+                  touchesConnection = true;
+                }
+                const nbrShardIdx = cellOccupant[nIdx];
+                if (nbrShardIdx >= 0) {
+                  const nbrShard = placed[nbrShardIdx];
+                  const nbrEl = nbrShard.element;
+                  if (isKhac(itemEl, nbrEl) || isKhac(nbrEl, itemEl)) {
+                    hasConflict = true;
+                    break;
+                  }
+                  if (isSinh(itemEl, nbrEl) || isSinh(nbrEl, itemEl)) {
+                    sinhScore += 150;
+                  } else if (itemEl === nbrEl && itemEl !== "vo_sac") {
+                    sinhScore += 40;
+                  }
+                }
+              }
+              if (hasConflict) break;
+            }
+            if (!touchesConnection || hasConflict) continue;
+            const ddX = layout.danDien % layout.rong;
+            const ddY = Math.floor(layout.danDien / layout.rong);
+            const avgX = cells.reduce((s, c) => s + c % layout.rong, 0) / cells.length;
+            const avgY = cells.reduce((s, c) => s + Math.floor(c / layout.rong), 0) / cells.length;
+            const distScore = -Math.hypot(avgX - ddX, avgY - ddY) * 10;
+            const totalScore = sinhScore + distScore + (item.quality || 1) * 20;
+            if (totalScore > bestScore) {
+              bestScore = totalScore;
+              bestPlacement = {
+                item: item.id,
+                name: item.name,
+                loai: item.cat,
+                x,
+                y,
+                xoay: rot,
+                cells,
+                element: itemEl
+              };
             }
           }
-          if (bestPos) break;
         }
       }
-      if (bestPos) {
-        const primaryEl = item.he && item.he.length && item.he[0] !== "vo_sac" ? item.he[0] : "kim";
-        placed.push({
-          item: item.id,
-          x: bestPos.x,
-          y: bestPos.y,
-          xoay: bestPos.rot,
-          cells: bestPos.cells,
-          element: primaryEl
-        });
-        bestPos.cells.forEach((idx) => occupied.add(idx));
-        if (placed.length >= maxCount) break;
+      if (bestPlacement) {
+        const shardIdx = placed.length;
+        placed.push(bestPlacement);
+        for (const c of bestPlacement.cells) {
+          cellOccupant[c] = shardIdx;
+          if (isCP) {
+            connectionSources.add(c);
+          }
+        }
       }
     }
     return placed;
+  }
+  function evaluatePlacedShards(layout, placed) {
+    const r = placed.map((p) => {
+      const it = getItemInfo(p.item);
+      return {
+        item: it,
+        o: p.cells,
+        he: p.element || it.he?.[0] || "vo_sac",
+        heO: p.cells.map(() => p.element || it.he?.[0] || "vo_sac"),
+        thong: false
+      };
+    });
+    const h = layout.vung.map(() => -1);
+    r.forEach((shard, sIdx) => shard.o.forEach((c) => h[c] = sIdx));
+    const l = r.map(() => /* @__PURE__ */ new Set());
+    const d = r.map(() => false);
+    const g = r.map(() => /* @__PURE__ */ new Map());
+    r.forEach((C, S) => {
+      C.o.forEach((cellIdx, eIdx) => {
+        for (const neighbor of qg(layout, cellIdx)) {
+          if (neighbor === layout.danDien) {
+            d[S] = true;
+          } else if (h[neighbor] >= 0 && h[neighbor] !== S) {
+            l[S].add(h[neighbor]);
+            const pairs = g[S].get(h[neighbor]) ?? [];
+            pairs.push([C.heO[eIdx], r[h[neighbor]].heO[r[h[neighbor]].o.indexOf(neighbor)]]);
+            g[S].set(h[neighbor], pairs);
+          }
+        }
+      });
+    });
+    const isCP = (C) => r[C]?.item.cat === "cong_phap";
+    const queue = r.map((C, S) => S).filter((C) => d[C] && isCP(C));
+    for (const C of queue) r[C].thong = true;
+    while (queue.length > 0) {
+      const C = queue.shift();
+      for (const nbr of l[C]) {
+        if (!r[nbr].thong && isCP(nbr)) {
+          r[nbr].thong = true;
+          queue.push(nbr);
+        }
+      }
+    }
+    r.forEach((C, S) => {
+      if (C && C.item.cat !== "cong_phap") {
+        C.thong = d[S] || [...l[S]].some((P) => isCP(P) && r[P].thong);
+      }
+    });
+    let greenBorders = 0;
+    let redBorders = 0;
+    r.forEach((C, S) => {
+      if (C.thong) {
+        for (const nbr of l[S]) {
+          if (nbr > S && r[nbr].thong) {
+            const pairs = g[S].get(nbr) || [];
+            const hasSinh = pairs.some(([e1, e2]) => isSinh(e1, e2) || isSinh(e2, e1));
+            const hasKhac = pairs.some(([e1, e2]) => isKhac(e1, e2) || isKhac(e2, e1));
+            if (hasKhac) redBorders++;
+            if (hasSinh) greenBorders++;
+          }
+        }
+      }
+    });
+    return { total: r.length, thong: r.filter((s) => s.thong).length, green: greenBorders, red: redBorders };
   }
   var TOP_EQUIPMENT = {
     tru_vat: "item.can_khon_gioi",
@@ -1632,104 +1759,128 @@ f d 2 b 2 3 5
   var ELEMENT_BUILDS = {
     kim: {
       name: "\u2694\uFE0F Ki\u1EBFm T\xF4ng / Kim Tu",
-      elements: ["kim", "loi"],
+      elements: ["kim", "thuy", "tho"],
       linhCanPham: "thien",
       items: [
         "item.yeu_hoang_huyet_kinh",
-        "item.bat_chiet_kiem",
-        "item.doan_thien_chien_ky",
-        "item.toai_thien_kiem",
         "item.huyet_ma_thien_dao",
         "item.canh_kim_chan_kinh",
-        "item.thien_loi_chinh_phap",
-        "item.tu_tieu_loi_dien",
+        "item.truong_sinh_chan_kinh",
+        "item.khon_nguyen_than_kinh",
         "item.bat_diet_kim_than",
-        "item.tru_tien_kiem"
+        "item.huyen_vu_chan_kinh",
+        "item.bat_chiet_kiem",
+        "item.thai_co_long_lan",
+        "item.doan_thien_chien_ky",
+        "item.nghich_lan_thuan",
+        "item.toai_thien_kiem",
+        "item.tru_tien_kiem",
+        "item.dai_phan_thien_chung"
       ]
     },
     hoa: {
       name: "\u{1F525} H\u1ECFa Tu / Vi\xEAm \u0110\u1EBF",
-      elements: ["hoa", "moc"],
+      elements: ["hoa", "moc", "tho"],
       linhCanPham: "thien",
       items: [
         "item.yeu_hoang_huyet_kinh",
-        "item.doan_thien_chien_ky",
         "item.dai_nhat_phat_an",
+        "item.truong_sinh_chan_kinh",
         "item.phan_thien_chan_hoa",
         "item.chuc_dung_hoa_dien",
+        "item.khon_nguyen_than_kinh",
+        "item.kien_moc_thien_kinh",
+        "item.thai_co_long_lan",
+        "item.doan_thien_chien_ky",
         "item.hon_thien_lang",
+        "item.hau_tho_than_bi",
+        "item.hat_vi_tien",
         "item.cuu_vi_huyen_dang",
-        "item.hoa_lan_truong",
-        "item.hoa_loan_vu_y",
-        "item.van_tuong_dien"
+        "item.hoa_lan_truong"
       ]
     },
     thuy: {
       name: "\u2744\uFE0F Th\u1EE7y / B\u0103ng Tu",
-      elements: ["thuy", "bang"],
+      elements: ["thuy", "bang", "kim"],
       linhCanPham: "thien",
       items: [
-        "item.thai_co_long_lan",
-        "item.nghich_lan_thuan",
+        "item.yeu_hoang_huyet_kinh",
+        "item.huyet_ma_thien_dao",
+        "item.canh_kim_chan_kinh",
         "item.truong_sinh_chan_kinh",
         "item.thai_am_han_kinh",
+        "item.bat_diet_kim_than",
         "item.huyen_vu_chan_kinh",
-        "item.ngoc_tinh_binh",
-        "item.tran_hai_than_chuy",
-        "item.hoa_long_truong",
-        "item.thien_bang_cung",
-        "item.ly_long_giap"
+        "item.bat_chiet_kiem",
+        "item.thai_co_long_lan",
+        "item.doan_thien_chien_ky",
+        "item.nghich_lan_thuan",
+        "item.toai_thien_kiem",
+        "item.tru_tien_kiem",
+        "item.dai_phan_thien_chung"
       ]
     },
     moc: {
       name: "\u{1F33F} M\u1ED9c Tu / Tr\u01B0\u1EDDng Sinh",
-      elements: ["moc", "phong"],
+      elements: ["moc", "phong", "thuy"],
       linhCanPham: "thien",
       items: [
         "item.truong_sinh_chan_kinh",
         "item.cuu_thien_cuong_phong",
         "item.con_bang_chan_quyet",
         "item.kien_moc_thien_kinh",
-        "item.van_hon_phien",
-        "item.hat_vi_tien",
-        "item.thanh_loan_tram",
-        "item.tu_sa_doc_cham",
+        "item.huyen_vu_chan_kinh",
         "item.thanh_de_truong_xuan_kinh",
-        "item.van_thi_doc_vu"
+        "item.van_thi_doc_vu",
+        "item.thai_co_long_lan",
+        "item.nghich_lan_thuan",
+        "item.van_hon_phien",
+        "item.ngoc_tinh_binh",
+        "item.tran_hai_than_chuy",
+        "item.hoa_long_truong",
+        "item.hat_vi_tien"
       ]
     },
     tho: {
       name: "\u26F0\uFE0F Th\u1ED5 Tu / B\u1EA5t Di\u1EC7t",
-      elements: ["tho", "kim"],
+      elements: ["tho", "hoa", "kim"],
       linhCanPham: "thien",
       items: [
         "item.yeu_hoang_huyet_kinh",
-        "item.thai_co_long_lan",
+        "item.huyet_ma_thien_dao",
+        "item.dai_nhat_phat_an",
+        "item.canh_kim_chan_kinh",
+        "item.phan_thien_chan_hoa",
+        "item.chuc_dung_hoa_dien",
         "item.khon_nguyen_than_kinh",
-        "item.hau_tho_than_bi",
-        "item.hung_tam_kinh",
-        "item.vien_tam_moc_ngu",
-        "item.huyen_hoang_tao_hoa_kinh",
-        "item.huyen_hoang_chuong",
-        "item.huyen_nham_chan_kinh",
-        "item.thai_son_ap_dinh"
+        "item.bat_chiet_kiem",
+        "item.thai_co_long_lan",
+        "item.doan_thien_chien_ky",
+        "item.toai_thien_kiem",
+        "item.tru_tien_kiem",
+        "item.dai_phan_thien_chung",
+        "item.hon_thien_lang"
       ]
     },
     loi_phong: {
       name: "\u26A1 L\xF4i / Phong Tu (Cu\u1ED3ng B\u1EA1o)",
-      elements: ["loi", "phong"],
+      elements: ["loi", "phong", "thuy"],
       linhCanPham: "bien_di",
       items: [
+        "item.truong_sinh_chan_kinh",
         "item.thien_loi_chinh_phap",
         "item.cuu_thien_cuong_phong",
         "item.tu_tieu_loi_dien",
         "item.con_bang_chan_quyet",
+        "item.huyen_vu_chan_kinh",
+        "item.cuu_tieu_ngu_loi_quyet",
+        "item.thai_co_long_lan",
+        "item.nghich_lan_thuan",
         "item.van_hon_phien",
         "item.tu_tieu_than_kiem",
-        "item.cuu_tieu_ngu_loi_quyet",
-        "item.thien_cuong_loi_quyet",
-        "item.thanh_minh_phong_kinh",
-        "item.oanh_thien_loi_chuy"
+        "item.ngoc_tinh_binh",
+        "item.tran_hai_than_chuy",
+        "item.hoa_long_truong"
       ]
     },
     toan_nang: {
@@ -1740,6 +1891,10 @@ f d 2 b 2 3 5
         "item.luan_hoi_chan_kinh",
         "item.yeu_hoang_huyet_kinh",
         "item.phong_thien_an",
+        "item.ngu_to_hop_dao_quyet",
+        "item.thien_ma_chan_kinh",
+        "item.huyet_ma_thien_dao",
+        "item.nhu_lai_tang_kinh",
         "item.bat_chiet_kiem",
         "item.tam_sinh_thach",
         "item.thai_co_long_lan",
@@ -1772,14 +1927,14 @@ f d 2 b 2 3 5
       notify("\u26A0\uFE0F Trong t\xFAi ch\u01B0a c\xF3 c\xF4ng ph\xE1p ho\u1EB7c ph\xE1p kh\xED c\xF3 m\u1EA3nh gh\xE9p \u0111\u1EC3 b\u1ED1 tr\xED!");
       return false;
     }
-    const placed = packShards(layout, candidateItems, 12);
+    const placed = packShards(layout, candidateItems, 10);
     if (placed.length === 0) {
-      notify("\u26A0\uFE0F Kh\xF4ng t\xECm \u0111\u01B0\u1EE3c v\u1ECB tr\xED h\u1EE3p l\u1EC7 \u0111\u1EC3 \u0111\u1EB7t c\xE1c m\u1EA3nh hi\u1EC7n c\xF3!");
+      notify("\u26A0\uFE0F Kh\xF4ng t\xECm \u0111\u01B0\u1EE3c v\u1ECB tr\xED h\u1EE3p l\u1EC7 k\u1EBFt n\u1ED1i v\u1EDBi \u0110an \u0110i\u1EC1n cho c\xE1c m\u1EA3nh hi\u1EC7n c\xF3!");
       return false;
     }
     const oldKm = copyObj(nv.kinhMach || {});
     const totalCells = layout.rong * layout.cao;
-    const mau = oldKm.mau && oldKm.mau.length === totalCells ? [...oldKm.mau] : new Array(totalCells).fill("kim");
+    const mau = oldKm.mau && oldKm.mau.length === totalCells ? [...oldKm.mau] : new Array(totalCells).fill("vo_sac");
     const trangThai = new Array(totalCells).fill("an");
     for (let i = 0; i < totalCells; i++) {
       if (layout.vung[i] >= 0) {
@@ -1834,7 +1989,8 @@ f d 2 b 2 3 5
     nextRun.nhanVat = nv;
     setGameState({ run: nextRun });
     persistGameSave(nextRun);
-    notify(`\u26A1 B\u1ED1 tr\xED th\xE0nh c\xF4ng ${placed.length} m\u1EA3nh t\u1ED1i \u01B0u & trang b\u1ECB 6 m\xF3n \u0111\u1ED3 t\u1EEB t\xFAi!`);
+    const ev = evaluatePlacedShards(layout, placed);
+    notify(`\u26A1 B\u1ED1 tr\xED ${ev.thong}/${ev.total} m\u1EA3nh th\xF4ng m\u1EA1ch (${ev.green} vi\u1EC1n t\u01B0\u01A1ng sinh, ${ev.red} vi\u1EC1n kh\u1EAFc) & trang b\u1ECB 6 m\xF3n \u0111\u1ED3 t\u1EEB t\xFAi!`);
     return true;
   }
   function applyElementalBuild(buildKey) {
@@ -1861,7 +2017,7 @@ f d 2 b 2 3 5
     }
     nv.trangBi = currentTrangBi;
     const candidateItems = build.items.map((id) => getItemInfo(id)).filter((it) => it.isShaped);
-    const placed = packShards(layout, candidateItems, 12);
+    const placed = packShards(layout, candidateItems, 10);
     const totalCells = layout.rong * layout.cao;
     const primaryEl = build.elements[0] || "kim";
     const mau = new Array(totalCells).fill(primaryEl);
@@ -1898,7 +2054,8 @@ f d 2 b 2 3 5
     nextRun.nhanVat = nv;
     setGameState({ run: nextRun });
     persistGameSave(nextRun);
-    notify(`\u{1F680} \u0110\xE3 \xE1p d\u1EE5ng ${build.name}: B\u1ED1 tr\xED ${placed.length} m\u1EA3nh c\u1EF1c ph\u1EA9m, trang b\u1ECB 6 th\u1EA7n kh\xED!`);
+    const ev = evaluatePlacedShards(layout, placed);
+    notify(`\u{1F680} \u0110\xE3 \xE1p d\u1EE5ng ${build.name}: ${ev.thong}/${ev.total} m\u1EA3nh th\xF4ng m\u1EA1ch (${ev.green} vi\u1EC1n t\u01B0\u01A1ng sinh, 0 vi\u1EC1n kh\u1EAFc)!`);
     return true;
   }
 
@@ -7242,7 +7399,7 @@ f d 2 b 2 3 5
     <div class="vktt-card">
       <div class="vktt-card-hdr">\u26A1 T\u1EF1 \u0110\u1ED9ng B\u1ED1 Tr\xED Kinh M\u1EA1ch & Trang B\u1ECB</div>
       <p style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">
-        Thu\u1EADt to\xE1n 2D x\u1EBFp k\xEDn m\u1EA3nh t\u1EEB t\xFAi l\xEAn ng\u01B0\u1EDDi (kh\xF4ng ch\u1EA1m \u0110an \u0110i\u1EC1n), t\u1EF1 \u0111\u1ED9ng ch\u1EC9nh m\xE0u \xF4 kinh m\u1EA1ch t\u01B0\u01A1ng th\xEDch 100% h\u1EC7 v\u1EADt ph\u1EA9m (0 \u0111i\u1EC3m ngh\u1ECBch, buff t\u1ED1i \u0111a), \u0111\u1EA3 th\xF4ng to\xE0n b\u1ED9 \xF4 v\xE0 trang b\u1ECB 6 m\xF3n \u0111\u1ED3 t\u1ED1t nh\u1EA5t.
+        Thu\u1EADt to\xE1n k\u1EBFt n\u1ED1i m\u1EA1ch t\u1EEB \u0110an \u0110i\u1EC1n: 100% th\xF4ng m\u1EA1ch (\u0111\u01B0\u1EDDng d\u1EABn kh\xED m\xE0u tr\u1EAFng, KH\xD4NG b\u1ECB hatch ch\xE9o), t\u1EF1 \u0111\u1ED9ng gh\xE9p c\u1EB7p t\u01B0\u01A1ng sinh (vi\u1EC1n xanh l\xE1 buff c\u1EF1c \u0111\u1EA1i), tri\u1EC7t ti\xEAu 100% t\u01B0\u01A1ng kh\u1EAFc (KH\xD4NG c\xF3 vi\u1EC1n \u0111\u1ECF) v\xE0 t\u1EF1 \u0111\u1ED9ng trang b\u1ECB 6 m\xF3n \u0111\u1ED3 t\u1ED1t nh\u1EA5t.
       </p>
       <button id="vktt-btn-auto-opt-bag" class="vktt-btn vktt-btn-green vktt-btn-block" style="margin-bottom:8px;">
         \u26A1 B\u1ED0 TR\xCD M\u1EA2NH T\u1EEA T\xDAI L\xCAN NG\u01AF\u1EDCI T\u1ED0I \u01AFU NH\u1EA4T
