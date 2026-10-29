@@ -2,10 +2,10 @@ import esbuild from 'esbuild';
 import fs from 'fs';
 
 const banner = `// ==UserScript==
-// @name         Vạn Kiếp Tu Tiên - MOD Assistant Suite v3.0 (Mobile & Desktop)
+// @name         Vạn Kiếp Tu Tiên - MOD Assistant Suite v3.5 (Ma Đạo & Ngự Linh)
 // @namespace    https://github.com/magicxlll/Z-tienhiep
-// @version      3.0.0
-// @description  Bảng MOD & Tự Động Hóa Vạn Kiếp Tu Tiên - Giao diện Mobile-First tối ưu cho Edge Mobile (Violentmonkey) và Desktop (Tampermonkey)
+// @version      3.5.0
+// @description  Bảng MOD & Tự Động Hóa Vạn Kiếp Tu Tiên - Cập nhật Ma Đạo, Linh Thú/Ngự Linh, 3 Thể Chất Mới, Trận Pháp & Redesign Giao Diện Cổ Phong Xianxia
 // @author       Z-TienHiep & VKTT Team
 // @match        https://van-kiep-tu-tien.vuhaiquan2k1.workers.dev/*
 // @grant        unsafeWindow

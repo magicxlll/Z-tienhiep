@@ -13,17 +13,17 @@ export function notify(msg: string): void {
       top: 18px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(19, 22, 34, 0.95);
-      color: #f8fafc;
-      padding: 10px 18px;
-      border-radius: 20px;
-      border: 1px solid #e5b869;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(229, 184, 105, 0.3);
+      background: rgba(28, 24, 21, 0.96);
+      color: #f0e9d6;
+      padding: 9px 18px;
+      border-radius: 4px;
+      border: 1px solid #a31d1d;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(212, 163, 75, 0.35);
       z-index: 99999999;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      transition: opacity 0.25s, transform 0.25s;
+      font-family: "Noto Serif", "Times New Roman", serif;
+      font-size: 13.5px;
+      letter-spacing: 0.2px;
+      transition: opacity 0.22s ease, transform 0.22s ease;
       opacity: 0;
       pointer-events: none;
       max-width: 90vw;
@@ -38,7 +38,7 @@ export function notify(msg: string): void {
   toastTimer = setTimeout(() => {
     if (t) {
       t.style.opacity = '0';
-      t.style.transform = 'translateX(-50%) translateY(-10px)';
+      t.style.transform = 'translateX(-50%) translateY(-8px)';
     }
   }, 2600);
 }
@@ -511,4 +511,247 @@ export function unlockAllAchievementsAndFerrymen(): void {
   });
 
   notify(`🏆 Đã Max 999,999 Điểm Luân Hồi + Mở Khóa 17 Lão Đò & 28 Thành Tựu!`);
+}
+
+/* ================= MA ĐẠO (TÀ TU / MA TU) CONTROLLERS ================= */
+
+export function setCultivationPath(path: 'chinh' | 'ta'): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const nv = copyObj(state.run.nhanVat);
+  nv.path = path;
+  delete nv.pathShift;
+
+  const cs = copyObj(nv.chiSo || {});
+  if (path === 'ta') {
+    if ((cs.tam_ma || 0) < 100) cs.tam_ma = 100;
+    if ((cs.dao_tam || 0) < 150) cs.dao_tam = 150;
+    delete nv.erodeFrac;
+    updateNhanVat({ path: 'ta', chiSo: cs });
+    notify('🔥 Đạo cơ đã chuyển: Ngươi nay là Tà Tu! Tâm ma hóa Ma Niệm buff uy lực chiêu thức.');
+  } else {
+    cs.tam_ma = 0;
+    if ((cs.dao_tam || 0) < 200) cs.dao_tam = 200;
+    delete nv.erodeFrac;
+    updateNhanVat({ path: 'chinh', chiSo: cs });
+    notify('✨ Đạo cơ quy y Chính Đạo! Giữ vững bản tâm, không bị ma niệm xói mòn.');
+  }
+}
+
+export function maximizeDemonicIntent(): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const nv = copyObj(state.run.nhanVat);
+  const cs = copyObj(nv.chiSo || {});
+  cs.tam_ma = 600; // Cực hạn ma niệm
+  cs.dao_tam = 600; // Bản tâm cực đại để tuyệt đối không tẩu hỏa nhập ma
+  nv.path = 'ta';
+  delete nv.pathShift;
+  delete nv.erodeFrac;
+
+  updateNhanVat({ path: 'ta', chiSo: cs });
+  notify('🔥 Ma Niệm Đỉnh Phong (600) & Đạo Tâm Bất Hoại (600)! Sát phạt ma công đạt cực hạn.');
+}
+
+export function purifyDemonicIntent(): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const nv = copyObj(state.run.nhanVat);
+  const cs = copyObj(nv.chiSo || {});
+  cs.tam_ma = 0;
+  cs.dao_tam = Math.max(cs.dao_tam || 0, 300);
+  nv.path = 'chinh';
+  delete nv.pathShift;
+  delete nv.erodeFrac;
+
+  updateNhanVat({ path: 'chinh', chiSo: cs });
+  notify('🕊️ Tịnh hóa hoàn toàn Tâm ma & Ma niệm! Đạo tâm thanh tịnh.');
+}
+
+/* ================= NGỰ LINH / LINH THÚ / KHÔI LỖI / THI KHÔI CONTROLLERS ================= */
+
+export function healAllFamiliars(): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const nv = copyObj(state.run.nhanVat);
+  const familiars = nv.familiars || [];
+  if (!familiars.length) {
+    notify('ℹ️ Hiện chưa có linh thú / khôi lỗi nào trong đội hình!');
+    return;
+  }
+
+  familiars.forEach((f: any) => {
+    delete f.injury;
+    if (f.state === 'down') f.state = 'field';
+  });
+
+  updateNhanVat({ familiars });
+  notify(`💖 Đã chữa lành toàn bộ ${familiars.length} linh thú, khôi lỗi, thi khôi về trạng thái hoàn mỹ!`);
+}
+
+export function maxBondAllFamiliars(): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const nv = copyObj(state.run.nhanVat);
+  const familiars = nv.familiars || [];
+  if (!familiars.length) {
+    notify('ℹ️ Hiện chưa có linh thú nào trong đội hình!');
+    return;
+  }
+
+  familiars.forEach((f: any) => {
+    f.bond = 100;
+  });
+
+  updateNhanVat({ familiars });
+  notify(`🌟 Đã kích hoạt Độ Thân Mật Tối Đa (100) cho toàn bộ linh thú!`);
+}
+
+export function upgradeAllFamiliars(): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const nv = copyObj(state.run.nhanVat);
+  const familiars = nv.familiars || [];
+  if (!familiars.length) {
+    notify('ℹ️ Hiện chưa có linh thú nào trong đội hình!');
+    return;
+  }
+
+  const hostRealm = nv.canhGioi || 0;
+  familiars.forEach((f: any) => {
+    f.aptitude = 5; // Thần Huyết / Hoàn Mỹ
+    f.realm = Math.max(f.realm || 0, hostRealm);
+    f.stage = 3; // Đại viên mãn
+    f.exp = 999999;
+    f.bond = 100;
+    delete f.injury;
+  });
+
+  updateNhanVat({ familiars });
+  notify(`⚡ Toàn bộ thú cưng thăng hoa lên Thần Huyết / Phẩm 5 & Cảnh giới đại viên mãn!`);
+}
+
+export function addQuickFamiliar(preset: {
+  name: string;
+  kind: 'linh_thu' | 'thu' | 'trung' | 'khoi_loi' | 'thi' | 'hon';
+  template: string;
+  element: string;
+  realm?: number;
+  stage?: number;
+  aptitude?: number;
+  temper?: string;
+}): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const nv = copyObj(state.run.nhanVat);
+  const familiars = nv.familiars || [];
+
+  // Generate unique fam ID
+  const famId = `fam_${Math.floor(Math.random() * 2176782336).toString(36).padStart(6, '0')}`;
+  const hostRealm = nv.canhGioi || 0;
+
+  const newFam: any = {
+    id: famId,
+    name: preset.name,
+    kind: preset.kind,
+    template: preset.template,
+    realm: preset.realm !== undefined ? preset.realm : hostRealm,
+    stage: preset.stage !== undefined ? preset.stage : 3,
+    exp: 0,
+    aptitude: preset.aptitude || 5,
+    element: preset.element || 'vo_sac',
+    skills: [],
+    traits: ['ho_chu', 'dong_tam'],
+    skillSlots: 4,
+    traitSlots: 2,
+    state: 'field'
+  };
+
+  if (preset.kind === 'linh_thu' || preset.kind === 'thu') {
+    newFam.bond = 100;
+    newFam.temper = preset.temper || 'hien';
+  }
+
+  familiars.push(newFam);
+
+  // Assign to petSlot if empty and it is linh_thu
+  const updates: Record<string, any> = { familiars };
+  if (!nv.petSlot && (preset.kind === 'linh_thu' || preset.kind === 'thu')) {
+    updates.petSlot = famId;
+  }
+
+  // Ensure active familiarSlots
+  if (!nv.familiarSlots || !Array.isArray(nv.familiarSlots)) {
+    updates.familiarSlots = [famId];
+  } else if (!nv.familiarSlots.includes(famId)) {
+    const slots = [...nv.familiarSlots];
+    const emptyIdx = slots.indexOf(null);
+    if (emptyIdx !== -1) {
+      slots[emptyIdx] = famId;
+    } else {
+      slots.push(famId);
+    }
+    updates.familiarSlots = slots;
+  }
+
+  updateNhanVat(updates);
+  notify(`🐾 Đã khế ước & xuất chiến [${preset.name}] thành công!`);
+}
+
+export function removeFamiliar(famId: string): void {
+  const state = getGameState();
+  if (!state || !state.run || !state.run.nhanVat) {
+    notify('⚠️ Hãy bước vào trong kiếp tu tiên trước!');
+    return;
+  }
+  const nv = copyObj(state.run.nhanVat);
+  let familiars = nv.familiars || [];
+  familiars = familiars.filter((f: any) => f.id !== famId);
+
+  const updates: Record<string, any> = { familiars };
+  if (nv.petSlot === famId) updates.petSlot = null;
+  if (Array.isArray(nv.familiarSlots)) {
+    updates.familiarSlots = nv.familiarSlots.map((id: string) => (id === famId ? null : id));
+  }
+
+  updateNhanVat(updates);
+  notify('🍃 Đã giải trừ khế ước linh thú.');
+}
+
+export function addFamiliarFoodPack(): void {
+  const itemsToAdd = [
+    { id: 'item.yeu_dan_5', count: 99 },
+    { id: 'item.yeu_dan_4', count: 99 },
+    { id: 'item.co_khoi_hach', count: 99 },
+    { id: 'item.thi_khoi_hach', count: 99 },
+    { id: 'item.hu_linh_phach', count: 99 },
+    { id: 'item.linh_thach', count: 99999 }
+  ];
+
+  for (const it of itemsToAdd) {
+    addItem(it.id, it.count);
+  }
+
+  notify('🍱 Đã nhận Túi Dưỡng Linh Thú (x99 Yêu Đan 5, Khôi Hạch, Hồn Phách, 99,999 Linh Thạch)!');
 }

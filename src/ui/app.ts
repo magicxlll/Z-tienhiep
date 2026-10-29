@@ -17,10 +17,19 @@ import {
   setLinhCan,
   resetLinhCan,
   updateMetaLuanHoi,
-  unlockAllAchievementsAndFerrymen 
+  unlockAllAchievementsAndFerrymen,
+  setCultivationPath,
+  maximizeDemonicIntent,
+  purifyDemonicIntent,
+  healAllFamiliars,
+  maxBondAllFamiliars,
+  upgradeAllFamiliars,
+  addQuickFamiliar,
+  removeFamiliar,
+  addFamiliarFoodPack
 } from '../core/mutator';
 import { searchItems, getAllAvailableItems, filterItems, CATEGORY_NAMES, getItemInfo, ItemInfo } from '../data/items';
-import { QUALITY_COLORS, THE_CHAT_DB, PRESET_ITEMS } from '../data/presets';
+import { QUALITY_COLORS, THE_CHAT_DB, PRESET_ITEMS, FAMILIAR_PRESETS } from '../data/presets';
 import { autoOptimizeFromBag, applyElementalBuild, ELEMENT_BUILDS } from '../modules/optimizer';
 import { getAllRecipes, giveIngredientsForRecipe, giveCraftedProduct, RecipeInfo } from '../data/recipes';
 import { 
@@ -61,13 +70,14 @@ export function initUI(): void {
     </div>
     <div class="vktt-header">
       <div class="vktt-title-wrap">
-        <span class="vktt-title vktt-rainbow">VẠN KIẾP TU TIÊN</span>
-        <span class="vktt-badge">v3.0 PRO</span>
+        <span class="vktt-title">☯ VẠN KIẾP TU TIÊN</span>
+        <span class="vktt-badge">v3.5 PHIÊN BẢN MỚI</span>
       </div>
       <button class="vktt-close-btn" id="vktt-btn-close">✕</button>
     </div>
     <div class="vktt-tabs">
-      <button class="vktt-tab-btn active" data-tab="tab-nhan-vat">👑 Nhân Vật</button>
+      <button class="vktt-tab-btn active" data-tab="tab-nhan-vat">👑 Tu Tiên</button>
+      <button class="vktt-tab-btn" data-tab="tab-ngu-linh">🐾 Ngự Linh</button>
       <button class="vktt-tab-btn" data-tab="tab-kho-do">🎒 Kho Đồ</button>
       <button class="vktt-tab-btn" data-tab="tab-kinh-mach">📜 Kinh Mạch</button>
       <button class="vktt-tab-btn" data-tab="tab-tu-dong">⚡ Tự Động</button>
@@ -167,6 +177,9 @@ function renderTabContent(tabId: string): void {
   if (tabId === 'tab-nhan-vat') {
     container.innerHTML = getTabNhanVatHtml();
     bindTabNhanVatEvents();
+  } else if (tabId === 'tab-ngu-linh') {
+    container.innerHTML = getTabNguLinhHtml();
+    bindTabNguLinhEvents();
   } else if (tabId === 'tab-kho-do') {
     container.innerHTML = getTabKhoDoHtml();
     bindTabKhoDoEvents();
@@ -333,7 +346,29 @@ function getTabNhanVatHtml(): string {
       </div>
     </div>
 
-    <!-- KHỐI 3: THỂ CHẤT (6 THỂ CHẤT GỐC) & LINH CĂN -->
+    
+    <!-- KHỐI MA ĐẠO (TÀ TU / CHÍNH ĐẠO) -->
+    <div class="vktt-card vktt-card-madao">
+      <div class="vktt-card-hdr">
+        <span>☯ Đạo Cơ: Chính Đạo ⇋ Ma Đạo (Tà Tu)</span>
+        <span class="vktt-badge" style="${nv.path === 'ta' ? 'background:rgba(163,29,29,0.3);color:#ff9e9e;' : 'background:rgba(47,122,92,0.3);color:#a7dfc9;'}">
+          ${nv.path === 'ta' ? '🩸 Tà Tu (Ma Đạo)' : '✨ Chính Đạo'}
+        </span>
+      </div>
+      <div style="font-size:11.5px;color:var(--vktt-chu-nhat);margin-bottom:8px;line-height:1.4;">
+        Cơ chế: Khi là <b>Tà Tu</b>, Tâm Ma biến thành <b>Ma Niệm</b> buff uy lực chiêu thức. Đạo Tâm giữ bản tâm không bị phản phệ.
+      </div>
+      <div class="vktt-row" style="margin-bottom:6px;">
+        <button id="vktt-btn-path-ta" class="vktt-btn vktt-btn-madao" style="flex:1;">🩸 Nhập Ma Đạo (Tà Tu)</button>
+        <button id="vktt-btn-path-chinh" class="vktt-btn vktt-btn-jade" style="flex:1;">✨ Quy Y Chính Đạo</button>
+      </div>
+      <div class="vktt-row">
+        <button id="vktt-btn-max-demon" class="vktt-btn vktt-btn-madao" style="flex:1;">🔥 Max Ma Niệm (600) + Bất Hoại (600 Đạo Tâm)</button>
+        <button id="vktt-btn-purify-demon" class="vktt-btn vktt-btn-phu" style="flex:1;">🕊️ Tịnh Hóa Ma Niệm</button>
+      </div>
+    </div>
+
+    <!-- KHỐI 3: THỂ CHẤT (9 THỂ CHẤT CHUẨN) & LINH CĂN -->
     <div class="vktt-card">
       <div class="vktt-card-hdr">🧬 3. Thể Chất Chuẩn Game & Linh Căn</div>
       <div class="vktt-row">
@@ -343,6 +378,9 @@ function getTabNhanVatHtml(): string {
           <option value="the_chat.kiem_cot" ${nv.theChat === 'the_chat.kiem_cot' ? 'selected' : ''}>⚔️ Kiếm Cốt Thể (Kiếm +25%)</option>
           <option value="the_chat.bach_thao" ${nv.theChat === 'the_chat.bach_thao' ? 'selected' : ''}>🌿 Bách Thảo Thể (Đan tu)</option>
           <option value="the_chat.thiet_cot" ${nv.theChat === 'the_chat.thiet_cot' ? 'selected' : ''}>🛡️ Thiết Cốt Thể (Khí huyết)</option>
+          <option value="the_chat.am_hon" ${nv.theChat === 'the_chat.am_hon' ? 'selected' : ''}>👻 Âm Hồn Thể (+1 Slot Thi/Quỷ - Mới)</option>
+          <option value="the_chat.huyen_vu" ${nv.theChat === 'the_chat.huyen_vu' ? 'selected' : ''}>🐢 Huyền Vũ Thể (Kháng Phản Phệ 50% - Mới)</option>
+          <option value="the_chat.liet_duong" ${nv.theChat === 'the_chat.liet_duong' ? 'selected' : ''}>☀️ Liệt Dương Thể (Tu Luyện +25%, Hỏa +25% - Mới)</option>
           <option value="the_chat.pham_the" ${nv.theChat === 'the_chat.pham_the' ? 'selected' : ''}>👤 Phàm Thể</option>
         </select>
         <button id="vktt-btn-tc" class="vktt-btn vktt-btn-purple vktt-btn-sm">Gán Thể Chất</button>
@@ -767,7 +805,253 @@ function bindTabNhanVatEvents(): void {
   }
 }
 
-/* ================= TAB 2: KHO ĐỒ ================= */
+
+/* ================= TAB: NGỰ LINH & THÚ CƯNG ================= */
+function getTabNguLinhHtml(): string {
+  const state = getGameState();
+  const nv = state?.run?.nhanVat || {};
+  const familiars: any[] = nv.familiars || [];
+  const petSlot = nv.petSlot;
+
+  const KIND_NAMES: Record<string, string> = {
+    linh_thu: 'Linh Thú',
+    thu: 'Ngự Thú',
+    trung: 'Cổ Trùng',
+    khoi_loi: 'Khôi Lỗi',
+    thi: 'Thi Khôi',
+    hon: 'Quỷ Hồn'
+  };
+
+  const REALM_NAMES: Record<number, string> = {
+    0: 'Nhất Giai', 1: 'Nhị Giai', 2: 'Tam Giai', 3: 'Tứ Giai', 4: 'Ngũ Giai', 5: 'Lục Giai'
+  };
+  const STAGE_NAMES: Record<number, string> = {
+    0: 'Sơ kỳ', 1: 'Trung kỳ', 2: 'Hậu kỳ', 3: 'Đại viên mãn'
+  };
+  const APTITUDE_NAMES: Record<number, string> = {
+    1: 'Phàm Huyết / Hạ',
+    2: 'Linh Huyết / Trung',
+    3: 'Dị Huyết / Thượng',
+    4: 'Chân Huyết / Cực',
+    5: 'Thần Huyết / Hoàn Mỹ'
+  };
+
+  const INJURY_DESC = ['Lành lặn 100%', 'Thương nhẹ', 'Thương nặng', 'Trọng thương', 'Hấp hối'];
+
+  return `
+    <!-- KHỐI TỔNG QUAN NGỰ LINH -->
+    <div class="vktt-stat-overview">
+      <div>🐾 Số lượng linh sủng: <b>${familiars.length}</b></div>
+      <div>⚔️ Trạng thái: <b style="color:#5ce3af;">${familiars.some(f => f.state === 'field') ? 'Đang Xuất Trận' : 'Trong Túi'}</b></div>
+      <div style="grid-column: span 2;">🌟 Linh thú bản mệnh: <b style="color:var(--vktt-vang-kim-nhat);">${familiars.find(f => f.id === petSlot)?.name || 'Chưa gán'}</b></div>
+    </div>
+
+    <!-- CÁC THAO TÁC 1-CLICK -->
+    <div class="vktt-card vktt-card-ngulinh">
+      <div class="vktt-card-hdr">⚡ Thao Tác Thần Tốc Toàn Bộ Ngự Linh</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+        <button id="vktt-btn-heal-familiars" class="vktt-btn vktt-btn-jade">💖 Chữa Lành 100%</button>
+        <button id="vktt-btn-bond-familiars" class="vktt-btn vktt-btn-gold">🌟 Max Thân Mật (100)</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <button id="vktt-btn-upgrade-familiars" class="vktt-btn vktt-btn-block">⚡ Lên Thần Huyết (Phẩm 5)</button>
+        <button id="vktt-btn-feed-familiars" class="vktt-btn vktt-btn-phu">🍱 Túi Thức Ăn (x99)</button>
+      </div>
+    </div>
+
+    <!-- KHỐI KHẾ ƯỚC NHANH LINH THÚ / MA THI / QUỶ HỒN -->
+    <div class="vktt-card">
+      <div class="vktt-card-hdr">✨ Khế Ước Nhanh Thần Thú / Khôi Lỗi / Ma Thi / Quỷ Hồn</div>
+      <div class="vktt-row">
+        <select id="vktt-sel-quick-familiar" class="vktt-select" style="flex:1;">
+          ${FAMILIAR_PRESETS.map((p, idx) => `
+            <option value="${idx}">${p.icon} ${p.name} [${KIND_NAMES[p.kind] || p.kind} - ${p.element.toUpperCase()}]</option>
+          `).join('')}
+        </select>
+        <button id="vktt-btn-add-quick-fam" class="vktt-btn vktt-btn-jade vktt-btn-sm">+ Khế Ước</button>
+      </div>
+      <div id="vktt-fam-preset-desc" style="font-size:11px;color:var(--vktt-chu-nhat);margin-top:4px;">
+        ${FAMILIAR_PRESETS[0]?.desc || ''}
+      </div>
+    </div>
+
+    <!-- DANH SÁCH LINH THÚ HIỆN TẠI -->
+    <div class="vktt-card">
+      <div class="vktt-card-hdr">
+        <span>📋 Danh Sách Ngự Linh Đang Nuôi (${familiars.length})</span>
+      </div>
+      <div id="vktt-familiar-list">
+        ${familiars.length === 0 ? `
+          <div style="font-size:12px;color:var(--vktt-chu-nhat);text-align:center;padding:16px;">
+            Đạo hữu chưa có linh thú hay khôi lỗi nào. Hãy chọn mục "Khế Ước Nhanh" phía trên để triệu hồi!
+          </div>
+        ` : familiars.map(f => {
+          const kindName = KIND_NAMES[f.kind] || f.kind;
+          const realmName = REALM_NAMES[f.realm] || `${f.realm} Giai`;
+          const stageName = STAGE_NAMES[f.stage] || '';
+          const aptName = APTITUDE_NAMES[f.aptitude] || `Phẩm ${f.aptitude}`;
+          const injuryLvl = f.injury?.level || 0;
+          const isMain = petSlot === f.id;
+
+          return `
+            <div class="vktt-familiar-card">
+              <div class="vktt-familiar-hdr">
+                <span class="vktt-familiar-title">
+                  ${isMain ? '👑 ' : '🐾 '}${f.name || f.template}
+                  <span class="vktt-badge" style="margin-left:4px;">${kindName}</span>
+                </span>
+                <span style="font-size:10.5px;color:${injuryLvl > 0 ? '#ff8585' : '#5ce3af'};">
+                  ${INJURY_DESC[injuryLvl] || 'Lành lặn'}
+                </span>
+              </div>
+              <div class="vktt-familiar-meta">
+                <span>Cảnh Giới: <b>${realmName} ${stageName}</b></span>
+                <span>Huyết Mạch: <b style="color:var(--vktt-vang-kim);">${aptName}</b></span>
+                <span>Hệ: <b>${(f.element || 'vô sắc').toUpperCase()}</b></span>
+                ${f.bond !== undefined ? `<span>Thân Mật: <b>${f.bond}/100</b></span>` : ''}
+                ${f.temper ? `<span>Tính cách: <b>${f.temper}</b></span>` : ''}
+              </div>
+              <div class="vktt-familiar-actions">
+                <button class="vktt-btn vktt-btn-sm vktt-btn-phu vktt-act-fam-heal" data-id="${f.id}">💖 Trị Thương</button>
+                <button class="vktt-btn vktt-btn-sm vktt-btn-phu vktt-act-fam-max" data-id="${f.id}">🌟 Thần Huyết</button>
+                ${!isMain && (f.kind === 'linh_thu' || f.kind === 'thu') ? `
+                  <button class="vktt-btn vktt-btn-sm vktt-btn-gold vktt-act-fam-setmain" data-id="${f.id}">👑 Đặt Chủ Lực</button>
+                ` : ''}
+                <button class="vktt-btn vktt-btn-sm vktt-btn-ghost vktt-act-fam-del" data-id="${f.id}" style="color:#ff8585;margin-left:auto;">Thả Về Rừng</button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function bindTabNguLinhEvents(): void {
+  const selPreset = document.getElementById('vktt-sel-quick-familiar') as HTMLSelectElement | null;
+  const descEl = document.getElementById('vktt-fam-preset-desc');
+  if (selPreset && descEl) {
+    selPreset.onchange = () => {
+      const idx = parseInt(selPreset.value, 10);
+      if (FAMILIAR_PRESETS[idx]) {
+        descEl.innerText = FAMILIAR_PRESETS[idx].desc;
+      }
+    };
+  }
+
+  const btnAddQuick = document.getElementById('vktt-btn-add-quick-fam');
+  if (btnAddQuick && selPreset) {
+    btnAddQuick.onclick = () => {
+      const idx = parseInt(selPreset.value, 10);
+      const p = FAMILIAR_PRESETS[idx];
+      if (p) {
+        addQuickFamiliar({
+          name: p.name,
+          kind: p.kind as any,
+          template: p.template,
+          element: p.element,
+          realm: p.realm,
+          stage: p.stage,
+          aptitude: p.aptitude,
+          temper: p.temper
+        });
+        renderTabContent('tab-ngu-linh');
+      }
+    };
+  }
+
+  const btnHealAll = document.getElementById('vktt-btn-heal-familiars');
+  if (btnHealAll) {
+    btnHealAll.onclick = () => {
+      healAllFamiliars();
+      renderTabContent('tab-ngu-linh');
+    };
+  }
+
+  const btnBondAll = document.getElementById('vktt-btn-bond-familiars');
+  if (btnBondAll) {
+    btnBondAll.onclick = () => {
+      maxBondAllFamiliars();
+      renderTabContent('tab-ngu-linh');
+    };
+  }
+
+  const btnUpgradeAll = document.getElementById('vktt-btn-upgrade-familiars');
+  if (btnUpgradeAll) {
+    btnUpgradeAll.onclick = () => {
+      upgradeAllFamiliars();
+      renderTabContent('tab-ngu-linh');
+    };
+  }
+
+  const btnFeed = document.getElementById('vktt-btn-feed-familiars');
+  if (btnFeed) {
+    btnFeed.onclick = () => {
+      addFamiliarFoodPack();
+    };
+  }
+
+  // Individual familiar actions
+  document.querySelectorAll<HTMLButtonElement>('.vktt-act-fam-heal').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      if (!id) return;
+      const state = getGameState();
+      const nv = state?.run?.nhanVat;
+      if (!nv) return;
+      const fam = (nv.familiars || []).find((f: any) => f.id === id);
+      if (fam) {
+        delete fam.injury;
+        if (fam.state === 'down') fam.state = 'field';
+        updateNhanVat({ familiars: nv.familiars });
+        notify(`💖 Đã chữa lành cho ${fam.name || id}!`);
+        renderTabContent('tab-ngu-linh');
+      }
+    };
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.vktt-act-fam-max').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      if (!id) return;
+      const state = getGameState();
+      const nv = state?.run?.nhanVat;
+      if (!nv) return;
+      const fam = (nv.familiars || []).find((f: any) => f.id === id);
+      if (fam) {
+        fam.aptitude = 5;
+        fam.stage = 3;
+        fam.exp = 999999;
+        fam.bond = 100;
+        delete fam.injury;
+        updateNhanVat({ familiars: nv.familiars });
+        notify(`🌟 ${fam.name || id} đã thức tỉnh Thần Huyết phẩm 5 & Đại viên mãn!`);
+        renderTabContent('tab-ngu-linh');
+      }
+    };
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.vktt-act-fam-setmain').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      if (!id) return;
+      updateNhanVat({ petSlot: id });
+      notify('👑 Đã đặt làm linh thú bản mệnh!');
+      renderTabContent('tab-ngu-linh');
+    };
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.vktt-act-fam-del').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      if (!id) return;
+      removeFamiliar(id);
+      renderTabContent('tab-ngu-linh');
+    };
+  });
+}
+
+/* ================= TAB 3: KHO ĐỒ ================= */
 
 // Catalog state
 let catalogCatFilter = 'all';
@@ -878,6 +1162,9 @@ function getTabKhoDoHtml(): string {
             <option value="moc">🌿 Mộc Tu / Trường Sinh (Full Mộc/Phong Phẩm 7-8)</option>
             <option value="tho">⛰️ Thổ Tu / Bất Diệt (Full Thổ Phẩm 7-8)</option>
             <option value="loi_phong">⚡ Lôi / Phong Tu (Full Biến Dị Phẩm 7)</option>
+            <option value="ma_dao">🩸 Huyết Ma / Ma Tu (Ma Đạo Tối Thượng)</option>
+            <option value="ngu_linh">🐾 Ngự Linh / Vạn Thú (Thần Thú Triều Phụng)</option>
+            <option value="luyen_thi">🧟 Thi Khôi / Quỷ Đạo (Luyện Thi & Câu Hồn)</option>
           </select>
           <button id="vktt-btn-apply-opt-build" class="vktt-btn vktt-btn-cyan vktt-btn-sm">Gán Build</button>
         </div>
@@ -1195,7 +1482,7 @@ function getTabKinhMachHtml(): string {
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
         <button id="vktt-btn-all-profs" class="vktt-btn vktt-btn-ghost">⚒️ Tông Sư 3 Nghề</button>
-        <button id="vktt-btn-all-recipes" class="vktt-btn vktt-btn-ghost">🔥 Học 216 Đơn Phương</button>
+        <button id="vktt-btn-all-recipes" class="vktt-btn vktt-btn-ghost">🔥 Học 315 Đơn Phương & Trận Đồ</button>
       </div>
       <button id="vktt-btn-all-skills" class="vktt-btn vktt-btn-block" style="margin-top:6px;">
         ⚡ Học Toàn Bộ 87 Kỹ Pháp & Công Pháp Cực Phẩm
@@ -1209,9 +1496,10 @@ function getTabKinhMachHtml(): string {
       </div>
       <!-- 3 SUB-TABS -->
       <div class="vktt-subtabs" id="vktt-craft-subtabs">
-        <button class="vktt-subtab-btn ${currentCraftType === 'luyen_dan' ? 'active' : ''}" data-craft="luyen_dan">🌿 Luyện Đan (69)</button>
-        <button class="vktt-subtab-btn ${currentCraftType === 'luyen_bao' ? 'active' : ''}" data-craft="luyen_bao">⚔️ Luyện Bảo / Khí (112)</button>
-        <button class="vktt-subtab-btn ${currentCraftType === 'che_phu' ? 'active' : ''}" data-craft="che_phu">📜 Chế Phù (35)</button>
+        <button class="vktt-subtab-btn ${currentCraftType === 'luyen_dan' ? 'active' : ''}" data-craft="luyen_dan">🌿 Luyện Đan (73)</button>
+        <button class="vktt-subtab-btn ${currentCraftType === 'luyen_bao' ? 'active' : ''}" data-craft="luyen_bao">⚔️ Luyện Khí (118)</button>
+        <button class="vktt-subtab-btn ${currentCraftType === 'che_phu' ? 'active' : ''}" data-craft="che_phu">📜 Chế Phù (65)</button>
+        <button class="vktt-subtab-btn ${currentCraftType === 'tran_phap' ? 'active' : ''}" data-craft="tran_phap">🔯 Trận Pháp (59)</button>
       </div>
 
       <div style="margin-bottom:6px;">

@@ -73,6 +73,44 @@ f d 2 b 2 3 5
 4 2 0 0 0 c 4
 5 3 2 b 2 3 5
 . 5 3 d 3 f .
+`,
+  'the_chat.am_hon': `
+. . . 5 f 5 . . .
+. . 4 4 e 4 4 . .
+. 5 3 2 2 2 3 d .
+5 3 2 1 1 1 2 3 5
+e 2 1 0 0 0 1 2 4
+4 c 1 0 D 0 1 c 4
+5 3 2 0 0 0 2 3 5
+. 4 b 1 1 1 2 4 .
+. . 3 2 . 2 3 . .
+. . . 5 . 5 . . .
+`,
+  'the_chat.huyen_vu': `
+. . . 5 4 4 4 5 . . .
+. . 5 3 3 3 3 3 5 . .
+. 4 3 2 2 2 2 2 3 4 .
+5 3 2 1 1 1 1 1 2 3 5
+4 3 2 1 0 0 0 1 2 c 4
+4 2 1 1 0 D 0 1 1 2 4
+4 3 2 1 0 0 0 1 2 3 4
+5 3 2 1 1 1 1 1 2 3 5
+. 4 3 2 2 2 2 2 3 4 .
+. . 5 3 3 3 3 3 5 . .
+. . . 5 4 e 4 5 . . .
+`,
+  'the_chat.liet_duong': `
+. . . . . 5 . . . . .
+. . . . . f . . . . .
+. . . 4 3 3 3 4 . . .
+. . 3 2 1 1 1 2 3 . .
+. 4 2 1 0 0 0 1 2 4 .
+5 d 3 1 0 D 0 1 3 e 5
+. 4 2 1 0 0 0 1 2 4 .
+. . 3 2 1 b 1 2 3 . .
+. . . 4 3 3 3 4 . . .
+. . . . . c . . . . .
+. . . . . 5 . . . . .
 `
 };
 
@@ -551,6 +589,69 @@ export const ELEMENT_BUILDS: Record<string, {
       'item.nghich_lan_thuan',
       'item.van_kiep_hon_dang',
       'item.toai_thien_kiem'
+    ]
+  },
+  ma_dao: {
+    name: '🩸 Huyết Ma / Ma Tu (Ma Đạo Tối Thượng)',
+    elements: ['hoa', 'kim', 'thuy'],
+    linhCanPham: 'bien_di',
+    items: [
+      'item.thien_ma_chan_kinh',
+      'item.huyet_ma_thien_dao',
+      'item.huyet_ma_nghich_mach',
+      'item.hoa_huyet_dai_phap',
+      'item.nhiep_hon_dai_phap',
+      'item.yeu_hoang_huyet_kinh',
+      'item.cuu_u_am_hoa',
+      'item.huyet_ha_phien',
+      'item.van_hon_chu',
+      'item.nhiep_hon_linh',
+      'item.phe_huyet_ma_dao',
+      'item.van_doc_phien',
+      'item.van_kiep_hon_dang',
+      'item.toai_thien_kiem'
+    ]
+  },
+  ngu_linh: {
+    name: '🐾 Ngự Linh / Vạn Thú (Thần Thú Triều Phụng)',
+    elements: ['moc', 'thuy', 'tho'],
+    linhCanPham: 'thien',
+    items: [
+      'item.van_thu_trieu_phong',
+      'item.kien_moc_thien_kinh',
+      'item.truong_sinh_chan_kinh',
+      'item.thanh_de_truong_xuan_kinh',
+      'item.huyen_vu_chan_kinh',
+      'item.yeu_hoang_huyet_kinh',
+      'item.ngu_to_hop_dao_quyet',
+      'item.ngu_thu_hoan',
+      'item.ngu_thu_lenh',
+      'item.van_yeu_phien',
+      'item.thanh_moc_tu_linh_chau',
+      'item.thai_co_long_lan',
+      'item.hon_thien_lang',
+      'item.nghich_lan_thuan'
+    ]
+  },
+  luyen_thi: {
+    name: '🧟 Thi Khôi / Quỷ Đạo (Luyện Thi & Câu Hồn)',
+    elements: ['tho', 'kim', 'bang'],
+    linhCanPham: 'bien_di',
+    items: [
+      'item.thiet_thi_khoi',
+      'item.cuong_thi_tuong',
+      'item.nhiep_hon_dai_phap',
+      'item.bat_diet_kim_than',
+      'item.huyen_vu_chan_kinh',
+      'item.khon_nguyen_than_kinh',
+      'item.luan_hoi_chan_kinh',
+      'item.nhan_cu',
+      'item.thi_khoi_hach',
+      'item.hu_linh_phach',
+      'item.ban_son_an',
+      'item.nghich_lan_thuan',
+      'item.thai_co_long_lan',
+      'item.van_kiep_hon_dang'
     ]
   }
 };
